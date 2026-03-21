@@ -27,7 +27,7 @@
 //! - ABI Stablizaation.
 //!
 //! # Common Usage
-//! 
+//!
 //! This library is intended to be used as a build script. It does not facilitate how data is loaded
 //! but users are welcome to create their own on top of this library.
 //!
@@ -89,12 +89,11 @@ use std::cmp::max;
 
 #[cfg(feature = "image")]
 use image::DynamicImage;
-
-use util::{Rect, RotatableRect};
+use util::Rect;
+use util::RotatableRect;
 
 /// Represents an axis aligned rectangle to be packed in a bin.
-pub trait AtlasRect
-{
+pub trait AtlasRect {
 	/// The width size dimension of the rectangle.
 	fn width(&self) -> u32;
 
@@ -102,62 +101,48 @@ pub trait AtlasRect
 	fn height(&self) -> u32;
 }
 
-impl<'a> AtlasRect + 'a
-{
+impl<'a> AtlasRect + 'a {
 	/// Returns the total number of pixels this rectangle takes up.
-	pub fn area(&self) -> u64
-	{
+	pub fn area(&self) -> u64 {
 		self.width() as u64 * self.height() as u64
 	}
 
 	/// Returns true if this rectangle has an area of 0.
-	pub fn empty(&self) -> bool
-	{
+	pub fn empty(&self) -> bool {
 		self.width() == 0 || self.height() == 0
 	}
 
 	/// Returns the dimensions of this rectangle.
-	pub fn dimensions(&self) -> Rect
-	{
+	pub fn dimensions(&self) -> Rect {
 		Rect::new(self.width(), self.height())
 	}
 
 	/// Returns the dimensions of this rect with width and height inverted if `rotate` is `true`.
-	pub fn dimensions_rotated(&self, rotate: bool) -> Rect
-	{
-		if !rotate
-		{
+	pub fn dimensions_rotated(&self, rotate: bool) -> Rect {
+		if !rotate {
 			self.dimensions()
-		}
-		else
-		{
+		} else {
 			Rect::new(self.height(), self.width())
 		}
 	}
 
 	/// Returns a rect with the longest dimension being its width and its other being its height.
-	pub fn dimensions_longest(&self) -> RotatableRect
-	{
+	pub fn dimensions_longest(&self) -> RotatableRect {
 		self.dimensions_longest_rotated(true)
 	}
 
 	/// Returns `dimensions_longest` if `rotate` is true or `dimensions` otherwise.
-	pub fn dimensions_longest_rotated(&self, rotate: bool) -> RotatableRect
-	{
-		if (self.width() >= self.height() && rotate) || !rotate
-		{
+	pub fn dimensions_longest_rotated(&self, rotate: bool) -> RotatableRect {
+		if (self.width() >= self.height() && rotate) || !rotate {
 			RotatableRect::new(self.width(), self.height(), false)
-		}
-		else
-		{
+		} else {
 			RotatableRect::new(self.height(), self.width(), true)
 		}
 	}
 }
 
 /// References an axis aligned rect placed in a bin by index.
-pub struct AtlasPart
-{
+pub struct AtlasPart {
 	/// The index of the original rect list that this class references.
 	pub rect_index: usize,
 
@@ -178,9 +163,7 @@ pub struct AtlasPart
 /// atlas generators play nicely and conform to all rules. The bin size should be the minimum
 /// bounding size, capable of encapsulating all objects. Each object should also not pass through
 /// any boundaries and should be disjoint.
-///
-pub struct AtlasBin
-{
+pub struct AtlasBin {
 	/// The bounding dimensions of the bin.
 	dimensions: Rect,
 
@@ -188,44 +171,36 @@ pub struct AtlasBin
 	part_list: Vec<AtlasPart>,
 }
 
-impl AtlasBin
-{
+impl AtlasBin {
 	/// Initializes a new bin with the given rect at the top right of the bin.
-	fn new(rect_index: usize, dimensions: Rect, rotate: bool) -> Self
-	{
-		let part = AtlasPart
-		{
+	fn new(rect_index: usize, dimensions: Rect, rotate: bool) -> Self {
+		let part = AtlasPart {
 			rect_index,
 			x: 0,
 			y: 0,
 			rotate,
 		};
-		AtlasBin
-		{
+		AtlasBin {
 			dimensions,
 			part_list: vec![part],
 		}
 	}
 
 	/// Returns the current bounding dimensions of the bin.
-	pub fn dimensions(&self) -> Rect
-	{
+	pub fn dimensions(&self) -> Rect {
 		self.dimensions
 	}
 
 	/// Returns the parts in this bin.
-	pub fn part_list(&self) -> &[AtlasPart]
-	{
+	pub fn part_list(&self) -> &[AtlasPart] {
 		&self.part_list
 	}
 
 	/// Adds a new rect to the bin. The size of the bin increases if mandatory.
-	fn part_add(&mut self, rect_index: usize, x: u32, y: u32, dimensions: Rect, rotate: bool)
-	{
+	fn part_add(&mut self, rect_index: usize, x: u32, y: u32, dimensions: Rect, rotate: bool) {
 		self.dimensions.width = max(self.dimensions.width, x + dimensions.width);
 		self.dimensions.height = max(self.dimensions.height, y + dimensions.height);
-		self.part_list.push(AtlasPart
-		{
+		self.part_list.push(AtlasPart {
 			rect_index,
 			x,
 			y,
@@ -234,17 +209,14 @@ impl AtlasBin
 	}
 }
 
-impl AsRef<Rect> for AtlasBin
-{
-	fn as_ref(&self) -> &Rect
-	{
+impl AsRef<Rect> for AtlasBin {
+	fn as_ref(&self) -> &Rect {
 		&self.dimensions
 	}
 }
 
 /// Generates a texture atlas using a bin packing algorithm.
-pub trait AtlasGenerator
-{
+pub trait AtlasGenerator {
 	/// Generates a list of bins for the given atlas.
 	fn generate<T: AtlasRect>(&self, atlas: &mut Atlas<T>, width: u32, height: u32, rotate: bool);
 }
@@ -254,65 +226,56 @@ pub trait AtlasGenerator
 /// This data structure is essentially a wrapper on `Vec<T>` with the difference that it tracks
 /// total area of all rects in order to calculate a lower bound of the number of bins. By using a
 /// lower bound, an atlas may potentially re-allocate less.
-///
-pub struct AtlasRectList<T: AtlasRect>
-{
+pub struct AtlasRectList<T: AtlasRect> {
 	rect_list: Vec<T>,
 	total_area: u64,
 }
 
-impl<T> AtlasRectList<T> where T: AtlasRect
+impl<T> AtlasRectList<T>
+where
+	T: AtlasRect,
 {
 	/// Constructs a new, empty list.
-	pub fn new() -> Self
-	{
-		AtlasRectList
-		{
+	pub fn new() -> Self {
+		AtlasRectList {
 			rect_list: Vec::new(),
 			total_area: 0,
 		}
 	}
 
 	/// Constructs a new, empty list with the specified capacity.
-	pub fn with_capacity(capacity: usize) -> Self
-	{
-		AtlasRectList
-		{
+	pub fn with_capacity(capacity: usize) -> Self {
+		AtlasRectList {
 			rect_list: Vec::with_capacity(capacity),
 			total_area: 0,
 		}
 	}
 
 	/// Returns the number of rects in the list.
-	pub fn len(&self) -> usize
-	{
+	pub fn len(&self) -> usize {
 		self.rect_list.len()
 	}
 
 	/// Adds the given rect to the list and potentially increases the lower bound.
-	pub fn add(&mut self, rect: T)
-	{
+	pub fn add(&mut self, rect: T) {
 		self.total_area += (&rect as &AtlasRect).area();
 		self.rect_list.push(rect);
 	}
 
 	/// Returns the total area of all rects in this list combined.
-	pub fn total_area(&self) -> u64
-	{
+	pub fn total_area(&self) -> u64 {
 		self.total_area
 	}
 
 	/// Returns the lower bound of bins needed for the rects in this list.
-	pub fn lower_bound(&self, size: Rect) -> usize
-	{
+	pub fn lower_bound(&self, size: Rect) -> usize {
 		let atlas_rect = &size as &AtlasRect;
 		assert_eq!(atlas_rect.empty(), false);
 		((self.total_area / atlas_rect.area()) + 1) as usize
 	}
 
 	/// Returns an atlas builder using this rect list and given constraints.
-	pub fn build(&self, width: u32, height: u32, rotate: bool) -> AtlasBuilder<T>
-	{
+	pub fn build(&self, width: u32, height: u32, rotate: bool) -> AtlasBuilder<T> {
 		let lower_bound = self.lower_bound(Rect::new(width, height));
 		AtlasBuilder::new(&self.rect_list, width, height, rotate, lower_bound)
 	}
@@ -323,8 +286,9 @@ impl<T> AtlasRectList<T> where T: AtlasRect
 /// The builder takes a few constraints. It takes a maximal width and height constraint, which atlas
 /// generators are not expected to exceed. It also takes a flag indicating whether or not rotations
 /// should be allowed by generators.
-///
-pub struct AtlasBuilder<'a, T> where T: 'a + AtlasRect
+pub struct AtlasBuilder<'a, T>
+where
+	T: 'a + AtlasRect,
 {
 	rect_list: &'a [T],
 	width: u32,
@@ -333,25 +297,23 @@ pub struct AtlasBuilder<'a, T> where T: 'a + AtlasRect
 	rotate: bool,
 }
 
-impl<'a, T> AtlasBuilder<'a, T> where T: 'a + AtlasRect
+impl<'a, T> AtlasBuilder<'a, T>
+where
+	T: 'a + AtlasRect,
 {
-	fn new(rect_list: &'a [T], width: u32, height: u32, rotate: bool, lower_bound: usize) -> Self
-	{
-		AtlasBuilder
-		{
+	fn new(rect_list: &'a [T], width: u32, height: u32, rotate: bool, lower_bound: usize) -> Self {
+		AtlasBuilder {
 			rect_list,
 			width,
 			height,
 			lower_bound,
-			rotate
+			rotate,
 		}
 	}
 
 	/// Generates bins using the given generator.
-	pub fn generate<G: AtlasGenerator>(self, generator: &G) -> Atlas<'a, T>
-	{
-		let mut atlas = Atlas
-		{
+	pub fn generate<G: AtlasGenerator>(self, generator: &G) -> Atlas<'a, T> {
+		let mut atlas = Atlas {
 			rect_list: self.rect_list,
 			bin_list: Vec::with_capacity(self.lower_bound),
 		};
@@ -361,45 +323,40 @@ impl<'a, T> AtlasBuilder<'a, T> where T: 'a + AtlasRect
 }
 
 /// Encapsulates axis aligned rectangles and generated bins.
-pub struct Atlas<'a, T: 'a + AtlasRect>
-{
+pub struct Atlas<'a, T: 'a + AtlasRect> {
 	rect_list: &'a [T],
 	bin_list: Vec<AtlasBin>,
 }
 
-impl<'a, T> Atlas<'a, T> where T: 'a + AtlasRect
+impl<'a, T> Atlas<'a, T>
+where
+	T: 'a + AtlasRect,
 {
 	/// Returns a builder instance with the given size constraints.
-	pub fn build(rect_list: &'a [T], width: u32, height: u32, rotate: bool) -> AtlasBuilder<T>
-	{
+	pub fn build(rect_list: &'a [T], width: u32, height: u32, rotate: bool) -> AtlasBuilder<T> {
 		AtlasBuilder::new(rect_list, width, height, rotate, 1)
 	}
 
 	/// Creates a new atlas with the given axis-aligned rectangles.
-	pub fn new(rect_list: &'a [T]) -> Self
-	{
-		Self
-		{
+	pub fn new(rect_list: &'a [T]) -> Self {
+		Self {
 			rect_list,
 			bin_list: Vec::new(),
 		}
 	}
 
 	/// Returns the list of axis-aligned rectangles that are part of the atlas.
-	pub fn rect_list(&self) -> &[T]
-	{
+	pub fn rect_list(&self) -> &[T] {
 		&self.rect_list
 	}
 
 	/// Returns the bins that reference the rects.
-	pub fn bin_list(&self) -> &[AtlasBin]
-	{
+	pub fn bin_list(&self) -> &[AtlasBin] {
 		&self.bin_list
 	}
 
 	/// Creates a new bin with the given rect at the top left.
-	pub fn bin_add_new(&mut self, rect_index: usize, rotate: bool) -> usize
-	{
+	pub fn bin_add_new(&mut self, rect_index: usize, rotate: bool) -> usize {
 		let bin_index = self.bin_list.len();
 		let dimensions = (&self.rect_list[rect_index] as &AtlasRect).dimensions_rotated(rotate);
 		self.bin_list.push(AtlasBin::new(rect_index, dimensions, rotate));
@@ -407,29 +364,32 @@ impl<'a, T> Atlas<'a, T> where T: 'a + AtlasRect
 	}
 
 	/// Adds a new rect to the indicated bin.
-	pub fn bin_add_rect(&mut self, bin_index: usize, rect_index: usize, x: u32, y: u32, rotate: bool)
-	{
+	pub fn bin_add_rect(
+		&mut self,
+		bin_index: usize,
+		rect_index: usize,
+		x: u32,
+		y: u32,
+		rotate: bool,
+	) {
 		let dimensions = (&self.rect_list[rect_index] as &AtlasRect).dimensions_rotated(rotate);
 		self.bin_list[bin_index].part_add(rect_index, x, y, dimensions, rotate);
 	}
 
 	#[cfg(feature = "image")]
 	/// Generates an image from the indicated bin with uniformly separated colors.
-	pub fn bin_as_colors(&self, bin_index: usize) -> DynamicImage
-	{
+	pub fn bin_as_colors(&self, bin_index: usize) -> DynamicImage {
 		let weight = util::colors_weight(self.rect_list.len());
 		util::colors_from_bin(weight, self.rect_list, &self.bin_list[bin_index])
 	}
 
 	#[cfg(feature = "image")]
 	/// Generates images from the generated bins with uniformly separated colors.
-	pub fn as_colors(&self) -> Vec<DynamicImage>
-	{
+	pub fn as_colors(&self) -> Vec<DynamicImage> {
 		let weight = util::colors_weight(self.rect_list.len());
 		let mut image_list = Vec::with_capacity(self.rect_list.len());
 
-		for bin in &self.bin_list
-		{
+		for bin in &self.bin_list {
 			image_list.push(util::colors_from_bin(weight, self.rect_list, bin));
 		}
 		image_list
@@ -437,21 +397,20 @@ impl<'a, T> Atlas<'a, T> where T: 'a + AtlasRect
 }
 
 #[cfg(feature = "image")]
-impl<'a, T> Atlas<'a, T> where T: AtlasRect + Borrow<DynamicImage>
+impl<'a, T> Atlas<'a, T>
+where
+	T: AtlasRect + Borrow<DynamicImage>,
 {
 	/// Returns the given bin as an image.
-	pub fn bin_as_image(&self, bin_index: usize) -> DynamicImage
-	{
+	pub fn bin_as_image(&self, bin_index: usize) -> DynamicImage {
 		util::image_from_bin(self.rect_list, &self.bin_list[bin_index])
 	}
 
 	/// Generates images from the generated bin using the given image objects.
-	pub fn as_images(&self) -> Vec<DynamicImage>
-	{
+	pub fn as_images(&self) -> Vec<DynamicImage> {
 		let mut image_list = Vec::with_capacity(self.rect_list.len());
 
-		for bin in &self.bin_list
-		{
+		for bin in &self.bin_list {
 			image_list.push(util::image_from_bin(self.rect_list, bin));
 		}
 		image_list

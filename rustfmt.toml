@@ -1,0 +1,35 @@
+array_width = 0
+attr_fn_like_width = 0
+fn_call_width = 100
+hard_tabs = true
+max_width = 100
+newline_style = "Unix"
+short_array_element_width_threshold = 0
+single_line_if_else_max_width = 0
+single_line_let_else_max_width = 0
+struct_lit_width = 0
+struct_variant_width = 0
+use_small_heuristics = "Off"
+
+# Unstable features.
+unstable_features = true
+# https://github.com/rust-lang/rustfmt/issues/3349
+comment_width = 100
+# https://github.com/rust-lang/rustfmt/issues/3391
+error_on_line_overflow = true
+# https://github.com/rust-lang/rustfmt/issues/3374
+force_multiline_blocks = true
+# https://github.com/rust-lang/rustfmt/issues/3348
+format_code_in_doc_comments = true
+# https://github.com/rust-lang/rustfmt/issues/5083
+group_imports = "StdExternalCrate"
+# https://github.com/rust-lang/rustfmt/issues/4991
+imports_granularity = "Item"
+# https://github.com/rust-lang/rustfmt/issues/3360
+imports_layout = "Horizontal"
+# https://github.com/rust-lang/rustfmt/issues/3343
+inline_attribute_width = 0
+# https://github.com/rust-lang/rustfmt/issues/3346
+struct_lit_single_line = false
+# https://github.com/rust-lang/rustfmt/issues/3347
+wrap_comments = true

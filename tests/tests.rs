@@ -1,23 +1,23 @@
 extern crate texture_atlas;
 
-use texture_atlas::{Atlas, AtlasBin, AtlasGenerator, AtlasRect};
-use texture_atlas::gen::{BinaryTreeGenerator, PassthroughGenerator};
+use texture_atlas::gen::BinaryTreeGenerator;
+use texture_atlas::gen::PassthroughGenerator;
 use texture_atlas::util::Rect;
+use texture_atlas::Atlas;
+use texture_atlas::AtlasBin;
+use texture_atlas::AtlasGenerator;
+use texture_atlas::AtlasRect;
 
 #[derive(Eq, PartialEq, PartialOrd)]
-struct SweepPart
-{
+struct SweepPart {
 	value: u32,
 	rect_index: usize,
 	start: bool,
 }
 
-impl SweepPart
-{
-	fn new(rect_index: usize, start: bool, value: u32) -> Self
-	{
-		SweepPart
-		{
+impl SweepPart {
+	fn new(rect_index: usize, start: bool, value: u32) -> Self {
+		SweepPart {
 			value: value,
 			rect_index: rect_index,
 			start: start,
@@ -25,32 +25,21 @@ impl SweepPart
 	}
 }
 
-impl std::cmp::Ord for SweepPart
-{
-	fn cmp(&self, other: &Self) -> std::cmp::Ordering
-	{
+impl std::cmp::Ord for SweepPart {
+	fn cmp(&self, other: &Self) -> std::cmp::Ordering {
 		let value = self.value.cmp(&other.value);
-		if value == std::cmp::Ordering::Equal
-		{
+		if value == std::cmp::Ordering::Equal {
 			let rect_index = self.rect_index.cmp(&other.rect_index);
-			if rect_index == std::cmp::Ordering::Equal
-			{
-				if self.start
-				{
+			if rect_index == std::cmp::Ordering::Equal {
+				if self.start {
 					std::cmp::Ordering::Less
-				}
-				else
-				{
+				} else {
 					std::cmp::Ordering::Greater
 				}
-			}
-			else
-			{
+			} else {
 				rect_index
 			}
-		}
-		else
-		{
+		} else {
 			value
 		}
 	}
@@ -58,12 +47,10 @@ impl std::cmp::Ord for SweepPart
 
 use std::collections::HashSet;
 
-fn has_overlaps<T: AtlasRect>(atlas: &Atlas<T>, bin: &AtlasBin) -> bool
-{
+fn has_overlaps<T: AtlasRect>(atlas: &Atlas<T>, bin: &AtlasBin) -> bool {
 	// Sweep horizontally.
 	let mut sweep_list = Vec::with_capacity(bin.part_list().len());
-	for part in bin.part_list()
-	{
+	for part in bin.part_list() {
 		let height = atlas.rect_list()[part.rect_index].height();
 		sweep_list.push(SweepPart::new(part.rect_index, true, part.y));
 		sweep_list.push(SweepPart::new(part.rect_index, false, part.y + height));
@@ -73,15 +60,11 @@ fn has_overlaps<T: AtlasRect>(atlas: &Atlas<T>, bin: &AtlasBin) -> bool
 	let mut inner_set = HashSet::with_capacity(2);
 
 	sweep_list.sort();
-	for sweep in sweep_list
-	{
-		if sweep.start
-		{
+	for sweep in sweep_list {
+		if sweep.start {
 			let width = atlas.rect_list()[sweep.rect_index].width();
 			inner_set.insert((sweep.value, sweep.value + width));
-		}
-		else
-		{
+		} else {
 			// TODO.
 			let width = atlas.rect_list()[sweep.rect_index].width();
 			inner_set.remove(&(sweep.value, sweep.value + width));
@@ -91,8 +74,7 @@ fn has_overlaps<T: AtlasRect>(atlas: &Atlas<T>, bin: &AtlasBin) -> bool
 }
 
 // TODO: Consider using this function in the lib by default.
-fn smoke_atlas<T: AtlasRect>(atlas: &Atlas<T>)
-{
+fn smoke_atlas<T: AtlasRect>(atlas: &Atlas<T>) {
 	// If the rect generates more bins than rects, something is wrong.
 	assert!(atlas.bin_list().len() <= atlas.rect_list().len());
 	atlas.bin_list();
@@ -100,31 +82,25 @@ fn smoke_atlas<T: AtlasRect>(atlas: &Atlas<T>)
 	// Make sure no bins repeat textures.
 	let mut counter = atlas.bin_list().len();
 	let mut checker = vec![false; counter];
-	for bin in atlas.bin_list()
-	{
-		for part in bin.part_list()
-		{
+	for bin in atlas.bin_list() {
+		for part in bin.part_list() {
 			let rect_index = part.rect_index;
-			if checker[rect_index]
-			{
+			if checker[rect_index] {
 				panic!("Bin contains rect already in another bin");
 			}
 			checker[rect_index] = true;
 			counter -= 1;
 		}
-		if has_overlaps(atlas, bin)
-		{
+		if has_overlaps(atlas, bin) {
 			panic!("Bin has overlapping rect");
 		}
 	}
-	if counter != 0
-	{
+	if counter != 0 {
 		panic!("Atlas does not include all rects");
 	}
 }
 
-fn smoke<T: AtlasGenerator>(generator: &T)
-{
+fn smoke<T: AtlasGenerator>(generator: &T) {
 	const ATLAS_WIDTH: u32 = 256;
 	const ATLAS_HEIGHT: u32 = 128;
 
@@ -144,21 +120,22 @@ fn smoke<T: AtlasGenerator>(generator: &T)
 	assert_eq!(atlas.bin_list().len(), 1);
 
 	// Having two large items means you cannot fit everything, so two bins.
-	let list_large = vec![rect_large, rect_large];
+	let list_large = vec![
+		rect_large,
+		rect_large,
+	];
 	let atlas = Atlas::build(&list_large, ATLAS_WIDTH, ATLAS_HEIGHT, false).generate(generator);
 	assert_eq!(atlas.bin_list().len(), 2);
 	smoke_atlas(&atlas);
 }
 
 #[test]
-fn test_passthrough()
-{
+fn test_passthrough() {
 	smoke(&PassthroughGenerator);
 }
 
 #[test]
-fn test_binary_tree()
-{
+fn test_binary_tree() {
 	smoke(&BinaryTreeGenerator);
 
 	// TODO: Better tests specific to this generator.
