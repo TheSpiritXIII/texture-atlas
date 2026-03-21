@@ -30,7 +30,11 @@ fn sort_by_longest_width_increasing<T: AtlasRect>(
 	for (index, rect) in atlas.rect_list().iter().enumerate() {
 		rect_list.push(RectReference {
 			index,
-			rect: rect.dimensions_longest_rotated(rotate),
+			rect: if rotate {
+				rect.dimensions_longest()
+			} else {
+				RotatableRect::from_rect(rect.dimensions(), false)
+			},
 		})
 	}
 	rect_list.sort_by(|ref_left, ref_right| {

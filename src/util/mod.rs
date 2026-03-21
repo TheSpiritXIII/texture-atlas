@@ -61,6 +61,13 @@ impl RotatableRect {
 			rotated,
 		}
 	}
+
+	pub fn from_rect(rect: Rect, rotated: bool) -> Self {
+		Self {
+			rect,
+			rotated,
+		}
+	}
 }
 
 impl AsRef<Rect> for RotatableRect {
