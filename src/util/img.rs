@@ -221,7 +221,11 @@ where
 		color_current.data[0] = (reference.rect_index as f32 * color_weight) as u8;
 
 		let rotate = reference.rotate;
-		let dimensions = rect_list[reference.rect_index].dimensions_rotated(rotate);
+		let dimensions = if rotate {
+			rect_list[reference.rect_index].dimensions_rotated()
+		} else {
+			rect_list[reference.rect_index].dimensions()
+		};
 
 		for x in reference.x..(reference.x + dimensions.width) {
 			for y in reference.y..(reference.y + dimensions.height) {

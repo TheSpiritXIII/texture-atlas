@@ -111,8 +111,8 @@ trait AtlasRectExt {
 	/// Returns the dimensions of this rectangle.
 	fn dimensions(&self) -> Rect;
 
-	/// Returns the dimensions of this rect with width and height inverted if `rotate` is `true`.
-	fn dimensions_rotated(&self, rotate: bool) -> Rect;
+	/// Returns the dimensions of this rect with width and height inverted.
+	fn dimensions_rotated(&self) -> Rect;
 
 	/// Returns a rect with the longest dimension being its width and its other being its height.
 	fn dimensions_longest(&self) -> RotatableRect;
@@ -137,12 +137,8 @@ where
 		Rect::new(self.width(), self.height())
 	}
 
-	fn dimensions_rotated(&self, rotate: bool) -> Rect {
-		if !rotate {
-			self.dimensions()
-		} else {
-			Rect::new(self.height(), self.width())
-		}
+	fn dimensions_rotated(&self) -> Rect {
+		Rect::new(self.height(), self.width())
 	}
 
 	fn dimensions_longest(&self) -> RotatableRect {
@@ -374,7 +370,11 @@ where
 	/// Creates a new bin with the given rect at the top left.
 	pub fn bin_add_new(&mut self, rect_index: usize, rotate: bool) -> usize {
 		let bin_index = self.bin_list.len();
-		let dimensions = self.rect_list[rect_index].dimensions_rotated(rotate);
+		let dimensions = if rotate {
+			self.rect_list[rect_index].dimensions_rotated()
+		} else {
+			self.rect_list[rect_index].dimensions()
+		};
 		self.bin_list.push(AtlasBin::new(rect_index, dimensions, rotate));
 		bin_index
 	}
@@ -388,7 +388,11 @@ where
 		y: u32,
 		rotate: bool,
 	) {
-		let dimensions = self.rect_list[rect_index].dimensions_rotated(rotate);
+		let dimensions = if rotate {
+			self.rect_list[rect_index].dimensions_rotated()
+		} else {
+			self.rect_list[rect_index].dimensions()
+		};
 		self.bin_list[bin_index].part_add(rect_index, x, y, dimensions, rotate);
 	}
 
