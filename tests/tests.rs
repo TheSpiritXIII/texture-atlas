@@ -18,9 +18,9 @@ struct SweepPart {
 impl SweepPart {
 	fn new(rect_index: usize, start: bool, value: u32) -> Self {
 		SweepPart {
-			value: value,
-			rect_index: rect_index,
-			start: start,
+			value,
+			rect_index,
+			start,
 		}
 	}
 }

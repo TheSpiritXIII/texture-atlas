@@ -137,12 +137,12 @@ where
 
 	/// Returns the lower bound of bins needed for the rects in this list.
 	pub fn lower_bound(&self, size: Rect) -> usize {
-		assert_eq!(size.empty(), false);
+		assert!(!size.empty());
 		((self.total_area / size.area()) + 1) as usize
 	}
 
 	/// Returns an atlas builder using this rect list and given constraints.
-	pub fn build(&self, width: u32, height: u32, rotate: bool) -> AtlasBuilder<T> {
+	pub fn build<'a>(&'a self, width: u32, height: u32, rotate: bool) -> AtlasBuilder<'a, T> {
 		let lower_bound = self.lower_bound(Rect::new(width, height));
 		AtlasBuilder::new(&self.rect_list, width, height, rotate, lower_bound)
 	}
@@ -200,7 +200,7 @@ where
 	T: 'a + AtlasRect,
 {
 	/// Returns a builder instance with the given size constraints.
-	pub fn build(rect_list: &'a [T], width: u32, height: u32, rotate: bool) -> AtlasBuilder<T> {
+	pub fn build(rect_list: &'a [T], width: u32, height: u32, rotate: bool) -> AtlasBuilder<'a, T> {
 		AtlasBuilder::new(rect_list, width, height, rotate, 1)
 	}
 
@@ -214,7 +214,7 @@ where
 
 	/// Returns the list of axis-aligned rectangles that are part of the atlas.
 	pub fn rect_list(&self) -> &[T] {
-		&self.rect_list
+		self.rect_list
 	}
 
 	/// Returns the bins that reference the rects.

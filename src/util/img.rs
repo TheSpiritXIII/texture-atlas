@@ -12,10 +12,10 @@ use crate::AtlasRectExt;
 
 impl AtlasRect for DynamicImage {
 	fn width(&self) -> u32 {
-		GenericImage::width(self) as u32
+		GenericImage::width(self)
 	}
 	fn height(&self) -> u32 {
-		GenericImage::height(self) as u32
+		GenericImage::height(self)
 	}
 }
 
@@ -99,15 +99,15 @@ where
 	for reference in &bin.part_list {
 		let texture = &rect_list[reference.rect_index];
 		if !reference.rotate {
-			for x in 0..AtlasRect::width(texture) as u32 {
-				for y in 0..AtlasRect::height(texture) as u32 {
+			for x in 0..AtlasRect::width(texture) {
+				for y in 0..AtlasRect::height(texture) {
 					let pixel = texture.borrow().get_pixel(x, y);
 					image.put_pixel(reference.x + x, reference.y + y, pixel);
 				}
 			}
 		} else {
-			for x in 0..AtlasRect::width(texture) as u32 {
-				for y in 0..AtlasRect::height(texture) as u32 {
+			for x in 0..AtlasRect::width(texture) {
+				for y in 0..AtlasRect::height(texture) {
 					let pixel = texture.borrow().get_pixel(x, y);
 					image.put_pixel(
 						reference.x + (AtlasRect::height(texture) - 1 - y),
@@ -128,11 +128,11 @@ struct Hsv {
 
 impl Hsv {
 	fn to_rgb(&self) -> Rgb<u8> {
-		let sat = self.data[1] as f32 / u8::max_value() as f32;
-		let val = self.data[2] as f32 / u8::max_value() as f32;
+		let sat = self.data[1] as f32 / u8::MAX as f32;
+		let val = self.data[2] as f32 / u8::MAX as f32;
 
 		let chroma = val * sat;
-		let h_prime = self.data[0] as f32 / u8::max_value() as f32 * (359.0 / 60.0);
+		let h_prime = self.data[0] as f32 / u8::MAX as f32 * (359.0 / 60.0);
 		let x = chroma * (1.0 - (h_prime % 2.0 - 1.0).abs());
 
 		let result: [f32; 3] = match h_prime as isize {
@@ -190,9 +190,9 @@ impl Hsv {
 		let m = val - chroma;
 		Rgb::<u8> {
 			data: [
-				((result[0] + m) * u8::max_value() as f32) as u8,
-				((result[1] + m) * u8::max_value() as f32) as u8,
-				((result[2] + m) * u8::max_value() as f32) as u8,
+				((result[0] + m) * u8::MAX as f32) as u8,
+				((result[1] + m) * u8::MAX as f32) as u8,
+				((result[2] + m) * u8::MAX as f32) as u8,
 			],
 		}
 	}
@@ -214,8 +214,7 @@ where
 		],
 	};
 
-	let mut image =
-		DynamicImage::new_rgba8(bin.dimensions.width as u32, bin.dimensions.height as u32);
+	let mut image = DynamicImage::new_rgba8(bin.dimensions.width, bin.dimensions.height);
 
 	for reference in &bin.part_list {
 		color_current.data[0] = (reference.rect_index as f32 * color_weight) as u8;
@@ -229,7 +228,7 @@ where
 
 		for x in reference.x..(reference.x + dimensions.width) {
 			for y in reference.y..(reference.y + dimensions.height) {
-				image.put_pixel(x as u32, y as u32, color_current.to_rgb().to_rgba());
+				image.put_pixel(x, y, color_current.to_rgb().to_rgba());
 			}
 		}
 	}

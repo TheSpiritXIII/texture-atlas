@@ -60,11 +60,11 @@ struct Rectr {
 impl Rectr {
 	fn new(bin: usize, x: u32, y: u32, width: u32, height: u32) -> Self {
 		Rectr {
-			bin: bin,
-			x: x,
-			y: y,
-			width: width,
-			height: height,
+			bin,
+			x,
+			y,
+			width,
+			height,
 		}
 	}
 	fn empty(&self) -> bool {
