@@ -81,7 +81,7 @@
 #[cfg(feature = "image")]
 extern crate image;
 
-pub mod gen;
+pub mod r#gen;
 pub mod util;
 
 use std::borrow::Borrow;
@@ -101,7 +101,7 @@ pub trait AtlasRect {
 	fn height(&self) -> u32;
 }
 
-impl<'a> AtlasRect + 'a {
+impl<'a> dyn AtlasRect + 'a {
 	/// Returns the total number of pixels this rectangle takes up.
 	pub fn area(&self) -> u64 {
 		self.width() as u64 * self.height() as u64
@@ -258,7 +258,7 @@ where
 
 	/// Adds the given rect to the list and potentially increases the lower bound.
 	pub fn add(&mut self, rect: T) {
-		self.total_area += (&rect as &AtlasRect).area();
+		self.total_area += (&rect as &dyn AtlasRect).area();
 		self.rect_list.push(rect);
 	}
 
@@ -269,7 +269,7 @@ where
 
 	/// Returns the lower bound of bins needed for the rects in this list.
 	pub fn lower_bound(&self, size: Rect) -> usize {
-		let atlas_rect = &size as &AtlasRect;
+		let atlas_rect = &size as &dyn AtlasRect;
 		assert_eq!(atlas_rect.empty(), false);
 		((self.total_area / atlas_rect.area()) + 1) as usize
 	}
@@ -358,7 +358,7 @@ where
 	/// Creates a new bin with the given rect at the top left.
 	pub fn bin_add_new(&mut self, rect_index: usize, rotate: bool) -> usize {
 		let bin_index = self.bin_list.len();
-		let dimensions = (&self.rect_list[rect_index] as &AtlasRect).dimensions_rotated(rotate);
+		let dimensions = (&self.rect_list[rect_index] as &dyn AtlasRect).dimensions_rotated(rotate);
 		self.bin_list.push(AtlasBin::new(rect_index, dimensions, rotate));
 		bin_index
 	}
@@ -372,7 +372,7 @@ where
 		y: u32,
 		rotate: bool,
 	) {
-		let dimensions = (&self.rect_list[rect_index] as &AtlasRect).dimensions_rotated(rotate);
+		let dimensions = (&self.rect_list[rect_index] as &dyn AtlasRect).dimensions_rotated(rotate);
 		self.bin_list[bin_index].part_add(rect_index, x, y, dimensions, rotate);
 	}
 

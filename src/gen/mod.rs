@@ -2,11 +2,10 @@
 
 mod binary_tree;
 
-use Atlas;
-use AtlasGenerator;
-use AtlasRect;
-
 pub use self::binary_tree::BinaryTreeGenerator;
+use crate::Atlas;
+use crate::AtlasGenerator;
+use crate::AtlasRect;
 
 /// A generator that creates a separate bin for each object.
 pub struct PassthroughGenerator;

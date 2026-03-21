@@ -3,10 +3,9 @@
 #[cfg(feature = "image")]
 mod img;
 
-use AtlasRect;
-
 #[cfg(feature = "image")]
 pub use self::img::*;
+use crate::AtlasRect;
 
 /// An axis-aligned rectangle.
 #[derive(Copy, Clone, Debug)]

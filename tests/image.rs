@@ -4,8 +4,8 @@ extern crate texture_atlas;
 use image::DynamicImage;
 use image::GenericImage;
 use image::Rgba;
-use texture_atlas::util::Rect;
 use texture_atlas::Atlas;
+use texture_atlas::util::Rect;
 
 fn image_equal(image1: DynamicImage, image2: DynamicImage) -> bool {
 	if image1.dimensions() == image2.dimensions() {

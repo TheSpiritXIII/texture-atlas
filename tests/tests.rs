@@ -1,12 +1,12 @@
 extern crate texture_atlas;
 
-use texture_atlas::gen::BinaryTreeGenerator;
-use texture_atlas::gen::PassthroughGenerator;
-use texture_atlas::util::Rect;
 use texture_atlas::Atlas;
 use texture_atlas::AtlasBin;
 use texture_atlas::AtlasGenerator;
 use texture_atlas::AtlasRect;
+use texture_atlas::r#gen::BinaryTreeGenerator;
+use texture_atlas::r#gen::PassthroughGenerator;
+use texture_atlas::util::Rect;
 
 #[derive(Eq, PartialEq, PartialOrd)]
 struct SweepPart {
