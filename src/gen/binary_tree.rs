@@ -3,6 +3,7 @@ use std::cmp::Ordering;
 use crate::Atlas;
 use crate::AtlasGenerator;
 use crate::AtlasRect;
+use crate::AtlasRectExt;
 use crate::util::Rect;
 use crate::util::RotatableRect;
 
@@ -29,7 +30,7 @@ fn sort_by_longest_width_increasing<T: AtlasRect>(
 	for (index, rect) in atlas.rect_list().iter().enumerate() {
 		rect_list.push(RectReference {
 			index,
-			rect: (rect as &dyn AtlasRect).dimensions_longest_rotated(rotate),
+			rect: rect.dimensions_longest_rotated(rotate),
 		})
 	}
 	rect_list.sort_by(|ref_left, ref_right| {
@@ -144,7 +145,7 @@ impl AtlasGenerator for BinaryTreeGenerator {
 				let leaf_index = leaves.len();
 				leaves.push(Rectr::new(bin, 0, 0, widthr, heightr));
 
-				let dimensions = (&atlas.rect_list()[rect_index] as &dyn AtlasRect).dimensions();
+				let dimensions = &atlas.rect_list()[rect_index].dimensions();
 
 				BinaryTreeGenerator::subdivide(
 					&mut leaves,

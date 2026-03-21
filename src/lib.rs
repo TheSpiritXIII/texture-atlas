@@ -101,24 +101,43 @@ pub trait AtlasRect {
 	fn height(&self) -> u32;
 }
 
-impl<'a> dyn AtlasRect + 'a {
+trait AtlasRectExt {
 	/// Returns the total number of pixels this rectangle takes up.
-	pub fn area(&self) -> u64 {
+	fn area(&self) -> u64;
+
+	/// Returns true if this rectangle has an area of 0.
+	fn empty(&self) -> bool;
+
+	/// Returns the dimensions of this rectangle.
+	fn dimensions(&self) -> Rect;
+
+	/// Returns the dimensions of this rect with width and height inverted if `rotate` is `true`.
+	fn dimensions_rotated(&self, rotate: bool) -> Rect;
+
+	/// Returns a rect with the longest dimension being its width and its other being its height.
+	fn dimensions_longest(&self) -> RotatableRect;
+
+	/// Returns `dimensions_longest` if `rotate` is true or `dimensions` otherwise.
+	fn dimensions_longest_rotated(&self, rotate: bool) -> RotatableRect;
+}
+
+impl<T> AtlasRectExt for T
+where
+	T: AtlasRect,
+{
+	fn area(&self) -> u64 {
 		self.width() as u64 * self.height() as u64
 	}
 
-	/// Returns true if this rectangle has an area of 0.
-	pub fn empty(&self) -> bool {
+	fn empty(&self) -> bool {
 		self.width() == 0 || self.height() == 0
 	}
 
-	/// Returns the dimensions of this rectangle.
-	pub fn dimensions(&self) -> Rect {
+	fn dimensions(&self) -> Rect {
 		Rect::new(self.width(), self.height())
 	}
 
-	/// Returns the dimensions of this rect with width and height inverted if `rotate` is `true`.
-	pub fn dimensions_rotated(&self, rotate: bool) -> Rect {
+	fn dimensions_rotated(&self, rotate: bool) -> Rect {
 		if !rotate {
 			self.dimensions()
 		} else {
@@ -126,13 +145,11 @@ impl<'a> dyn AtlasRect + 'a {
 		}
 	}
 
-	/// Returns a rect with the longest dimension being its width and its other being its height.
-	pub fn dimensions_longest(&self) -> RotatableRect {
+	fn dimensions_longest(&self) -> RotatableRect {
 		self.dimensions_longest_rotated(true)
 	}
 
-	/// Returns `dimensions_longest` if `rotate` is true or `dimensions` otherwise.
-	pub fn dimensions_longest_rotated(&self, rotate: bool) -> RotatableRect {
+	fn dimensions_longest_rotated(&self, rotate: bool) -> RotatableRect {
 		if (self.width() >= self.height() && rotate) || !rotate {
 			RotatableRect::new(self.width(), self.height(), false)
 		} else {
@@ -258,7 +275,7 @@ where
 
 	/// Adds the given rect to the list and potentially increases the lower bound.
 	pub fn add(&mut self, rect: T) {
-		self.total_area += (&rect as &dyn AtlasRect).area();
+		self.total_area += rect.area();
 		self.rect_list.push(rect);
 	}
 
@@ -269,9 +286,8 @@ where
 
 	/// Returns the lower bound of bins needed for the rects in this list.
 	pub fn lower_bound(&self, size: Rect) -> usize {
-		let atlas_rect = &size as &dyn AtlasRect;
-		assert_eq!(atlas_rect.empty(), false);
-		((self.total_area / atlas_rect.area()) + 1) as usize
+		assert_eq!(size.empty(), false);
+		((self.total_area / size.area()) + 1) as usize
 	}
 
 	/// Returns an atlas builder using this rect list and given constraints.
@@ -358,7 +374,7 @@ where
 	/// Creates a new bin with the given rect at the top left.
 	pub fn bin_add_new(&mut self, rect_index: usize, rotate: bool) -> usize {
 		let bin_index = self.bin_list.len();
-		let dimensions = (&self.rect_list[rect_index] as &dyn AtlasRect).dimensions_rotated(rotate);
+		let dimensions = self.rect_list[rect_index].dimensions_rotated(rotate);
 		self.bin_list.push(AtlasBin::new(rect_index, dimensions, rotate));
 		bin_index
 	}
@@ -372,7 +388,7 @@ where
 		y: u32,
 		rotate: bool,
 	) {
-		let dimensions = (&self.rect_list[rect_index] as &dyn AtlasRect).dimensions_rotated(rotate);
+		let dimensions = self.rect_list[rect_index].dimensions_rotated(rotate);
 		self.bin_list[bin_index].part_add(rect_index, x, y, dimensions, rotate);
 	}
 

@@ -8,6 +8,7 @@ use image::Rgba;
 
 use crate::AtlasBin;
 use crate::AtlasRect;
+use crate::AtlasRectExt;
 
 impl AtlasRect for DynamicImage {
 	fn width(&self) -> u32 {
@@ -92,7 +93,7 @@ pub(crate) fn image_from_bin<T>(rect_list: &[T], bin: &AtlasBin) -> DynamicImage
 where
 	T: AtlasRect + Borrow<DynamicImage>,
 {
-	let dimensions = (bin as &dyn AtlasRect).dimensions();
+	let dimensions = bin.dimensions();
 	let mut image = DynamicImage::new_rgba8(dimensions.width, dimensions.height);
 
 	for reference in &bin.part_list {
@@ -220,8 +221,7 @@ where
 		color_current.data[0] = (reference.rect_index as f32 * color_weight) as u8;
 
 		let rotate = reference.rotate;
-		let dimensions =
-			(&rect_list[reference.rect_index] as &dyn AtlasRect).dimensions_rotated(rotate);
+		let dimensions = rect_list[reference.rect_index].dimensions_rotated(rotate);
 
 		for x in reference.x..(reference.x + dimensions.width) {
 			for y in reference.y..(reference.y + dimensions.height) {
