@@ -1,8 +1,8 @@
 [package]
 name = "texture-atlas"
 version = "0.2.0"
-authors = ["TheSpiritXIII <thespiritxiii@gmail.com>"]
 license = "MIT"
+edition = "2015"
 
 [features]
 default = ["image"]
