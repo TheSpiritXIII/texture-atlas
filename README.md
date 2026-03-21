@@ -1,5 +1,8 @@
 # texture_atlas [![Build Status](https://travis-ci.org/TheSpiritXIII/Texture-Atlas.svg?branch=master)](https://travis-ci.org/TheSpiritXIII/Texture-Atlas) [![Coverage Status](https://coveralls.io/repos/github/TheSpiritXIII/Texture-Atlas/badge.svg?branch=master)](https://coveralls.io/github/TheSpiritXIII/Texture-Atlas?branch=master)
 
+> [!NOTE]
+> This repository is a work in progress and doesn't work yet. Use at your own risk!
+
 This crate provides various algorithms for bin packing axis aligned rectangles.
 
 The most common use case for this library is for games. In order to reduce texture swapping on
