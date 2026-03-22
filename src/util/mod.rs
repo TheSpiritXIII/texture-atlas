@@ -8,7 +8,7 @@ pub use self::img::*;
 use crate::AtlasRect;
 
 /// An axis-aligned rectangle.
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub struct Rect {
 	/// The width dimension of the rectangle.
 	pub width: u32,
@@ -45,7 +45,7 @@ impl<T: AsRef<Rect>> AtlasRect for T {
 }
 
 /// An axis-aligned rectangle that can be rotated.
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub struct RotatableRect {
 	/// The dimensions of the rectangle.
 	pub rect: Rect,
