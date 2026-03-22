@@ -79,6 +79,8 @@
 //! utility functions, such as border cropping.
 
 mod base;
+#[cfg(feature = "image")]
+mod image;
 
 pub mod r#gen;
 pub mod util;

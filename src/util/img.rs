@@ -11,15 +11,6 @@ use crate::AtlasBin;
 use crate::AtlasRect;
 use crate::AtlasRectExt;
 
-impl AtlasRect for DynamicImage {
-	fn width(&self) -> u32 {
-		DynamicImage::width(self)
-	}
-	fn height(&self) -> u32 {
-		DynamicImage::height(self)
-	}
-}
-
 const RGBA_EMPTY: Rgba<u8> = Rgba::<u8>([
 	0,
 	0,
