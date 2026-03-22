@@ -5,6 +5,7 @@ edition.workspace = true
 license.workspace = true
 
 [dependencies]
+chacha20 = { workspace = true }
 clap = { workspace = true }
 image = { workspace = true }
 rand = { workspace = true }
