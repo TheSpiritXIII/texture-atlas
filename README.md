@@ -16,7 +16,7 @@ The `image` feature is enabled by default, which allows interoperability with th
 use std::num::NonZeroU32;
 
 use image::RgbaImage;
-use texture_atlas::AtlasOptions;
+use texture_atlas::Options2;
 use texture_atlas::BinaryPacker;
 use texture_atlas::DynamicBuilder;
 use texture_atlas::Pos2;
@@ -25,7 +25,7 @@ use texture_atlas::Pos2;
 fn pack(image_list: &[&RgbaImage]) -> Vec<RgbaImage> {
 	// Output a 1024x1024 image.
 	let options =
-		AtlasOptions::with_max_size(NonZeroU32::new(1024).unwrap(), NonZeroU32::new(1024).unwrap());
+		Options2::with_max_size(NonZeroU32::new(1024).unwrap(), NonZeroU32::new(1024).unwrap());
 
 	// Take RgbaImage as input and output. Return the positions of each image.
 	let mut builder = DynamicBuilder::<_, RgbaImage, RgbaImage, Pos2>::new(
@@ -77,5 +77,5 @@ The following script generates images and runs the command-line tool on them, wh
 
 ```shell
 cargo run -p image-generator -- --output-dir generated --amount 16 --min-width 16 --min-height 16 --max-width 128 --max-height 128
-RUST_LOG=info cargo run -p cli -- --input-dir generated --output-dir atlas --output-file atlas/output.toml --max-width 256 --max-height 256 --rotatable --format json binary
+RUST_LOG=info cargo run -p cli -- --input-dir generated --output-dir atlas --output-file atlas/output.json --max-width 256 --max-height 256 --rotatable --format json binary
 ```

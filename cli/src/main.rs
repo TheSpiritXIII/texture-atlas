@@ -100,7 +100,7 @@ fn main() -> anyhow::Result<()> {
 		}
 	}
 
-	let options = Options2::with_max_size(cli.max_width, cli.max_height);
+	let options = Options2::with_max_size(cli.max_width, cli.max_height).and_spacing(1);
 	let packer: GenericPacker = match cli.algorithm {
 		Algorithm::Binary => GenericPacker::Binary(BinaryPacker::new()),
 		Algorithm::Passthrough => GenericPacker::Passthrough(PassthroughPacker::new()),

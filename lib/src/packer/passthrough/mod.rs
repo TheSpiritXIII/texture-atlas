@@ -34,14 +34,8 @@ where
 {
 	type Error = Infallible;
 
-	fn add(&mut self, _: &Options2, _: &Item) -> Result<PackerOp<Output>, Self::Error> {
-		Ok(PackerOp::NewBin(
-			Pos2 {
-				x: 0,
-				y: 0,
-			}
-			.into(),
-		))
+	fn add(&mut self, options: &Options2, _: &Item) -> Result<PackerOp<Output>, Self::Error> {
+		Ok(PackerOp::NewBin(options.margin().into()))
 	}
 
 	fn add_all<T: Borrow<Item>>(

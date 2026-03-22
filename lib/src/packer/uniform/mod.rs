@@ -46,8 +46,8 @@ where
 
 	fn add(&mut self, options: &Options2, item: &Item) -> Result<PackerOp<Output>, Self::Error> {
 		let mut y = self.used.height;
-		if item.width() > options.max_width.get()
-			|| self.used.width > options.max_width.get() - item.width()
+		if item.width() > options.max_logical_width()
+			|| self.used.width > options.max_logical_width() - item.width()
 		{
 			self.used.width = 0;
 			self.used.height += self.highest;
@@ -55,7 +55,8 @@ where
 
 			y = self.used.height;
 		}
-		if item.height() > options.max_height.get() || y > options.max_height.get() - item.height()
+		if item.height() > options.max_logical_height()
+			|| y > options.max_logical_height() - item.height()
 		{
 			let op = PackerOp::NewBin(
 				Pos2 {

@@ -49,19 +49,16 @@ where
 	type Error = Infallible;
 
 	fn add(&mut self, options: &Options2, item: &Item) -> Result<PackerOp<Pos2>, Self::Error> {
-		let size = Size2::new(item.width(), item.height());
+		let size = options.item_size(item);
 		for (index, bin) in &mut self.bin_list.iter_mut().enumerate() {
 			if let Some(position) = bin.add_to_smallest_node(&size) {
 				// TODO: Add test for multiple bins.
-				return Ok(PackerOp::ExistingBin((index, position)));
+				return Ok(PackerOp::ExistingBin((index, options.pos(position.x, position.y))));
 			}
 		}
 
 		self.add_bin(options, &size);
-		Ok(PackerOp::NewBin(Pos2 {
-			x: 0,
-			y: 0,
-		}))
+		Ok(PackerOp::NewBin(options.margin()))
 	}
 
 	fn add_all<T: Borrow<Item>>(
@@ -91,10 +88,7 @@ struct BinaryBin {
 
 impl BinaryBin {
 	pub fn new(options: &Options2, item: &Size2) -> Self {
-		let node = Node::new(Size2 {
-			width: options.max_width.get(),
-			height: options.max_height.get(),
-		});
+		let node = Node::new(options.max_logical_size());
 
 		let node_list = match node.fit(item) {
 			Fit2::Total | Fit2::None => vec![],

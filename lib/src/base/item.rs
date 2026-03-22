@@ -82,6 +82,10 @@ impl Size2 {
 			height,
 		}
 	}
+
+	pub fn with_spacing(self, spacing: u32) -> Self {
+		Self::new(self.width + spacing, self.height + spacing)
+	}
 }
 
 impl Item2 for Size2 {

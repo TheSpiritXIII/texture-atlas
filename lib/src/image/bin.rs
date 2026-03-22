@@ -19,7 +19,7 @@ where
 	type Error = ImageError;
 
 	fn new(options: &Self::Options) -> Self {
-		ImageBuffer::<P, Vec<P::Subpixel>>::new(options.max_width.get(), options.max_height.get())
+		ImageBuffer::<P, Vec<P::Subpixel>>::new(options.max_width(), options.max_height())
 	}
 }
 

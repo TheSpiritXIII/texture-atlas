@@ -37,8 +37,8 @@ where
 
 // TODO: Might be useful for other tests.
 struct IndexedBin<T> {
-	width: NonZero<u32>,
-	height: NonZero<u32>,
+	width: u32,
+	height: u32,
 	data: Vec<(usize, T)>,
 }
 
@@ -51,8 +51,8 @@ where
 
 	fn new(options: &Self::Options) -> Self {
 		Self {
-			width: options.max_width,
-			height: options.max_height,
+			width: options.max_width(),
+			height: options.max_height(),
 			data: Vec::new(),
 		}
 	}
@@ -70,11 +70,11 @@ where
 
 impl<T> Item2 for IndexedBin<T> {
 	fn width(&self) -> u32 {
-		self.width.get()
+		self.width
 	}
 
 	fn height(&self) -> u32 {
-		self.height.get()
+		self.height
 	}
 }
 

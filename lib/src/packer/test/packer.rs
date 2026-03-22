@@ -19,18 +19,18 @@ where
 
 	fn add(
 		&mut self,
-		_options: &Options2,
+		options: &Options2,
 		_item: &Item,
 	) -> Result<crate::PackerOp<Pos2>, Self::Error> {
-		Ok(PackerOp::ExistingBin((0, Pos2::new(0, 0))))
+		Ok(PackerOp::ExistingBin((0, options.margin())))
 	}
 
 	fn add_all<T: Borrow<Item>>(
 		&mut self,
-		_options: &Options2,
-		_group: &[T],
+		options: &Options2,
+		_item_list: &[T],
 	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Pos2>), Self::Error>> {
-		iter::once(Ok((0, PackerOp::ExistingBin((0, Pos2::new(0, 0))))))
+		iter::once(Ok((0, PackerOp::ExistingBin((0, options.margin())))))
 	}
 }
 
@@ -54,7 +54,7 @@ where
 	fn add_all<T: Borrow<Item>>(
 		&mut self,
 		_options: &Options2,
-		_group: &[T],
+		_item_list: &[T],
 	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Pos2>), Self::Error>> {
 		Err(())
 	}
