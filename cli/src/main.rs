@@ -39,6 +39,15 @@ struct Cli {
 	max_height: NonZero<u32>,
 
 	#[arg(long)]
+	margin: u32,
+
+	#[arg(
+		long,
+		default_value_t = 1
+	)]
+	spacing: u32,
+
+	#[arg(long)]
 	rotatable: bool,
 
 	#[arg(long)]
@@ -100,7 +109,9 @@ fn main() -> anyhow::Result<()> {
 		}
 	}
 
-	let options = Options2::with_max_size(cli.max_width, cli.max_height).and_spacing(1);
+	let options = Options2::with_max_size(cli.max_width, cli.max_height)
+		.and_margin(cli.margin)
+		.and_spacing(cli.spacing);
 	let packer: GenericPacker = match cli.algorithm {
 		Algorithm::Binary => GenericPacker::Binary(BinaryPacker::new()),
 		Algorithm::Passthrough => GenericPacker::Passthrough(PassthroughPacker::new()),
