@@ -2,10 +2,12 @@ mod generator;
 mod options;
 mod packer;
 mod page;
+mod params;
 mod rect;
 
 pub use generator::*;
 pub use options::*;
 pub use packer::*;
 pub use page::*;
+pub use params::*;
 pub use rect::*;

@@ -1,6 +1,6 @@
+use std::borrow::Borrow;
 use std::fmt::Debug;
 use std::fmt::Formatter;
-use std::iter;
 
 use crate::AtlasOptions;
 use crate::AtlasRect;
@@ -47,8 +47,8 @@ impl<T: PartialEq> PartialEq for AtlasPackerOp<T> {
 }
 
 /// Packs textures into a bin.
-pub trait AtlasPacker<Rect: AtlasRect> {
-	/// The output type of the packer. This should contain a list of references of the rects added
+pub trait AtlasPacker<Item: AtlasRect> {
+	/// The output type of the packer. This should contain a list of references of the items added
 	/// with metadata, e.g. position. Most packers will suffice with [Pos2].
 	// TODO: Add default. See: https://github.com/rust-lang/rust/issues/29661
 	type Output;
@@ -58,56 +58,44 @@ pub trait AtlasPacker<Rect: AtlasRect> {
 	// TODO: Add default. See: https://github.com/rust-lang/rust/issues/29661
 	type Error;
 
-	/// Adds rects to be placed on the atlas pages. `options` is always passed the same value
+	/// Adds items to be placed on the atlas bin. `options` is always passed the same value
 	/// throughout the lifetime of the packer.
 	fn add(
 		&mut self,
 		options: &AtlasOptions,
-		rect: &Rect,
+		item: &Item,
 	) -> Result<AtlasPackerOp<Self::Output>, Self::Error>;
 
-	/// Adds rects to be placed on the same atlas page if possible. If any existing page has enough
-	/// space for all the rects, they will be placed there. Otherwise, a new page will be created
-	/// and the rects will be placed there, overflowing only if needed. `options` is always passed
-	/// the same value throughout the lifetime of the packer.
+	/// Adds items to be placed on any available atlas bin, optimizing the placement of items to
+	/// reduce the total number of bins. `options` is always passed the same value throughout the
+	/// lifetime of the packer.
 	///
-	/// This method returns an iterator containing a tuple with the rect index and the operation
-	/// done on it. This is not guaranteed to happen linearly. For example, some packers may use a
-	/// heuristic, such as inserting largest rects first.
 	///
-	/// Implementing this is optional for packers. By default, this has the same behavior as `add`.
-	fn add_group(
+	/// This method returns an iterator containing a tuple with the item index and the operation
+	/// done on it. This is not guaranteed to be linear. For example, some packers may use a
+	/// heuristic such as inserting largest items first.
+	fn add_all<T: Borrow<Item>>(
 		&mut self,
 		options: &AtlasOptions,
-		group: &[&Rect],
+		group: &[T],
+	) -> impl IntoIterator<Item = Result<(usize, AtlasPackerOp<Self::Output>), Self::Error>>;
+
+	/// Adds items to be placed on any available atlas bin, prioritizing adding all given items to
+	/// the same bin. If a single bin does not have enough space, a new bin will be created and the
+	/// items will be placed there, overflowing only if needed. `options` is always passed the same
+	/// value throughout the lifetime of the packer.
+	///
+	/// This method returns an iterator containing a tuple with the item index and the operation
+	/// done on it. This is not guaranteed to be linear. For example, some packers may use a
+	/// heuristic such as inserting largest items first.
+	///
+	/// Implementing this is optional for packers. By default, this has the same behavior as
+	/// `add_all`.
+	fn add_group<T: Borrow<Item>>(
+		&mut self,
+		options: &AtlasOptions,
+		group: &[T],
 	) -> impl IntoIterator<Item = Result<(usize, AtlasPackerOp<Self::Output>), Self::Error>> {
-		let mut index = 0;
-		// TODO: Custom iterator to ensure properties, e.g. size hint + fuse?
-		iter::from_fn(move || {
-			if index >= group.len() {
-				return None;
-			}
-			let last_index = index;
-			index += 1;
-
-			let output = self.add(options, group[index - 1]);
-			Some(output.map(|x| (last_index, x)))
-		})
-	}
-}
-
-/// Represents a position of a rect added to a 2d bin.
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub struct Pos2 {
-	/// The x-position where this rect is located in the bin.
-	pub x: u32,
-
-	/// The y-position where this rect is located in the bin.
-	pub y: u32,
-}
-
-impl AsRef<Pos2> for Pos2 {
-	fn as_ref(&self) -> &Pos2 {
-		self
+		self.add_all(options, group)
 	}
 }

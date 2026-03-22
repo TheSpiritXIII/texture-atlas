@@ -1,6 +1,7 @@
 #[cfg(test)]
 mod test;
 
+use std::borrow::Borrow;
 use std::marker::PhantomData;
 
 use crate::AtlasOptions;
@@ -12,16 +13,16 @@ use crate::Pos2;
 /// A packer that packs every rect into its own bin at position (0, 0). This is useful for testing
 /// and debugging.
 #[derive(Debug)]
-pub struct PassthroughPacker<Rect>
+pub struct PassthroughPacker<Item>
 where
-	Rect: AtlasRect,
+	Item: AtlasRect,
 {
-	phantom: PhantomData<Rect>,
+	phantom: PhantomData<Item>,
 }
 
-impl<Rect> PassthroughPacker<Rect>
+impl<Item> PassthroughPacker<Item>
 where
-	Rect: AtlasRect,
+	Item: AtlasRect,
 {
 	pub fn new() -> Self {
 		Self {
@@ -30,18 +31,18 @@ where
 	}
 }
 
-impl<Rect> Default for PassthroughPacker<Rect>
+impl<Item> Default for PassthroughPacker<Item>
 where
-	Rect: AtlasRect,
+	Item: AtlasRect,
 {
 	fn default() -> Self {
 		Self::new()
 	}
 }
 
-impl<Rect> AtlasPacker<Rect> for PassthroughPacker<Rect>
+impl<Item> AtlasPacker<Item> for PassthroughPacker<Item>
 where
-	Rect: AtlasRect,
+	Item: AtlasRect,
 {
 	type Output = Pos2;
 	type Error = ();
@@ -49,11 +50,22 @@ where
 	fn add(
 		&mut self,
 		_: &AtlasOptions,
-		_: &Rect,
+		_: &Item,
 	) -> Result<AtlasPackerOp<Self::Output>, Self::Error> {
 		Ok(AtlasPackerOp::NewBin(Pos2 {
 			x: 0,
 			y: 0,
 		}))
+	}
+
+	fn add_all<T: Borrow<Item>>(
+		&mut self,
+		options: &AtlasOptions,
+		group: &[T],
+	) -> impl IntoIterator<Item = Result<(usize, AtlasPackerOp<Self::Output>), Self::Error>> {
+		(0..group.len()).map(|index| {
+			let output = self.add(options, group[index].borrow());
+			output.map(|x| (index, x))
+		})
 	}
 }
