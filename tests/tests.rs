@@ -8,7 +8,7 @@ use texture_atlas::r#gen::BinaryTreeGenerator;
 use texture_atlas::r#gen::PassthroughGenerator;
 use texture_atlas::util::Rect;
 
-#[derive(Eq, PartialEq, PartialOrd)]
+#[derive(Eq, PartialEq)]
 struct SweepPart {
 	value: u32,
 	rect_index: usize,
@@ -25,7 +25,13 @@ impl SweepPart {
 	}
 }
 
-impl std::cmp::Ord for SweepPart {
+impl PartialOrd for SweepPart {
+	fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+		Some(self.cmp(other))
+	}
+}
+
+impl Ord for SweepPart {
 	fn cmp(&self, other: &Self) -> std::cmp::Ordering {
 		let value = self.value.cmp(&other.value);
 		if value == std::cmp::Ordering::Equal {

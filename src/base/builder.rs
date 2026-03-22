@@ -124,6 +124,11 @@ where
 		self.rect_list.len()
 	}
 
+	/// Returns true if the rect list is empty.
+	pub fn is_empty(&self) -> bool {
+		self.rect_list.is_empty()
+	}
+
 	/// Adds the given rect to the list and potentially increases the lower bound.
 	pub fn add(&mut self, rect: T) {
 		self.total_area += rect.area();
@@ -145,6 +150,15 @@ where
 	pub fn build<'a>(&'a self, width: u32, height: u32, rotate: bool) -> AtlasBuilder<'a, T> {
 		let lower_bound = self.lower_bound(Rect::new(width, height));
 		AtlasBuilder::new(&self.rect_list, width, height, rotate, lower_bound)
+	}
+}
+
+impl<T> Default for AtlasRectList<T>
+where
+	T: AtlasRect,
+{
+	fn default() -> Self {
+		Self::new()
 	}
 }
 
