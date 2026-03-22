@@ -6,6 +6,7 @@ use anyhow::Context;
 use clap::Parser;
 use clap::Subcommand;
 use clap::ValueEnum;
+use image::GenericImageView;
 use image::ImageReader;
 use image::RgbaImage;
 use log::info;
@@ -13,6 +14,7 @@ use serde::Serialize;
 use texture_atlas::BinaryPacker;
 use texture_atlas::DynamicBuilder;
 use texture_atlas::GenericPacker;
+use texture_atlas::ImageExt;
 use texture_atlas::Options2;
 use texture_atlas::PassthroughPacker;
 use texture_atlas::Pos2;
@@ -46,6 +48,9 @@ struct Cli {
 		default_value_t = 1
 	)]
 	spacing: u32,
+
+	#[arg(long)]
+	crop: bool,
 
 	#[arg(long)]
 	rotatable: bool,
@@ -168,7 +173,14 @@ fn main() -> anyhow::Result<()> {
 		.with_context(|| format!("Failed to create output directory: {:?}", cli.output_dir))?;
 	for (i, bin) in bin_list.iter().enumerate() {
 		let output_path = cli.output_dir.join(format!("atlas_{}.png", i));
-		bin.bin()
+		let image = bin.bin();
+		let image_cropped = if let Some((image, _)) = image.crop_margin(cli.margin) {
+			image
+		} else {
+			image.view(0, 0, image.width(), image.height())
+		};
+		image_cropped
+			.to_image()
 			.save(&output_path)
 			.with_context(|| format!("Failed to save atlas image: {:?}", output_path))?;
 	}
