@@ -10,10 +10,48 @@ pub trait AtlasRect {
 	fn height(&self) -> u32;
 }
 
+/// Describes how an item can fit inside 2D space.
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+pub enum Fit2 {
+	/// The item does not fit.
+	None,
+	/// The item fits exactly, consuming the entire space.
+	Total,
+	/// The item fits vertically, consuming the entire width.
+	Vertical,
+	/// The item fits horizontally, consuming the entire height.
+	Horizontal,
+	/// The item fits inside the bin without consuming the entire width or height.
+	Within,
+}
+
+impl Fit2 {
+	/// Returns true if the item can be placed in the space.
+	pub fn fits(&self) -> bool {
+		!matches!(*self, Fit2::None)
+	}
+}
+
 // Common methods for all `AtlasRect` types.
 pub trait AtlasRectExt: AtlasRect {
-	fn fits(&self, other: &Rect) -> bool {
-		self.width() >= other.width && self.height() >= other.height
+	fn fit2(&self, other: &Size2) -> Fit2 {
+		match self.width().cmp(&other.width) {
+			std::cmp::Ordering::Equal => {
+				match self.height().cmp(&other.height) {
+					std::cmp::Ordering::Equal => Fit2::Total,
+					std::cmp::Ordering::Greater => Fit2::Vertical,
+					std::cmp::Ordering::Less => Fit2::None,
+				}
+			}
+			std::cmp::Ordering::Greater => {
+				match self.height().cmp(&other.height) {
+					std::cmp::Ordering::Equal => Fit2::Horizontal,
+					std::cmp::Ordering::Greater => Fit2::Within,
+					std::cmp::Ordering::Less => Fit2::None,
+				}
+			}
+			std::cmp::Ordering::Less => Fit2::None,
+		}
 	}
 
 	/// Returns the total number of pixels this rectangle takes up.
