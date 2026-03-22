@@ -3,6 +3,7 @@ extern crate texture_atlas;
 
 use image::DynamicImage;
 use image::GenericImage;
+use image::GenericImageView;
 use image::Rgba;
 use texture_atlas::Atlas;
 use texture_atlas::util::Rect;
@@ -39,14 +40,12 @@ fn image_single_rotated() {
 	let mut image = DynamicImage::new_luma8(IMAGE_WIDTH, IMAGE_HEIGHT);
 
 	// Make sure the image is asymmetric.
-	let pixel = Rgba::<u8> {
-		data: [
-			255,
-			255,
-			255,
-			255,
-		],
-	};
+	let pixel = Rgba::<u8>([
+		255,
+		255,
+		255,
+		255,
+	]);
 	for x in 0..IMAGE_WIDTH {
 		// Creates an image with the following lines:
 		// - Diagonal line going from the top-left to the bottom-right.

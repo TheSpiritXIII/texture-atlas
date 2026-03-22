@@ -8,5 +8,5 @@ edition = "2024"
 default = ["image"]
 
 [dependencies.image]
-version = "0.15"
+version = "0.25"
 optional = true

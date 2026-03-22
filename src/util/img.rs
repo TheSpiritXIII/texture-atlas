@@ -2,6 +2,7 @@ use std::borrow::Borrow;
 
 use image::DynamicImage;
 use image::GenericImage;
+use image::GenericImageView;
 use image::Pixel;
 use image::Rgb;
 use image::Rgba;
@@ -12,38 +13,36 @@ use crate::AtlasRectExt;
 
 impl AtlasRect for DynamicImage {
 	fn width(&self) -> u32 {
-		GenericImage::width(self)
+		DynamicImage::width(self)
 	}
 	fn height(&self) -> u32 {
-		GenericImage::height(self)
+		DynamicImage::height(self)
 	}
 }
 
-const RGBA_EMPTY: Rgba<u8> = Rgba::<u8> {
-	data: [
-		0,
-		0,
-		0,
-		0,
-	],
-};
+const RGBA_EMPTY: Rgba<u8> = Rgba::<u8>([
+	0,
+	0,
+	0,
+	0,
+]);
 
 /// Returns the amount of empty space at the left of the given image.
 pub fn border_left(image: &DynamicImage) -> u32 {
-	for x in 0..GenericImage::width(image) {
-		for y in 0..GenericImage::height(image) {
+	for x in 0..image.width() {
+		for y in 0..image.height() {
 			if image.get_pixel(x, y) != RGBA_EMPTY {
 				return x;
 			}
 		}
 	}
-	GenericImage::width(image)
+	image.width()
 }
 
 /// Returns the amount of empty space at the right of the given image.
 pub fn border_right(image: &DynamicImage) -> u32 {
-	for x in (0..GenericImage::width(image)).rev() {
-		for y in 0..GenericImage::height(image) {
+	for x in (0..image.width()).rev() {
+		for y in 0..image.height() {
 			if image.get_pixel(x, y) != RGBA_EMPTY {
 				return x;
 			}
@@ -54,20 +53,20 @@ pub fn border_right(image: &DynamicImage) -> u32 {
 
 /// Returns the amount of empty space at the top of the given image.
 pub fn border_top(image: &DynamicImage) -> u32 {
-	for y in 0..GenericImage::height(image) {
-		for x in 0..GenericImage::width(image) {
+	for y in 0..image.height() {
+		for x in 0..image.width() {
 			if image.get_pixel(x, y) != RGBA_EMPTY {
 				return y;
 			}
 		}
 	}
-	GenericImage::height(image)
+	image.height()
 }
 
 /// Returns the amount of empty space at the bottom of the given image.
 pub fn border_bottom(image: &DynamicImage) -> u32 {
-	for y in (0..GenericImage::height(image)).rev() {
-		for x in 0..GenericImage::width(image) {
+	for y in (0..image.height()).rev() {
+		for x in 0..image.width() {
 			if image.get_pixel(x, y) != RGBA_EMPTY {
 				return y;
 			}
@@ -188,13 +187,11 @@ impl Hsv {
 		};
 
 		let m = val - chroma;
-		Rgb::<u8> {
-			data: [
-				((result[0] + m) * u8::MAX as f32) as u8,
-				((result[1] + m) * u8::MAX as f32) as u8,
-				((result[2] + m) * u8::MAX as f32) as u8,
-			],
-		}
+		Rgb::<u8>([
+			((result[0] + m) * u8::MAX as f32) as u8,
+			((result[1] + m) * u8::MAX as f32) as u8,
+			((result[2] + m) * u8::MAX as f32) as u8,
+		])
 	}
 }
 
