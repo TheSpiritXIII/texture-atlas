@@ -10,9 +10,9 @@ use crate::AtlasPackerOp;
 use crate::AtlasRect;
 use crate::Pos2;
 
-/// A packer that packs every rect into its own bin at position (0, 0). This is useful for testing
+/// A packer that packs every item into its own bin at position (0, 0). This is useful for testing
 /// and debugging.
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct PassthroughPacker<Item>
 where
 	Item: AtlasRect,

@@ -6,6 +6,7 @@ use crate::AtlasPackerOp;
 use crate::PassthroughPacker;
 use crate::Pos2;
 use crate::Size2;
+use crate::assert_add_overflow;
 
 fn new_options() -> AtlasOptions {
 	AtlasOptions::with_max_size(NonZero::new(1024).unwrap(), NonZero::new(1024).unwrap())
@@ -16,7 +17,14 @@ fn new_packer() -> PassthroughPacker<Size2> {
 }
 
 #[test]
-fn add() {
+fn add_overflow() {
+	let options = new_options();
+	let packer = new_packer();
+	assert_add_overflow(&options, packer);
+}
+
+#[test]
+fn add_underflow() {
 	let options = new_options();
 	let rect_1 = Size2::new(10, 10);
 	let rect_2 = Size2::new(5, 5);
