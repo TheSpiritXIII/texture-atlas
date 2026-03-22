@@ -4,6 +4,10 @@
 mod img;
 
 #[cfg(feature = "image")]
+#[cfg(test)]
+mod img_test;
+
+#[cfg(feature = "image")]
 pub use self::img::*;
 use crate::AtlasRect;
 
@@ -50,7 +54,7 @@ pub struct RotatableRect {
 	/// The dimensions of the rectangle.
 	pub rect: Rect,
 
-	/// True if this rectagle is rotated 90 degrees clockwise.
+	/// True if this rectangle is rotated 90 degrees clockwise.
 	pub rotated: bool,
 }
 

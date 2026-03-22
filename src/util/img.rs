@@ -5,24 +5,19 @@ use image::GenericImage;
 use image::GenericImageView;
 use image::Pixel;
 use image::Rgb;
-use image::Rgba;
+use image::SubImage;
 
 use crate::AtlasBin;
 use crate::AtlasRect;
 use crate::AtlasRectExt;
 
-const RGBA_EMPTY: Rgba<u8> = Rgba::<u8>([
-	0,
-	0,
-	0,
-	0,
-]);
+// TODO: Put all these methods into an Ext trait so we could reuse it for ImageBuffer.
 
 /// Returns the amount of empty space at the left of the given image.
 pub fn border_left(image: &DynamicImage) -> u32 {
 	for x in 0..image.width() {
 		for y in 0..image.height() {
-			if image.get_pixel(x, y) != RGBA_EMPTY {
+			if image.get_pixel(x, y).alpha() != 0 {
 				return x;
 			}
 		}
@@ -34,7 +29,7 @@ pub fn border_left(image: &DynamicImage) -> u32 {
 pub fn border_right(image: &DynamicImage) -> u32 {
 	for x in (0..image.width()).rev() {
 		for y in 0..image.height() {
-			if image.get_pixel(x, y) != RGBA_EMPTY {
+			if image.get_pixel(x, y).alpha() != 0 {
 				return x;
 			}
 		}
@@ -46,7 +41,7 @@ pub fn border_right(image: &DynamicImage) -> u32 {
 pub fn border_top(image: &DynamicImage) -> u32 {
 	for y in 0..image.height() {
 		for x in 0..image.width() {
-			if image.get_pixel(x, y) != RGBA_EMPTY {
+			if image.get_pixel(x, y).alpha() != 0 {
 				return y;
 			}
 		}
@@ -58,7 +53,7 @@ pub fn border_top(image: &DynamicImage) -> u32 {
 pub fn border_bottom(image: &DynamicImage) -> u32 {
 	for y in (0..image.height()).rev() {
 		for x in 0..image.width() {
-			if image.get_pixel(x, y) != RGBA_EMPTY {
+			if image.get_pixel(x, y).alpha() != 0 {
 				return y;
 			}
 		}
@@ -66,17 +61,40 @@ pub fn border_bottom(image: &DynamicImage) -> u32 {
 	0
 }
 
-/// Returns the empty image borders in this order: left, right, top, bottom.
-pub fn border(image: &DynamicImage) -> (u32, u32, u32, u32) {
-	(border_left(image), border_right(image), border_top(image), border_bottom(image))
+/// Represents a boundary of an image.
+#[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub struct Bounds {
+	pub left: u32,
+	pub right: u32,
+	pub top: u32,
+	pub bottom: u32,
 }
 
-/// Crops the given image by removing empty borders.
-///
-/// Returns a tuple of the cropped image, left, right, top then bottom crop amount.
-pub fn border_crop(image: &mut DynamicImage) -> (DynamicImage, u32, u32, u32, u32) {
-	let (left, right, top, bottom) = border(image);
-	(image.crop(left, top, right - left, bottom - top), left, right, top, bottom)
+/// Returns the empty image boundary. If no boundary is found, returns a boundary where `right` and
+/// `bottom` are 0, `left`` is the image width and `top` is the image height.
+pub fn border(image: &DynamicImage) -> Bounds {
+	Bounds {
+		left: border_left(image),
+		right: border_right(image),
+		top: border_top(image),
+		bottom: border_bottom(image),
+	}
+}
+
+/// Returns a tuple of the cropped image and the empty borders. If no empty borders are found,
+/// returns `None`.
+pub fn border_crop(image: &DynamicImage) -> Option<(SubImage<&DynamicImage>, Bounds)> {
+	let bounds = border(image);
+	if bounds.right == 0
+		&& bounds.bottom == 0
+		&& bounds.left == image.width()
+		&& bounds.top == image.height()
+	{
+		return None;
+	}
+	let width = bounds.right - bounds.left + 1;
+	let height = bounds.bottom - bounds.top + 1;
+	Some((image.view(bounds.left, bounds.top, width, height), bounds))
 }
 
 pub(crate) fn image_from_bin<T>(rect_list: &[T], bin: &AtlasBin) -> DynamicImage
