@@ -1,2 +1,2 @@
-mod page;
+mod bin;
 mod rect;
