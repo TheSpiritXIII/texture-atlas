@@ -9,7 +9,7 @@ use crate::new_bin;
 pub const MAX_WIDTH: u32 = 1024;
 pub const MAX_HEIGHT: u32 = 1024;
 
-/// Asserts overflow behavior for various size scenarios.
+/// Asserts overflow behavior for various algorithm-agnostic size scenarios.
 pub fn assert_add_overflow<Packer, Error>(options: &AtlasOptions, packer: Packer)
 where
 	Packer: AtlasPacker<Size2, Output = Pos2, Error = Error> + Clone,
@@ -26,18 +26,6 @@ where
 		packer.clone(),
 		Size2::new(MAX_WIDTH + 1, MAX_HEIGHT + 1),
 		"overflow size",
-	);
-	assert_add_overflow_with(
-		options,
-		packer.clone(),
-		Size2::new(MAX_WIDTH - 1, MAX_HEIGHT),
-		"overflow width",
-	);
-	assert_add_overflow_with(
-		options,
-		packer.clone(),
-		Size2::new(MAX_WIDTH, MAX_HEIGHT - 1),
-		"overflow height",
 	);
 	assert_add_overflow_with(
 		options,

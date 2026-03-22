@@ -1,6 +1,8 @@
 mod overflow;
+mod underflow;
 
 pub use overflow::*;
+pub use underflow::*;
 
 use crate::AtlasPackerOp;
 use crate::Pos2;
