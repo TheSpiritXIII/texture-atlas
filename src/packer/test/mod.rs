@@ -1,7 +1,10 @@
 mod overflow;
+mod packer;
 mod underflow;
 
 pub use overflow::*;
+// TODO: Might be worth putting this elsewhere.
+pub(crate) use packer::*;
 pub use underflow::*;
 
 use crate::PackerOp;
