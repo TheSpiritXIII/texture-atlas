@@ -1,10 +1,10 @@
 use std::fmt::Debug;
 
 use crate::AtlasOptions;
-use crate::AtlasPacker;
-use crate::AtlasPackerOp;
 use crate::MAX_HEIGHT;
 use crate::MAX_WIDTH;
+use crate::Packer as AtlasPacker;
+use crate::PackerOp;
 use crate::Pos2;
 use crate::Size2;
 use crate::new_bin;
@@ -33,7 +33,7 @@ where
 	);
 	assert_eq!(
 		packer.add(options, &Size2::new(1, 1)),
-		Ok(AtlasPackerOp::ExistingBin((
+		Ok(PackerOp::ExistingBin((
 			0,
 			Pos2 {
 				x: 1,
@@ -44,7 +44,7 @@ where
 	);
 	assert_eq!(
 		packer.add(options, &Size2::new(1, 1)),
-		Ok(AtlasPackerOp::ExistingBin((
+		Ok(PackerOp::ExistingBin((
 			0,
 			Pos2 {
 				x: 2,
@@ -62,7 +62,7 @@ pub fn assert_add_underflow_max_width<T: Debug + PartialEq>(
 	assert_eq!(packer.add(options, &Size2::new(MAX_WIDTH - 1, MAX_HEIGHT)), Ok(new_bin()),);
 	assert_eq!(
 		packer.add(options, &Size2::new(1, 1)),
-		Ok(AtlasPackerOp::ExistingBin((
+		Ok(PackerOp::ExistingBin((
 			0,
 			Pos2 {
 				x: MAX_WIDTH - 1,
@@ -79,7 +79,7 @@ pub fn assert_add_underflow_max_height<T: Debug + PartialEq>(
 	assert_eq!(packer.add(options, &Size2::new(MAX_WIDTH, MAX_HEIGHT - 1)), Ok(new_bin()),);
 	assert_eq!(
 		packer.add(options, &Size2::new(1, 1)),
-		Ok(AtlasPackerOp::ExistingBin((
+		Ok(PackerOp::ExistingBin((
 			0,
 			Pos2 {
 				x: 0,

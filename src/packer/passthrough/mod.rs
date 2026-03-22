@@ -5,9 +5,9 @@ use std::borrow::Borrow;
 use std::marker::PhantomData;
 
 use crate::AtlasOptions;
-use crate::AtlasPacker;
-use crate::AtlasPackerOp;
 use crate::AtlasRect;
+use crate::Packer;
+use crate::PackerOp;
 use crate::Pos2;
 
 /// A packer that packs every item into its own bin at position (0, 0). This is useful for testing
@@ -40,19 +40,15 @@ where
 	}
 }
 
-impl<Item> AtlasPacker<Item> for PassthroughPacker<Item>
+impl<Item> Packer<Item> for PassthroughPacker<Item>
 where
 	Item: AtlasRect,
 {
 	type Output = Pos2;
 	type Error = ();
 
-	fn add(
-		&mut self,
-		_: &AtlasOptions,
-		_: &Item,
-	) -> Result<AtlasPackerOp<Self::Output>, Self::Error> {
-		Ok(AtlasPackerOp::NewBin(Pos2 {
+	fn add(&mut self, _: &AtlasOptions, _: &Item) -> Result<PackerOp<Self::Output>, Self::Error> {
+		Ok(PackerOp::NewBin(Pos2 {
 			x: 0,
 			y: 0,
 		}))
@@ -62,7 +58,7 @@ where
 		&mut self,
 		options: &AtlasOptions,
 		group: &[T],
-	) -> impl IntoIterator<Item = Result<(usize, AtlasPackerOp<Self::Output>), Self::Error>> {
+	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Self::Output>), Self::Error>> {
 		(0..group.len()).map(|index| {
 			let output = self.add(options, group[index].borrow());
 			output.map(|x| (index, x))

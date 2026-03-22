@@ -1,7 +1,7 @@
 use std::fmt::Debug;
 
 use crate::AtlasOptions;
-use crate::AtlasPacker;
+use crate::Packer as AtlasPacker;
 use crate::Pos2;
 use crate::Size2;
 use crate::new_bin;

@@ -6,17 +6,17 @@ use crate::AtlasOptions;
 use crate::AtlasRect;
 
 /// Represents operations from a packer.
-pub enum AtlasPackerOp<T> {
+pub enum PackerOp<T> {
 	/// Indicates to add T to a new bin. Bin indices start at 0 and increments by 1 each time a new
 	/// bin is created. After this operation, the same bin can be selected using
-	/// [ExistingBin](AtlasPackerOp::ExistingBin).
+	/// [ExistingBin](PackerOp::ExistingBin).
 	NewBin(T),
 	/// Indicates to add T to an existing bin. Bin indices start at 0 and must be created with a
-	/// [NewBin](AtlasPackerOp::NewBin) operation first.
+	/// [NewBin](PackerOp::NewBin) operation first.
 	ExistingBin((usize, T)),
 }
 
-impl<T: Clone> Clone for AtlasPackerOp<T> {
+impl<T: Clone> Clone for PackerOp<T> {
 	fn clone(&self) -> Self {
 		match self {
 			Self::NewBin(x) => Self::NewBin(x.clone()),
@@ -25,7 +25,7 @@ impl<T: Clone> Clone for AtlasPackerOp<T> {
 	}
 }
 
-impl<T: Debug> Debug for AtlasPackerOp<T> {
+impl<T: Debug> Debug for PackerOp<T> {
 	fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
 		match self {
 			Self::NewBin(x) => f.debug_tuple("NewBin").field(x).finish(),
@@ -34,9 +34,9 @@ impl<T: Debug> Debug for AtlasPackerOp<T> {
 	}
 }
 
-impl<T: Eq> Eq for AtlasPackerOp<T> {}
+impl<T: Eq> Eq for PackerOp<T> {}
 
-impl<T: PartialEq> PartialEq for AtlasPackerOp<T> {
+impl<T: PartialEq> PartialEq for PackerOp<T> {
 	fn eq(&self, other: &Self) -> bool {
 		match (self, other) {
 			(Self::NewBin(x), Self::NewBin(y)) => x == y,
@@ -47,7 +47,7 @@ impl<T: PartialEq> PartialEq for AtlasPackerOp<T> {
 }
 
 /// Packs textures into a bin.
-pub trait AtlasPacker<Item: AtlasRect> {
+pub trait Packer<Item: AtlasRect> {
 	/// The output type of the packer. This should contain a list of references of the items added
 	/// with metadata, e.g. position. Most packers will suffice with [Pos2].
 	// TODO: Add default. See: https://github.com/rust-lang/rust/issues/29661
@@ -58,18 +58,17 @@ pub trait AtlasPacker<Item: AtlasRect> {
 	// TODO: Add default. See: https://github.com/rust-lang/rust/issues/29661
 	type Error;
 
-	/// Adds items to be placed on the atlas bin. `options` is always passed the same value
+	/// Adds items to be placed on any available bin. `options` is always passed the same value
 	/// throughout the lifetime of the packer.
 	fn add(
 		&mut self,
 		options: &AtlasOptions,
 		item: &Item,
-	) -> Result<AtlasPackerOp<Self::Output>, Self::Error>;
+	) -> Result<PackerOp<Self::Output>, Self::Error>;
 
-	/// Adds items to be placed on any available atlas bin, optimizing the placement of items to
-	/// reduce the total number of bins. `options` is always passed the same value throughout the
-	/// lifetime of the packer.
-	///
+	/// Adds items to be placed on any available bin, optimizing the placement of items to reduce
+	/// the total number of bins. `options` is always passed the same value throughout the lifetime
+	/// of the packer.
 	///
 	/// This method returns an iterator containing a tuple with the item index and the operation
 	/// done on it. This is not guaranteed to be linear. For example, some packers may use a
@@ -78,10 +77,10 @@ pub trait AtlasPacker<Item: AtlasRect> {
 		&mut self,
 		options: &AtlasOptions,
 		group: &[T],
-	) -> impl IntoIterator<Item = Result<(usize, AtlasPackerOp<Self::Output>), Self::Error>>;
+	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Self::Output>), Self::Error>>;
 
-	/// Adds items to be placed on any available atlas bin, prioritizing adding all given items to
-	/// the same bin. If a single bin does not have enough space, a new bin will be created and the
+	/// Adds items to be placed on any available bin, prioritizing adding all given items to the
+	/// same bin. If a single bin does not have enough space, a new bin will be created and the
 	/// items will be placed there, overflowing only if needed. `options` is always passed the same
 	/// value throughout the lifetime of the packer.
 	///
@@ -95,7 +94,7 @@ pub trait AtlasPacker<Item: AtlasRect> {
 		&mut self,
 		options: &AtlasOptions,
 		group: &[T],
-	) -> impl IntoIterator<Item = Result<(usize, AtlasPackerOp<Self::Output>), Self::Error>> {
+	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Self::Output>), Self::Error>> {
 		self.add_all(options, group)
 	}
 }

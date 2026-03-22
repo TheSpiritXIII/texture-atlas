@@ -1,8 +1,8 @@
 use std::num::NonZero;
 
 use crate::AtlasOptions;
-use crate::AtlasPacker;
-use crate::AtlasPackerOp;
+use crate::Packer;
+use crate::PackerOp;
 use crate::PassthroughPacker;
 use crate::Pos2;
 use crate::Size2;
@@ -33,21 +33,21 @@ fn add_underflow() {
 	let mut packer = new_packer();
 	assert_eq!(
 		packer.add(&options, &rect_1),
-		Ok(AtlasPackerOp::NewBin(Pos2 {
+		Ok(PackerOp::NewBin(Pos2 {
 			x: 0,
 			y: 0
 		}))
 	);
 	assert_eq!(
 		packer.add(&options, &rect_2),
-		Ok(AtlasPackerOp::NewBin(Pos2 {
+		Ok(PackerOp::NewBin(Pos2 {
 			x: 0,
 			y: 0
 		}))
 	);
 	assert_eq!(
 		packer.add(&options, &rect_3),
-		Ok(AtlasPackerOp::NewBin(Pos2 {
+		Ok(PackerOp::NewBin(Pos2 {
 			x: 0,
 			y: 0
 		}))

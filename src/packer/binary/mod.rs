@@ -7,10 +7,10 @@ use std::marker::PhantomData;
 
 use node::Node;
 
-use crate::AtlasPacker;
 use crate::AtlasRect;
 use crate::AtlasRectExt;
 use crate::Fit2;
+use crate::Packer;
 use crate::Pos2;
 use crate::Size2;
 
@@ -48,7 +48,7 @@ where
 	}
 }
 
-impl<Item> AtlasPacker<Item> for BinaryPacker<Item>
+impl<Item> Packer<Item> for BinaryPacker<Item>
 where
 	Item: AtlasRect,
 {
@@ -59,16 +59,16 @@ where
 		&mut self,
 		options: &crate::AtlasOptions,
 		item: &Item,
-	) -> Result<crate::AtlasPackerOp<Self::Output>, Self::Error> {
+	) -> Result<crate::PackerOp<Self::Output>, Self::Error> {
 		let size = Size2::new(item.width(), item.height());
 		for bin in &mut self.bin_list {
 			if let Some(position) = bin.add_to_smallest_node(&size) {
-				return Ok(crate::AtlasPackerOp::ExistingBin((0, position)));
+				return Ok(crate::PackerOp::ExistingBin((0, position)));
 			}
 		}
 
 		self.add_bin(options, &size);
-		Ok(crate::AtlasPackerOp::NewBin(Pos2 {
+		Ok(crate::PackerOp::NewBin(Pos2 {
 			x: 0,
 			y: 0,
 		}))
@@ -78,8 +78,7 @@ where
 		&mut self,
 		options: &crate::AtlasOptions,
 		group: &[T],
-	) -> impl IntoIterator<Item = Result<(usize, crate::AtlasPackerOp<Self::Output>), Self::Error>>
-	{
+	) -> impl IntoIterator<Item = Result<(usize, crate::PackerOp<Self::Output>), Self::Error>> {
 		let mut index_list: Vec<usize> = (0..group.len()).collect::<Vec<usize>>();
 		index_list.sort_by_key(|x| {
 			let item = group[*x].borrow();

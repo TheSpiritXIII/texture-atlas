@@ -5,9 +5,9 @@ use std::borrow::Borrow;
 use std::marker::PhantomData;
 
 use crate::AtlasOptions;
-use crate::AtlasPacker;
-use crate::AtlasPackerOp;
 use crate::AtlasRect;
+use crate::Packer;
+use crate::PackerOp;
 use crate::Pos2;
 use crate::Size2;
 
@@ -48,7 +48,7 @@ where
 	}
 }
 
-impl<Item> AtlasPacker<Item> for UniformPacker<Item>
+impl<Item> Packer<Item> for UniformPacker<Item>
 where
 	Item: AtlasRect,
 {
@@ -59,7 +59,7 @@ where
 		&mut self,
 		options: &AtlasOptions,
 		item: &Item,
-	) -> Result<AtlasPackerOp<Self::Output>, Self::Error> {
+	) -> Result<PackerOp<Self::Output>, Self::Error> {
 		let mut y = self.used.height;
 		if item.width() > options.max_width.get()
 			|| self.used.width > options.max_width.get() - item.width()
@@ -72,7 +72,7 @@ where
 		}
 		if item.height() > options.max_height.get() || y > options.max_height.get() - item.height()
 		{
-			let op = AtlasPackerOp::NewBin(Pos2 {
+			let op = PackerOp::NewBin(Pos2 {
 				x: 0,
 				y: 0,
 			});
@@ -84,7 +84,7 @@ where
 			return Ok(op);
 		}
 
-		let op = AtlasPackerOp::ExistingBin((
+		let op = PackerOp::ExistingBin((
 			self.bin_len - 1,
 			Pos2 {
 				x: self.used.width,
@@ -101,7 +101,7 @@ where
 		&mut self,
 		options: &AtlasOptions,
 		group: &[T],
-	) -> impl IntoIterator<Item = Result<(usize, AtlasPackerOp<Self::Output>), Self::Error>> {
+	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Self::Output>), Self::Error>> {
 		(0..group.len()).map(|index| {
 			let output = self.add(options, group[index].borrow());
 			output.map(|x| (index, x))

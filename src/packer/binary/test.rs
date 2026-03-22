@@ -1,11 +1,11 @@
 use std::num::NonZero;
 
 use crate::AtlasOptions;
-use crate::AtlasPacker;
-use crate::AtlasPackerOp;
 use crate::BinaryPacker;
 use crate::MAX_HEIGHT;
 use crate::MAX_WIDTH;
+use crate::Packer;
+use crate::PackerOp;
 use crate::Pos2;
 use crate::Size2;
 use crate::assert_add_overflow;
@@ -41,7 +41,7 @@ fn add_single_underflow_then_underflow() {
 	assert_eq!(packer.add(&options, &rect_1), Ok(new_bin()));
 	assert_eq!(
 		packer.add(&options, &rect_2),
-		Ok(AtlasPackerOp::ExistingBin((
+		Ok(PackerOp::ExistingBin((
 			0,
 			Pos2 {
 				x: 600,
@@ -51,7 +51,7 @@ fn add_single_underflow_then_underflow() {
 	);
 	assert_eq!(
 		packer.add(&options, &rect_3),
-		Ok(AtlasPackerOp::ExistingBin((
+		Ok(PackerOp::ExistingBin((
 			0,
 			Pos2 {
 				x: 600,
@@ -72,7 +72,7 @@ fn add_single_underflow_then_overflow_bin() {
 	assert_eq!(packer.add(&options, &rect_1), Ok(new_bin()));
 	assert_eq!(
 		packer.add(&options, &rect_2),
-		Ok(AtlasPackerOp::ExistingBin((
+		Ok(PackerOp::ExistingBin((
 			0,
 			Pos2 {
 				x: 600,
@@ -94,7 +94,7 @@ fn add_single_underflow_then_overflow_space() {
 	assert_eq!(packer.add(&options, &rect_1), Ok(new_bin()));
 	assert_eq!(
 		packer.add(&options, &rect_2),
-		Ok(AtlasPackerOp::ExistingBin((
+		Ok(PackerOp::ExistingBin((
 			0,
 			Pos2 {
 				x: 600,
@@ -104,7 +104,7 @@ fn add_single_underflow_then_overflow_space() {
 	);
 	assert_eq!(
 		packer.add(&options, &rect_3),
-		Ok(AtlasPackerOp::ExistingBin((
+		Ok(PackerOp::ExistingBin((
 			0,
 			Pos2 {
 				x: 700,
@@ -163,7 +163,7 @@ fn add_multiple_max_width() {
 			Ok((0, new_bin())),
 			Ok((
 				1,
-				AtlasPackerOp::ExistingBin((
+				PackerOp::ExistingBin((
 					0,
 					Pos2 {
 						x: 0,
@@ -224,7 +224,7 @@ fn add_multiple_overflow_space() {
 			Ok((0, new_bin())),
 			Ok((
 				1,
-				AtlasPackerOp::ExistingBin((
+				PackerOp::ExistingBin((
 					0,
 					Pos2 {
 						x: 0,
@@ -261,7 +261,7 @@ fn add_multiple_underflow_then_underflow() {
 			Ok((0, new_bin())),
 			Ok((
 				2,
-				AtlasPackerOp::ExistingBin((
+				PackerOp::ExistingBin((
 					0,
 					Pos2 {
 						x: 600,
@@ -271,7 +271,7 @@ fn add_multiple_underflow_then_underflow() {
 			)),
 			Ok((
 				1,
-				AtlasPackerOp::ExistingBin((
+				PackerOp::ExistingBin((
 					0,
 					Pos2 {
 						x: 900,
@@ -309,7 +309,7 @@ fn add_multiple_underflow_then_overflow_bin() {
 			Ok((2, new_bin())),
 			Ok((
 				1,
-				AtlasPackerOp::ExistingBin((
+				PackerOp::ExistingBin((
 					0,
 					Pos2 {
 						x: 600,
@@ -346,7 +346,7 @@ fn add_multiple_underflow_then_overflow_space() {
 			Ok((0, new_bin())),
 			Ok((
 				1,
-				AtlasPackerOp::ExistingBin((
+				PackerOp::ExistingBin((
 					0,
 					Pos2 {
 						x: 600,
@@ -356,7 +356,7 @@ fn add_multiple_underflow_then_overflow_space() {
 			)),
 			Ok((
 				2,
-				AtlasPackerOp::ExistingBin((
+				PackerOp::ExistingBin((
 					0,
 					Pos2 {
 						x: 700,

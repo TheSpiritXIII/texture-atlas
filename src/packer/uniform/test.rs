@@ -1,10 +1,10 @@
 use std::num::NonZero;
 
 use crate::AtlasOptions;
-use crate::AtlasPacker;
-use crate::AtlasPackerOp;
 use crate::MAX_HEIGHT;
 use crate::MAX_WIDTH;
+use crate::Packer;
+use crate::PackerOp;
 use crate::Pos2;
 use crate::Size2;
 use crate::UniformPacker;
@@ -47,7 +47,7 @@ fn assert_fill_bin(options: &AtlasOptions, packer: &mut UniformPacker<Size2>, bi
 	);
 	assert_eq!(
 		packer.add(options, &Size2::new(MAX_WIDTH / 2, MAX_HEIGHT / 2)),
-		Ok(AtlasPackerOp::ExistingBin((
+		Ok(PackerOp::ExistingBin((
 			bin_index,
 			Pos2 {
 				x: MAX_WIDTH / 2,
@@ -59,7 +59,7 @@ fn assert_fill_bin(options: &AtlasOptions, packer: &mut UniformPacker<Size2>, bi
 	);
 	assert_eq!(
 		packer.add(options, &Size2::new(MAX_WIDTH / 2, MAX_HEIGHT / 2)),
-		Ok(AtlasPackerOp::ExistingBin((
+		Ok(PackerOp::ExistingBin((
 			bin_index,
 			Pos2 {
 				x: 0,
@@ -71,7 +71,7 @@ fn assert_fill_bin(options: &AtlasOptions, packer: &mut UniformPacker<Size2>, bi
 	);
 	assert_eq!(
 		packer.add(options, &Size2::new(MAX_WIDTH / 2, MAX_HEIGHT / 2)),
-		Ok(AtlasPackerOp::ExistingBin((
+		Ok(PackerOp::ExistingBin((
 			bin_index,
 			Pos2 {
 				x: MAX_WIDTH / 2,
