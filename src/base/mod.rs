@@ -1,5 +1,5 @@
-mod builder;
+mod generator;
 mod rect;
 
-pub use builder::*;
+pub use generator::*;
 pub use rect::*;
