@@ -5,22 +5,22 @@ use crate::AtlasPacker;
 use crate::AtlasPackerOp;
 use crate::PassthroughPacker;
 use crate::Pos2;
-use crate::util::Rect;
+use crate::Size2;
 
 fn new_options() -> AtlasOptions {
 	AtlasOptions::with_max_size(NonZero::new(1024).unwrap(), NonZero::new(1024).unwrap())
 }
 
-fn new_packer() -> PassthroughPacker<Rect> {
-	PassthroughPacker::<Rect>::new()
+fn new_packer() -> PassthroughPacker<Size2> {
+	PassthroughPacker::<Size2>::new()
 }
 
 #[test]
 fn add() {
 	let options = new_options();
-	let rect_1 = Rect::new(10, 10);
-	let rect_2 = Rect::new(5, 5);
-	let rect_3 = Rect::new(20, 20);
+	let rect_1 = Size2::new(10, 10);
+	let rect_2 = Size2::new(5, 5);
+	let rect_3 = Size2::new(20, 20);
 
 	let mut packer = new_packer();
 	assert_eq!(
