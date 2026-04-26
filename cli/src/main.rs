@@ -63,7 +63,7 @@ fn main() -> io::Result<()> {
 	let mut atlas =
 		DynamicAtlas::<_, ScoredBin2<RgbaImage, RgbaImage>, RgbaImage>::new(options, packer);
 	atlas.add_all(&image_list).unwrap();
-	let bin_list = atlas.consume();
+	let bin_list = atlas.build();
 
 	fs::create_dir_all(&cli.output_dir)?;
 	for (i, bin) in bin_list.iter().enumerate() {

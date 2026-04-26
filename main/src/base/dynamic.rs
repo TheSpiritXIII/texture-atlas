@@ -167,7 +167,7 @@ where
 		&self.bin_list
 	}
 
-	pub fn consume(self) -> Vec<Bin> {
+	pub fn build(self) -> Vec<Bin> {
 		self.bin_list
 	}
 }
