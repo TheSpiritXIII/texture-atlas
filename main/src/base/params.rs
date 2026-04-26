@@ -1,4 +1,5 @@
 /// Represents a position of a rect added to a 2d bin.
+/// Represents a position of a rect added to a 2D bin.
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct Pos2 {
 	/// The x-position where this rect is located in the bin.
@@ -14,5 +15,11 @@ impl Pos2 {
 			x,
 			y,
 		}
+	}
+}
+
+impl From<&Pos2> for Pos2 {
+	fn from(pos: &Pos2) -> Self {
+		*pos
 	}
 }

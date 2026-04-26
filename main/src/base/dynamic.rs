@@ -78,8 +78,9 @@ pub struct AtlasAddMulti<T> {
 pub struct DynamicAtlas<Packer, Bin, Item>
 where
 	Packer: AtlasPacker<Item>,
-	Bin: AtlasBin<Item, Params = Packer::Output>,
+	Bin: AtlasBin<Item>,
 	Item: AtlasRect,
+	for<'a> &'a Packer::Output: Into<Bin::Params>,
 {
 	options: AtlasOptions,
 	packer: Packer,
@@ -90,8 +91,9 @@ where
 impl<Packer, Bin, Item> DynamicAtlas<Packer, Bin, Item>
 where
 	Packer: AtlasPacker<Item>,
-	Bin: AtlasBin<Item, Params = Packer::Output>,
+	Bin: AtlasBin<Item>,
 	Item: AtlasRect,
+	for<'a> &'a Packer::Output: Into<Bin::Params>,
 {
 	pub fn new(options: AtlasOptions, packer: Packer) -> Self {
 		Self {
@@ -156,7 +158,7 @@ where
 			}
 			PackerOp::ExistingBin((bin, params)) => (bin, params),
 		};
-		bin_list[index].item_add(item, &params).map_err(AtlasError::Bin)?;
+		bin_list[index].item_add(item, &(&params).into()).map_err(AtlasError::Bin)?;
 		Ok(AtlasAdd {
 			bin_index: index,
 			output: params,

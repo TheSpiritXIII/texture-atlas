@@ -11,8 +11,9 @@ use crate::PackerOp;
 pub struct SingleAtlas<Packer, Bin, Item>
 where
 	Packer: AtlasPacker<Item>,
-	Bin: AtlasBin<Item, Params = Packer::Output>,
+	Bin: AtlasBin<Item>,
 	Item: AtlasRect,
+	for<'a> &'a Packer::Output: Into<Bin::Params>,
 {
 	options: AtlasOptions,
 	packer: Packer,
@@ -41,8 +42,9 @@ pub struct SingleAtlasEntry<T> {
 impl<Packer, Bin, Item> SingleAtlas<Packer, Bin, Item>
 where
 	Packer: AtlasPacker<Item>,
-	Bin: AtlasBin<Item, Params = Packer::Output>,
+	Bin: AtlasBin<Item>,
 	Item: AtlasRect,
+	for<'a> &'a Packer::Output: Into<Bin::Params>,
 {
 	/// Creates a new atlas.
 	pub fn new(options: AtlasOptions, packer: Packer) -> Self {
@@ -117,7 +119,7 @@ where
 				(bin, params)
 			}
 		};
-		bin.item_add(item, &params).map_err(SingleAtlasError::Bin)?;
+		bin.item_add(item, &(&params).into()).map_err(SingleAtlasError::Bin)?;
 		Ok(params)
 	}
 }
