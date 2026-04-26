@@ -7,3 +7,4 @@ license.workspace = true
 [dependencies]
 clap = { workspace = true }
 image = { workspace = true }
+rand = { workspace = true }

@@ -10,3 +10,4 @@ license = "MIT"
 [workspace.dependencies]
 clap = { version = "4.6", features = ["derive"] }
 image = { version = "0.25" }
+rand = { version = "0.10" }
