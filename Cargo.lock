@@ -283,6 +283,7 @@ version = "0.3.0"
 dependencies = [
  "clap",
  "image",
+ "texture-atlas",
 ]
 
 [[package]]
