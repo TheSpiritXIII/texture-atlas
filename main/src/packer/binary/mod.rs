@@ -16,6 +16,7 @@ use crate::Packer;
 use crate::PackerOp;
 use crate::Pos2;
 use crate::Size2;
+use crate::cmp_by_width;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct BinaryPacker<Item>
@@ -84,9 +85,10 @@ where
 		group: &[T],
 	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Self::Output>), Self::Error>> {
 		let mut index_list: Vec<usize> = (0..group.len()).collect::<Vec<usize>>();
-		index_list.sort_by_key(|x| {
-			let item = group[*x].borrow();
-			(item.width(), item.height())
+		index_list.sort_by(|a, b| {
+			let item_a = group[*a].borrow();
+			let item_b = group[*b].borrow();
+			cmp_by_width(item_a, item_b)
 		});
 		index_list.reverse();
 		index_list.into_iter().map(move |index| {
