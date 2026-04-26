@@ -1,6 +1,7 @@
 [workspace]
 resolver = "3"
-members = ["main"]
+members = ["cli", "main"]
 
 [workspace.dependencies]
+clap = { version = "4.6", features = ["derive"] }
 image = { version = "0.25" }

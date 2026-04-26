@@ -1,11 +1,9 @@
 [package]
-name = "texture-atlas"
+name = "cli"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 
 [dependencies]
-image = { workspace = true, optional = true }
-
-[features]
-default = ["image"]
+clap = { workspace = true }
+image = { workspace = true }
