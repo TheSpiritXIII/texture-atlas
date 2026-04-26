@@ -2,6 +2,7 @@
 mod test;
 
 use std::borrow::Borrow;
+use std::convert::Infallible;
 use std::marker::PhantomData;
 
 use crate::AtlasOptions;
@@ -45,7 +46,7 @@ where
 	Item: AtlasRect,
 {
 	type Output = Pos2;
-	type Error = ();
+	type Error = Infallible;
 
 	fn add(&mut self, _: &AtlasOptions, _: &Item) -> Result<PackerOp<Self::Output>, Self::Error> {
 		Ok(PackerOp::NewBin(Pos2 {

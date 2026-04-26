@@ -3,14 +3,17 @@ mod node;
 mod test;
 
 use std::borrow::Borrow;
+use std::convert::Infallible;
 use std::marker::PhantomData;
 
 use node::Node;
 
+use crate::AtlasOptions;
 use crate::AtlasRect;
 use crate::AtlasRectExt;
 use crate::Fit2;
 use crate::Packer;
+use crate::PackerOp;
 use crate::Pos2;
 use crate::Size2;
 
@@ -34,7 +37,7 @@ where
 		}
 	}
 
-	fn add_bin(&mut self, options: &crate::AtlasOptions, item: &Size2) {
+	fn add_bin(&mut self, options: &AtlasOptions, item: &Size2) {
 		self.bin_list.push(BinaryBin::new(options, item));
 	}
 }
@@ -53,22 +56,22 @@ where
 	Item: AtlasRect,
 {
 	type Output = Pos2;
-	type Error = ();
+	type Error = Infallible;
 
 	fn add(
 		&mut self,
-		options: &crate::AtlasOptions,
+		options: &AtlasOptions,
 		item: &Item,
-	) -> Result<crate::PackerOp<Self::Output>, Self::Error> {
+	) -> Result<PackerOp<Self::Output>, Self::Error> {
 		let size = Size2::new(item.width(), item.height());
 		for bin in &mut self.bin_list {
 			if let Some(position) = bin.add_to_smallest_node(&size) {
-				return Ok(crate::PackerOp::ExistingBin((0, position)));
+				return Ok(PackerOp::ExistingBin((0, position)));
 			}
 		}
 
 		self.add_bin(options, &size);
-		Ok(crate::PackerOp::NewBin(Pos2 {
+		Ok(PackerOp::NewBin(Pos2 {
 			x: 0,
 			y: 0,
 		}))
@@ -76,9 +79,9 @@ where
 
 	fn add_all<T: Borrow<Item>>(
 		&mut self,
-		options: &crate::AtlasOptions,
+		options: &AtlasOptions,
 		group: &[T],
-	) -> impl IntoIterator<Item = Result<(usize, crate::PackerOp<Self::Output>), Self::Error>> {
+	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Self::Output>), Self::Error>> {
 		let mut index_list: Vec<usize> = (0..group.len()).collect::<Vec<usize>>();
 		index_list.sort_by_key(|x| {
 			let item = group[*x].borrow();
@@ -99,7 +102,7 @@ struct BinaryBin {
 }
 
 impl BinaryBin {
-	pub fn new(options: &crate::AtlasOptions, item: &Size2) -> Self {
+	pub fn new(options: &AtlasOptions, item: &Size2) -> Self {
 		let node = Node::new(Size2 {
 			width: options.max_width.get(),
 			height: options.max_height.get(),
