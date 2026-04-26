@@ -12,6 +12,7 @@ use texture_atlas::BinaryPacker;
 use texture_atlas::DynamicAtlas;
 use texture_atlas::GenericPacker;
 use texture_atlas::PassthroughPacker;
+use texture_atlas::UniformPacker;
 
 #[derive(Parser)]
 struct Cli {
@@ -33,8 +34,9 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Algorithm {
-	Passthrough,
 	Binary,
+	Passthrough,
+	Uniform,
 }
 
 fn main() -> io::Result<()> {
@@ -52,8 +54,9 @@ fn main() -> io::Result<()> {
 
 	let options = AtlasOptions::with_max_size(cli.max_width, cli.max_height);
 	let packer: GenericPacker<RgbaImage> = match cli.algorithm {
-		Algorithm::Passthrough => GenericPacker::Passthrough(PassthroughPacker::new()),
 		Algorithm::Binary => GenericPacker::Binary(BinaryPacker::new()),
+		Algorithm::Passthrough => GenericPacker::Passthrough(PassthroughPacker::new()),
+		Algorithm::Uniform => GenericPacker::Uniform(UniformPacker::new()),
 	};
 	let mut atlas = DynamicAtlas::<_, RgbaImage, RgbaImage>::new(options, packer);
 	atlas.add_all(&image_list).unwrap();
