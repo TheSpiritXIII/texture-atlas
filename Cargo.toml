@@ -1,6 +1,11 @@
 [workspace]
 resolver = "3"
-members = ["cli", "main"]
+members = ["cli", "gen", "main"]
+
+[workspace.package]
+version = "0.3.0"
+edition = "2024"
+license = "MIT"
 
 [workspace.dependencies]
 clap = { version = "4.6", features = ["derive"] }
