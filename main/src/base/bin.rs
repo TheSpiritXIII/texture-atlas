@@ -5,7 +5,7 @@ use crate::AtlasRect;
 // TODO: Add options type that goes into the constructor.
 
 /// Represents a single bin in an atlas.
-pub trait Bin<T: AtlasRect>: AtlasRect {
+pub trait Bin<Item: AtlasRect>: AtlasRect {
 	/// The parameter type when adding an item to the bin.
 	type Params;
 
@@ -17,5 +17,5 @@ pub trait Bin<T: AtlasRect>: AtlasRect {
 
 	/// Adds a new item to the bin at the given position. The given item should not overlap with
 	/// any other items previously passed into this function.
-	fn item_add(&mut self, item: &T, params: &Self::Params) -> Result<(), Self::Error>;
+	fn item_add(&mut self, item: &Item, params: &Self::Params) -> Result<(), Self::Error>;
 }

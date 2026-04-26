@@ -12,6 +12,8 @@ use texture_atlas::BinaryPacker;
 use texture_atlas::DynamicAtlas;
 use texture_atlas::GenericPacker;
 use texture_atlas::PassthroughPacker;
+use texture_atlas::Scored;
+use texture_atlas::ScoredBin2;
 use texture_atlas::UniformPacker;
 
 #[derive(Parser)]
@@ -58,15 +60,19 @@ fn main() -> io::Result<()> {
 		Algorithm::Passthrough => GenericPacker::Passthrough(PassthroughPacker::new()),
 		Algorithm::Uniform => GenericPacker::Uniform(UniformPacker::new()),
 	};
-	let mut atlas = DynamicAtlas::<_, RgbaImage, RgbaImage>::new(options, packer);
+	let mut atlas =
+		DynamicAtlas::<_, ScoredBin2<RgbaImage, RgbaImage>, RgbaImage>::new(options, packer);
 	atlas.add_all(&image_list).unwrap();
-	let page_list = atlas.consume();
+	let bin_list = atlas.consume();
 
 	fs::create_dir_all(&cli.output_dir)?;
-	for (i, page) in page_list.into_iter().enumerate() {
+	for (i, bin) in bin_list.iter().enumerate() {
 		let output_path = cli.output_dir.join(format!("atlas_{}.png", i));
-		page.save(output_path).unwrap();
+		bin.bin().save(output_path).unwrap();
 	}
+
+	println!("Score: {:.2}%", bin_list.as_slice().score() * 100.0);
+	println!("Done!");
 
 	Ok(())
 }
