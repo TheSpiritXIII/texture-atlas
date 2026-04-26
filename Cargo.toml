@@ -1,12 +1,6 @@
-[package]
-name = "texture-atlas"
-version = "0.3.0"
-license = "MIT"
-edition = "2024"
+[workspace]
+resolver = "3"
+members = ["main"]
 
-[features]
-default = ["image"]
-
-[dependencies.image]
-version = "0.25"
-optional = true
+[workspace.dependencies]
+image = { version = "0.25" }
