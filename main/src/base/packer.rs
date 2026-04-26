@@ -49,7 +49,7 @@ impl<T: PartialEq> PartialEq for PackerOp<T> {
 /// Packs textures into a bin.
 pub trait Packer<Item: AtlasRect> {
 	/// The output type of the packer. This should contain a list of references of the items added
-	/// with metadata, e.g. position. Most packers will suffice with [Pos2].
+	/// with metadata, e.g. position. Most packers will suffice with [`Pos2`](crate::Pos2).
 	// TODO: Add default. See: https://github.com/rust-lang/rust/issues/29661
 	type Output;
 
