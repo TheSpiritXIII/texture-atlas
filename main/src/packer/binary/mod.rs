@@ -64,9 +64,10 @@ where
 		item: &Item,
 	) -> Result<PackerOp<Self::Output>, Self::Error> {
 		let size = Size2::new(item.width(), item.height());
-		for bin in &mut self.bin_list {
+		for (index, bin) in &mut self.bin_list.iter_mut().enumerate() {
 			if let Some(position) = bin.add_to_smallest_node(&size) {
-				return Ok(PackerOp::ExistingBin((0, position)));
+				// TODO: Add test for multiple bins.
+				return Ok(PackerOp::ExistingBin((index, position)));
 			}
 		}
 

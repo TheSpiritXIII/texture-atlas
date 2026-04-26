@@ -9,6 +9,7 @@ use crate::PassthroughPacker;
 use crate::Pos2;
 
 /// Encapsulates every built-in packer.
+#[derive(Debug)]
 pub enum GenericPacker<T: AtlasRect> {
 	Passthrough(PassthroughPacker<T>),
 	Binary(BinaryPacker<T>),
