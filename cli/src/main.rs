@@ -4,10 +4,13 @@ use std::num::NonZero;
 use std::path::PathBuf;
 
 use clap::Parser;
+use clap::Subcommand;
 use image::ImageReader;
 use image::RgbaImage;
 use texture_atlas::AtlasOptions;
+use texture_atlas::BinaryPacker;
 use texture_atlas::DynamicAtlas;
+use texture_atlas::GenericPacker;
 use texture_atlas::PassthroughPacker;
 
 #[derive(Parser)]
@@ -23,6 +26,15 @@ struct Cli {
 
 	#[arg(long)]
 	max_height: NonZero<u32>,
+
+	#[command(subcommand)]
+	algorithm: Algorithm,
+}
+
+#[derive(Subcommand)]
+enum Algorithm {
+	Passthrough,
+	Binary,
 }
 
 fn main() -> io::Result<()> {
@@ -39,7 +51,11 @@ fn main() -> io::Result<()> {
 	}
 
 	let options = AtlasOptions::with_max_size(cli.max_width, cli.max_height);
-	let mut atlas = DynamicAtlas::<_, RgbaImage, RgbaImage>::new(options, PassthroughPacker::new());
+	let packer: GenericPacker<RgbaImage> = match cli.algorithm {
+		Algorithm::Passthrough => GenericPacker::Passthrough(PassthroughPacker::new()),
+		Algorithm::Binary => GenericPacker::Binary(BinaryPacker::new()),
+	};
+	let mut atlas = DynamicAtlas::<_, RgbaImage, RgbaImage>::new(options, packer);
 	atlas.add_all(&image_list).unwrap();
 	let page_list = atlas.consume();
 
