@@ -57,11 +57,14 @@ fn main() -> anyhow::Result<()> {
 	let cli = Cli::parse();
 
 	let mut image_list = Vec::new();
-	for entry in cli.input_dir.read_dir()? {
-		let entry = entry?;
+	for entry in cli.input_dir.read_dir().with_context(|| "Failed to read input directory")? {
+		let entry = entry.with_context(|| "Failed to read directory entry")?;
 		let path = entry.path();
 		if path.is_file() {
-			let image = ImageReader::open(path)?.decode()?;
+			let image = ImageReader::open(&path)
+				.with_context(|| format!("Failed to open image: {:?}", path))?
+				.decode()
+				.with_context(|| format!("Failed to decode image: {:?}", path))?;
 			image_list.push(image.to_rgba8());
 		}
 	}
@@ -74,30 +77,38 @@ fn main() -> anyhow::Result<()> {
 	};
 	let mut atlas =
 		DynamicAtlas::<_, ScoredBin2<RgbaImage, RgbaImage>, RgbaImage>::new(options, packer);
+	// TODO: Consider thiserror for library errors so we could use with_context.
 	let data = atlas.add_all(&image_list).unwrap();
 	let bin_list = atlas.build();
 
-	fs::create_dir_all(&cli.output_dir)?;
+	fs::create_dir_all(&cli.output_dir)
+		.with_context(|| format!("Failed to create output directory: {:?}", cli.output_dir))?;
 	for (i, bin) in bin_list.iter().enumerate() {
 		let output_path = cli.output_dir.join(format!("atlas_{}.png", i));
-		bin.bin().save(output_path)?;
+		bin.bin()
+			.save(&output_path)
+			.with_context(|| format!("Failed to save atlas image: {:?}", output_path))?;
 	}
-	println!("Score: {:.2}%", bin_list.as_slice().score() * 100.0);
 
 	let value = toml::to_string(&Config {
 		items: data,
 	})
-	.with_context(|| "Generating TOML")?;
+	.with_context(|| "Failed to generate TOML")?;
 	if let Some(output_file) = cli.output_file {
 		if let Some(parent) = output_file.parent() {
-			fs::create_dir_all(parent)?;
+			fs::create_dir_all(parent)
+				.with_context(|| format!("Failed to create parent directory: {:?}", parent))?;
 		}
-		fs::write(output_file, value)?;
+		fs::write(&output_file, &value)
+			.with_context(|| format!("Failed to write config file: {:?}", output_file))?;
 	} else {
-	println!("{value}");
+		println!("{value}");
 	}
 
 	println!("Done!");
+	println!("Input images: {}%", image_list.len());
+	println!("Output images: {}%", bin_list.len());
+	println!("Score: {:.2}%", bin_list.as_slice().score() * 100.0);
 
 	Ok(())
 }
