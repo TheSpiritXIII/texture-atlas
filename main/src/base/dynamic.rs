@@ -11,6 +11,7 @@ use serde::Serialize;
 use crate::AtlasOptions;
 use crate::AtlasRect;
 use crate::Bin as AtlasBin;
+use crate::BinAdd;
 use crate::Packer as AtlasPacker;
 use crate::PackerOp;
 pub enum AtlasError<BinError, PackerError> {
@@ -89,9 +90,8 @@ pub struct AtlasAddMulti<T> {
 pub struct DynamicAtlas<Packer, Bin, Item, Output>
 where
 	Packer: AtlasPacker<Item, Output>,
-	Bin: AtlasBin<Item>,
+	Bin: AtlasBin<Item> + BinAdd<Item, Output>,
 	Item: AtlasRect,
-	for<'a> &'a Output: Into<Bin::Params>,
 {
 	options: AtlasOptions,
 	packer: Packer,
@@ -103,9 +103,8 @@ where
 impl<Packer, Bin, Item, Output> DynamicAtlas<Packer, Bin, Item, Output>
 where
 	Packer: AtlasPacker<Item, Output>,
-	Bin: AtlasBin<Item>,
+	Bin: AtlasBin<Item> + BinAdd<Item, Output>,
 	Item: AtlasRect,
-	for<'a> &'a Output: Into<Bin::Params>,
 {
 	pub fn new(options: AtlasOptions, packer: Packer) -> Self {
 		Self {
@@ -168,7 +167,7 @@ where
 			}
 			PackerOp::ExistingBin((bin, params)) => (bin, params),
 		};
-		bin_list[index].item_add(item, &(&params).into()).map_err(AtlasError::Bin)?;
+		bin_list[index].item_add(item, &params).map_err(AtlasError::Bin)?;
 		Ok(AtlasAdd {
 			bin_index: index,
 			output: params,

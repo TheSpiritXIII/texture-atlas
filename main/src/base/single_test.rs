@@ -5,6 +5,7 @@ use crate::AlwaysExistingBinPacker;
 use crate::AtlasOptions;
 use crate::AtlasRect;
 use crate::Bin;
+use crate::BinAdd;
 use crate::Pos2;
 use crate::SingleAtlas;
 use crate::SingleAtlasError;
@@ -45,7 +46,6 @@ impl<T> Bin<IndexedItem<T>> for IndexedBin<Pos2>
 where
 	T: AtlasRect + Clone,
 {
-	type Params = Pos2;
 	type Error = ();
 
 	fn new(width: NonZero<u32>, height: NonZero<u32>) -> Self {
@@ -55,12 +55,13 @@ where
 			data: Vec::new(),
 		}
 	}
+}
 
-	fn item_add(
-		&mut self,
-		item: &IndexedItem<T>,
-		params: &Self::Params,
-	) -> Result<(), Self::Error> {
+impl<T> BinAdd<IndexedItem<T>, Pos2> for IndexedBin<Pos2>
+where
+	T: AtlasRect + Clone,
+{
+	fn item_add(&mut self, item: &IndexedItem<T>, params: &Pos2) -> Result<(), Self::Error> {
 		self.data.push((item.index, *params));
 		Ok(())
 	}

@@ -52,10 +52,10 @@ pub struct Rotate2 {
 	pub rotate: bool,
 }
 
-impl From<&Pos2> for Rotate2 {
-	fn from(pos: &Pos2) -> Self {
+impl From<Pos2> for Rotate2 {
+	fn from(pos: Pos2) -> Self {
 		Rotate2 {
-			pos: *pos,
+			pos,
 			rotate: false,
 		}
 	}

@@ -4,6 +4,7 @@ use std::marker::PhantomData;
 use crate::AtlasOptions;
 use crate::AtlasRect;
 use crate::Bin as AtlasBin;
+use crate::BinAdd;
 use crate::Packer as AtlasPacker;
 use crate::PackerOp;
 
@@ -11,9 +12,8 @@ use crate::PackerOp;
 pub struct SingleAtlas<Packer, Bin, Item, Output>
 where
 	Packer: AtlasPacker<Item, Output>,
-	Bin: AtlasBin<Item>,
+	Bin: AtlasBin<Item> + BinAdd<Item, Output>,
 	Item: AtlasRect,
-	for<'a> &'a Output: Into<Bin::Params>,
 {
 	options: AtlasOptions,
 	packer: Packer,
@@ -43,9 +43,8 @@ pub struct SingleAtlasEntry<T> {
 impl<Packer, Bin, Item, Output> SingleAtlas<Packer, Bin, Item, Output>
 where
 	Packer: AtlasPacker<Item, Output>,
-	Bin: AtlasBin<Item>,
+	Bin: AtlasBin<Item> + BinAdd<Item, Output>,
 	Item: AtlasRect,
-	for<'a> &'a Output: Into<Bin::Params>,
 {
 	/// Creates a new atlas.
 	pub fn new(options: AtlasOptions, packer: Packer) -> Self {
@@ -118,7 +117,7 @@ where
 				(bin, params)
 			}
 		};
-		bin.item_add(item, &(&params).into()).map_err(SingleAtlasError::Bin)?;
+		bin.item_add(item, &params).map_err(SingleAtlasError::Bin)?;
 		Ok(params)
 	}
 }

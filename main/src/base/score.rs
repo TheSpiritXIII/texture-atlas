@@ -3,6 +3,7 @@ use std::marker::PhantomData;
 use crate::AtlasRect;
 use crate::AtlasRectExt;
 use crate::Bin as AtlasBin;
+use crate::BinAdd;
 
 /// An algorithm which can be scored.
 pub trait Scored {
@@ -36,7 +37,6 @@ where
 	Item: AtlasRect,
 	Bin: AtlasBin<Item>,
 {
-	type Params = Bin::Params;
 	type Error = Bin::Error;
 
 	fn new(width: std::num::NonZero<u32>, height: std::num::NonZero<u32>) -> Self {
@@ -46,8 +46,14 @@ where
 			phantom: PhantomData,
 		}
 	}
+}
 
-	fn item_add(&mut self, item: &Item, params: &Self::Params) -> Result<(), Self::Error> {
+impl<Item, Bin, Params> BinAdd<Item, Params> for ScoredBin2<Item, Bin>
+where
+	Item: AtlasRect,
+	Bin: AtlasBin<Item> + BinAdd<Item, Params>,
+{
+	fn item_add(&mut self, item: &Item, params: &Params) -> Result<(), Self::Error> {
 		self.bin.item_add(item, params)?;
 		// TODO: Avoid casting.
 		self.score += item.area() as usize;
