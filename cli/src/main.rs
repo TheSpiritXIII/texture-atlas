@@ -7,6 +7,7 @@ use clap::Parser;
 use clap::Subcommand;
 use image::ImageReader;
 use image::RgbaImage;
+use log::info;
 use serde::Deserialize;
 use serde::Serialize;
 use texture_atlas::AtlasAddMulti;
@@ -54,6 +55,7 @@ struct Config {
 }
 
 fn main() -> anyhow::Result<()> {
+	env_logger::init();
 	let cli = Cli::parse();
 
 	let mut image_list = Vec::new();
@@ -105,10 +107,10 @@ fn main() -> anyhow::Result<()> {
 		println!("{value}");
 	}
 
-	println!("Done!");
-	println!("Input images: {}%", image_list.len());
-	println!("Output images: {}%", bin_list.len());
-	println!("Score: {:.2}%", bin_list.as_slice().score() * 100.0);
+	info!("Done!");
+	info!("Input images: {}%", image_list.len());
+	info!("Output images: {}%", bin_list.len());
+	info!("Score: {:.2}%", bin_list.as_slice().score() * 100.0);
 
 	Ok(())
 }
