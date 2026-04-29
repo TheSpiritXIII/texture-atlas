@@ -4,7 +4,6 @@ mod test;
 
 use std::borrow::Borrow;
 use std::convert::Infallible;
-use std::marker::PhantomData;
 
 use node::Node;
 
@@ -19,22 +18,14 @@ use crate::Size2;
 use crate::cmp_by_width;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
-pub struct BinaryPacker<Item>
-where
-	Item: AtlasRect,
-{
+pub struct BinaryPacker {
 	bin_list: Vec<BinaryBin>,
-	phantom: PhantomData<Item>,
 }
 
-impl<Item> BinaryPacker<Item>
-where
-	Item: AtlasRect,
-{
+impl BinaryPacker {
 	pub fn new() -> Self {
 		Self {
 			bin_list: Vec::new(),
-			phantom: PhantomData,
 		}
 	}
 
@@ -43,16 +34,13 @@ where
 	}
 }
 
-impl<Item> Default for BinaryPacker<Item>
-where
-	Item: AtlasRect,
-{
+impl Default for BinaryPacker {
 	fn default() -> Self {
 		Self::new()
 	}
 }
 
-impl<Item> Packer<Item> for BinaryPacker<Item>
+impl<Item> Packer<Item> for BinaryPacker
 where
 	Item: AtlasRect,
 {

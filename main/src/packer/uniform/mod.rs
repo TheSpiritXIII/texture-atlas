@@ -3,7 +3,6 @@ mod test;
 
 use std::borrow::Borrow;
 use std::convert::Infallible;
-use std::marker::PhantomData;
 
 use crate::AtlasOptions;
 use crate::AtlasRect;
@@ -16,40 +15,29 @@ use crate::Size2;
 /// overflow. This algorithm is best used when items are uniformly sized since gaps would be
 /// impossible. As such, older bins are never reused once a new bin is created.
 #[derive(Clone, Debug)]
-pub struct UniformPacker<Item>
-where
-	Item: AtlasRect,
-{
+pub struct UniformPacker {
 	used: Size2,
 	highest: u32,
 	bin_len: usize,
-	phantom: PhantomData<Item>,
 }
 
-impl<Item> UniformPacker<Item>
-where
-	Item: AtlasRect,
-{
+impl UniformPacker {
 	pub fn new() -> Self {
 		Self {
 			used: Size2::new(u32::MAX, u32::MAX),
 			highest: 0,
 			bin_len: 0,
-			phantom: PhantomData,
 		}
 	}
 }
 
-impl<Item> Default for UniformPacker<Item>
-where
-	Item: AtlasRect,
-{
+impl Default for UniformPacker {
 	fn default() -> Self {
 		Self::new()
 	}
 }
 
-impl<Item> Packer<Item> for UniformPacker<Item>
+impl<Item> Packer<Item> for UniformPacker
 where
 	Item: AtlasRect,
 {

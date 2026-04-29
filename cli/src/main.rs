@@ -72,7 +72,7 @@ fn main() -> anyhow::Result<()> {
 	}
 
 	let options = AtlasOptions::with_max_size(cli.max_width, cli.max_height);
-	let packer: GenericPacker<RgbaImage> = match cli.algorithm {
+	let packer: GenericPacker = match cli.algorithm {
 		Algorithm::Binary => GenericPacker::Binary(BinaryPacker::new()),
 		Algorithm::Passthrough => GenericPacker::Passthrough(PassthroughPacker::new()),
 		Algorithm::Uniform => GenericPacker::Uniform(UniformPacker::new()),

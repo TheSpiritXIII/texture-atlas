@@ -3,7 +3,6 @@ mod test;
 
 use std::borrow::Borrow;
 use std::convert::Infallible;
-use std::marker::PhantomData;
 
 use crate::AtlasOptions;
 use crate::AtlasRect;
@@ -14,34 +13,21 @@ use crate::Pos2;
 /// A packer that packs every item into its own bin at position (0, 0). This is useful for testing
 /// and debugging.
 #[derive(Clone, Copy, Debug)]
-pub struct PassthroughPacker<Item>
-where
-	Item: AtlasRect,
-{
-	phantom: PhantomData<Item>,
-}
+pub struct PassthroughPacker;
 
-impl<Item> PassthroughPacker<Item>
-where
-	Item: AtlasRect,
-{
+impl PassthroughPacker {
 	pub fn new() -> Self {
-		Self {
-			phantom: PhantomData,
-		}
+		Self {}
 	}
 }
 
-impl<Item> Default for PassthroughPacker<Item>
-where
-	Item: AtlasRect,
-{
+impl Default for PassthroughPacker {
 	fn default() -> Self {
 		Self::new()
 	}
 }
 
-impl<Item> Packer<Item> for PassthroughPacker<Item>
+impl<Item> Packer<Item> for PassthroughPacker
 where
 	Item: AtlasRect,
 {

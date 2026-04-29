@@ -11,13 +11,13 @@ use crate::UniformPacker;
 
 /// Encapsulates every built-in packer.
 #[derive(Debug)]
-pub enum GenericPacker<T: AtlasRect> {
-	Uniform(UniformPacker<T>),
-	Passthrough(PassthroughPacker<T>),
-	Binary(BinaryPacker<T>),
+pub enum GenericPacker {
+	Uniform(UniformPacker),
+	Passthrough(PassthroughPacker),
+	Binary(BinaryPacker),
 }
 
-impl<Item> Packer<Item> for GenericPacker<Item>
+impl<Item> Packer<Item> for GenericPacker
 where
 	Item: AtlasRect,
 {

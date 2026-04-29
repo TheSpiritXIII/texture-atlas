@@ -12,14 +12,10 @@ fn new_options() -> AtlasOptions {
 	AtlasOptions::with_max_size(NonZero::new(1024).unwrap(), NonZero::new(1024).unwrap())
 }
 
-fn new_packer() -> PassthroughPacker<Size2> {
-	PassthroughPacker::<Size2>::new()
-}
-
 #[test]
 fn add_overflow() {
 	let options = new_options();
-	let packer = new_packer();
+	let packer = PassthroughPacker::new();
 	assert_add_overflow(&options, packer);
 }
 
@@ -30,7 +26,7 @@ fn add_underflow() {
 	let rect_2 = Size2::new(5, 5);
 	let rect_3 = Size2::new(20, 20);
 
-	let mut packer = new_packer();
+	let mut packer = PassthroughPacker::new();
 	assert_eq!(
 		packer.add(&options, &rect_1),
 		Ok(PackerOp::NewBin(Pos2 {

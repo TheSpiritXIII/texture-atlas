@@ -78,8 +78,8 @@ impl<T> AtlasRect for IndexedBin<T> {
 
 #[test]
 fn empty() {
-	let packer = UniformPacker::<IndexedItem<Size2>>::new();
-	let atlas = SingleAtlas::new(new_options(), packer);
+	let packer = UniformPacker::new();
+	let atlas = SingleAtlas::<_, _, IndexedItem<Size2>>::new(new_options(), packer);
 
 	let bin: Option<IndexedBin<Pos2>> = atlas.build();
 	assert!(bin.is_none());
@@ -122,8 +122,8 @@ fn packer_error() {
 
 #[test]
 fn add_single_once() {
-	let packer = UniformPacker::<IndexedItem<Size2>>::new();
-	let mut atlas = SingleAtlas::new(new_options(), packer);
+	let packer = UniformPacker::new();
+	let mut atlas = SingleAtlas::<_, _, IndexedItem<Size2>>::new(new_options(), packer);
 
 	assert!(
 		atlas
@@ -154,8 +154,8 @@ fn add_single_once() {
 
 #[test]
 fn add_single_many() {
-	let packer = UniformPacker::<IndexedItem<Size2>>::new();
-	let mut atlas = SingleAtlas::new(new_options(), packer);
+	let packer = UniformPacker::new();
+	let mut atlas = SingleAtlas::<_, _, IndexedItem<Size2>>::new(new_options(), packer);
 
 	assert!(
 		atlas
@@ -222,8 +222,8 @@ fn add_single_many() {
 
 #[test]
 fn add_all_single_once() {
-	let packer = UniformPacker::<IndexedItem<Size2>>::new();
-	let mut atlas = SingleAtlas::new(new_options(), packer);
+	let packer = UniformPacker::new();
+	let mut atlas = SingleAtlas::<_, _, IndexedItem<Size2>>::new(new_options(), packer);
 
 	assert!(
 		atlas
@@ -256,8 +256,8 @@ fn add_all_single_once() {
 
 #[test]
 fn add_all_single_many() {
-	let packer = UniformPacker::<IndexedItem<Size2>>::new();
-	let mut atlas = SingleAtlas::new(new_options(), packer);
+	let packer = UniformPacker::new();
+	let mut atlas = SingleAtlas::<_, _, IndexedItem<Size2>>::new(new_options(), packer);
 
 	assert!(
 		atlas
@@ -330,8 +330,8 @@ fn add_all_single_many() {
 
 #[test]
 fn add_all_multi() {
-	let packer = UniformPacker::<IndexedItem<Size2>>::new();
-	let mut atlas = SingleAtlas::new(new_options(), packer);
+	let packer = UniformPacker::new();
+	let mut atlas = SingleAtlas::<_, _, IndexedItem<Size2>>::new(new_options(), packer);
 
 	assert!(
 		atlas

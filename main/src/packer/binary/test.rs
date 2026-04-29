@@ -19,14 +19,14 @@ fn new_options() -> AtlasOptions {
 #[test]
 fn add_overflow() {
 	let options = new_options();
-	let packer = BinaryPacker::<Size2>::new();
+	let packer = BinaryPacker::new();
 	assert_add_overflow(&options, packer);
 }
 
 #[test]
 fn add_underflow() {
 	let options = new_options();
-	let packer = BinaryPacker::<Size2>::new();
+	let packer = BinaryPacker::new();
 	assert_add_underflow(&options, packer);
 }
 
@@ -37,7 +37,7 @@ fn add_single_underflow_then_underflow() {
 	let rect_2 = Size2::new(100, 100);
 	let rect_3 = Size2::new(400, 400);
 
-	let mut packer = BinaryPacker::<Size2>::new();
+	let mut packer = BinaryPacker::new();
 	assert_eq!(packer.add(&options, &rect_1), Ok(new_bin()));
 	assert_eq!(
 		packer.add(&options, &rect_2),
@@ -68,7 +68,7 @@ fn add_single_underflow_then_overflow_bin() {
 	let rect_2 = Size2::new(100, 100);
 	let rect_3 = Size2::new(500, 500);
 
-	let mut packer = BinaryPacker::<Size2>::new();
+	let mut packer = BinaryPacker::new();
 	assert_eq!(packer.add(&options, &rect_1), Ok(new_bin()));
 	assert_eq!(
 		packer.add(&options, &rect_2),
@@ -90,7 +90,7 @@ fn add_single_underflow_then_overflow_space() {
 	let rect_2 = Size2::new(100, 100);
 	let rect_3 = Size2::new(50, 50);
 
-	let mut packer = BinaryPacker::<Size2>::new();
+	let mut packer = BinaryPacker::new();
 	assert_eq!(packer.add(&options, &rect_1), Ok(new_bin()));
 	assert_eq!(
 		packer.add(&options, &rect_2),
@@ -120,17 +120,17 @@ fn add_multiple_max_size() {
 	let rect_1 = Size2::new(1024, 1024);
 	let rect_2 = Size2::new(100, 100);
 
-	let mut packer = BinaryPacker::<Size2>::new();
-	let result: Vec<_> = packer
-		.add_all(
-			&options,
-			&[
-				&rect_1,
-				&rect_2,
-			],
-		)
-		.into_iter()
-		.collect();
+	let mut packer = BinaryPacker::new();
+	let result: Vec<_> = Packer::<Size2>::add_all(
+		&mut packer,
+		&options,
+		&[
+			&rect_1,
+			&rect_2,
+		],
+	)
+	.into_iter()
+	.collect();
 	assert_eq!(
 		result,
 		&[
@@ -146,17 +146,17 @@ fn add_multiple_max_width() {
 	let rect_1 = Size2::new(1024, 600);
 	let rect_2 = Size2::new(100, 100);
 
-	let mut packer = BinaryPacker::<Size2>::new();
-	let result: Vec<_> = packer
-		.add_all(
-			&options,
-			&[
-				&rect_1,
-				&rect_2,
-			],
-		)
-		.into_iter()
-		.collect();
+	let mut packer = BinaryPacker::new();
+	let result: Vec<_> = Packer::<Size2>::add_all(
+		&mut packer,
+		&options,
+		&[
+			&rect_1,
+			&rect_2,
+		],
+	)
+	.into_iter()
+	.collect();
 	assert_eq!(
 		result,
 		&[
@@ -181,17 +181,17 @@ fn add_multiple_overflow_bin() {
 	let rect_1 = Size2::new(600, 600);
 	let rect_2 = Size2::new(599, 599);
 
-	let mut packer = BinaryPacker::<Size2>::new();
-	let result: Vec<_> = packer
-		.add_all(
-			&options,
-			&[
-				&rect_1,
-				&rect_2,
-			],
-		)
-		.into_iter()
-		.collect();
+	let mut packer = BinaryPacker::new();
+	let result: Vec<_> = Packer::<Size2>::add_all(
+		&mut packer,
+		&options,
+		&[
+			&rect_1,
+			&rect_2,
+		],
+	)
+	.into_iter()
+	.collect();
 	assert_eq!(
 		result,
 		&[
@@ -207,17 +207,17 @@ fn add_multiple_overflow_space() {
 	let rect_1 = Size2::new(600, 600);
 	let rect_2 = Size2::new(600, 100);
 
-	let mut packer = BinaryPacker::<Size2>::new();
-	let result: Vec<_> = packer
-		.add_all(
-			&options,
-			&[
-				&rect_1,
-				&rect_2,
-			],
-		)
-		.into_iter()
-		.collect();
+	let mut packer = BinaryPacker::new();
+	let result: Vec<_> = Packer::<Size2>::add_all(
+		&mut packer,
+		&options,
+		&[
+			&rect_1,
+			&rect_2,
+		],
+	)
+	.into_iter()
+	.collect();
 	assert_eq!(
 		result,
 		&[
@@ -243,18 +243,18 @@ fn add_multiple_underflow_then_underflow() {
 	let rect_2 = Size2::new(100, 100);
 	let rect_3 = Size2::new(300, 300);
 
-	let mut packer = BinaryPacker::<Size2>::new();
-	let result: Vec<_> = packer
-		.add_all(
-			&options,
-			&[
-				&rect_1,
-				&rect_2,
-				&rect_3,
-			],
-		)
-		.into_iter()
-		.collect();
+	let mut packer = BinaryPacker::new();
+	let result: Vec<_> = Packer::<Size2>::add_all(
+		&mut packer,
+		&options,
+		&[
+			&rect_1,
+			&rect_2,
+			&rect_3,
+		],
+	)
+	.into_iter()
+	.collect();
 	assert_eq!(
 		result,
 		&[
@@ -290,18 +290,18 @@ fn add_multiple_underflow_then_overflow_bin() {
 	let rect_2 = Size2::new(100, 100);
 	let rect_3 = Size2::new(500, 500);
 
-	let mut packer = BinaryPacker::<Size2>::new();
-	let result: Vec<_> = packer
-		.add_all(
-			&options,
-			&[
-				&rect_1,
-				&rect_2,
-				&rect_3,
-			],
-		)
-		.into_iter()
-		.collect();
+	let mut packer = BinaryPacker::new();
+	let result: Vec<_> = Packer::<Size2>::add_all(
+		&mut packer,
+		&options,
+		&[
+			&rect_1,
+			&rect_2,
+			&rect_3,
+		],
+	)
+	.into_iter()
+	.collect();
 	assert_eq!(
 		result,
 		&[
@@ -328,18 +328,18 @@ fn add_multiple_underflow_then_overflow_space() {
 	let rect_2 = Size2::new(100, 100);
 	let rect_3 = Size2::new(50, 50);
 
-	let mut packer = BinaryPacker::<Size2>::new();
-	let result: Vec<_> = packer
-		.add_all(
-			&options,
-			&[
-				&rect_1,
-				&rect_2,
-				&rect_3,
-			],
-		)
-		.into_iter()
-		.collect();
+	let mut packer = BinaryPacker::new();
+	let result: Vec<_> = Packer::<Size2>::add_all(
+		&mut packer,
+		&options,
+		&[
+			&rect_1,
+			&rect_2,
+			&rect_3,
+		],
+	)
+	.into_iter()
+	.collect();
 	assert_eq!(
 		result,
 		&[

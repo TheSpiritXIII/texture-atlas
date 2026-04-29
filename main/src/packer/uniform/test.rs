@@ -19,26 +19,26 @@ fn new_options() -> AtlasOptions {
 #[test]
 fn add_overflow() {
 	let options = new_options();
-	let packer = UniformPacker::<Size2>::new();
+	let packer = UniformPacker::new();
 	assert_add_overflow(&options, packer);
 }
 
 #[test]
 fn add_underflow() {
 	let options = new_options();
-	let packer = UniformPacker::<Size2>::new();
+	let packer = UniformPacker::new();
 	assert_add_underflow(&options, packer.clone());
 }
 
 #[test]
 fn add_rows() {
 	let options = new_options();
-	let mut packer = UniformPacker::<Size2>::new();
+	let mut packer = UniformPacker::new();
 	assert_fill_bin(&options, &mut packer, 0);
 	assert_fill_bin(&options, &mut packer, 1);
 }
 
-fn assert_fill_bin(options: &AtlasOptions, packer: &mut UniformPacker<Size2>, bin_index: usize) {
+fn assert_fill_bin(options: &AtlasOptions, packer: &mut UniformPacker, bin_index: usize) {
 	assert_eq!(
 		packer.add(options, &Size2::new(MAX_WIDTH / 2, MAX_HEIGHT / 2)),
 		Ok(new_bin()),
