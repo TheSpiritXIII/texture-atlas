@@ -29,6 +29,9 @@ struct Cli {
 	output_dir: PathBuf,
 
 	#[arg(long)]
+	output_file: Option<PathBuf>,
+
+	#[arg(long)]
 	max_width: NonZero<u32>,
 
 	#[arg(long)]
@@ -85,7 +88,14 @@ fn main() -> anyhow::Result<()> {
 		items: data,
 	})
 	.with_context(|| "Generating TOML")?;
+	if let Some(output_file) = cli.output_file {
+		if let Some(parent) = output_file.parent() {
+			fs::create_dir_all(parent)?;
+		}
+		fs::write(output_file, value)?;
+	} else {
 	println!("{value}");
+	}
 
 	println!("Done!");
 
