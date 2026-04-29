@@ -9,6 +9,7 @@ use image::ImageReader;
 use image::RgbaImage;
 use log::info;
 use serde::Serialize;
+use texture_atlas::AtlasAdd;
 use texture_atlas::AtlasAddMulti;
 use texture_atlas::AtlasOptions;
 use texture_atlas::BinaryPacker;
@@ -53,22 +54,30 @@ enum Algorithm {
 }
 
 #[derive(Serialize)]
+pub struct Output<T> {
+	pub bin_path: String,
+	pub item_path: String,
+	pub output: T,
+}
+
+#[derive(Serialize)]
 struct Config<T>
 where
 	T: Serialize,
 {
-	items: Vec<AtlasAddMulti<T>>,
+	items: Vec<Output<T>>,
 }
 
 enum ConfigType {
-	Pos(Vec<AtlasAddMulti<Pos2>>),
-	Rotate(Vec<AtlasAddMulti<Rotate2>>),
+	Pos(Vec<Output<Pos2>>),
+	Rotate(Vec<Output<Rotate2>>),
 }
 
 fn main() -> anyhow::Result<()> {
 	env_logger::init();
 	let cli = Cli::parse();
 
+	let mut file_path_list = Vec::new();
 	let mut image_list = Vec::new();
 	for entry in cli.input_dir.read_dir().with_context(|| "Failed to read input directory")? {
 		let entry = entry.with_context(|| "Failed to read directory entry")?;
@@ -78,6 +87,7 @@ fn main() -> anyhow::Result<()> {
 				.with_context(|| format!("Failed to open image: {:?}", path))?
 				.decode()
 				.with_context(|| format!("Failed to decode image: {:?}", path))?;
+			file_path_list.push(path);
 			image_list.push(image.to_rgba8());
 		}
 	}
@@ -95,7 +105,20 @@ fn main() -> anyhow::Result<()> {
 				packer,
 			);
 		// TODO: Consider thiserror for library errors so we could use with_context.
-		let data = atlas.add_all(&image_list).unwrap();
+		let data = atlas
+			.add_all(&image_list)
+			.unwrap()
+			.into_iter()
+			.map(|result| {
+				let output_path = cli.output_dir.join(format!("atlas_{}.png", result.bin_index));
+				let item_path = &file_path_list[result.item_index];
+				Output {
+					bin_path: output_path.to_string_lossy().to_string(),
+					item_path: item_path.to_string_lossy().to_string(),
+					output: result.output,
+				}
+			})
+			.collect();
 		let bin_list = atlas.build();
 		(ConfigType::Rotate(data), bin_list)
 	} else {
@@ -104,7 +127,20 @@ fn main() -> anyhow::Result<()> {
 			packer,
 		);
 		// TODO: Consider thiserror for library errors so we could use with_context.
-		let data = atlas.add_all(&image_list).unwrap();
+		let data = atlas
+			.add_all(&image_list)
+			.unwrap()
+			.into_iter()
+			.map(|result| {
+				let output_path = cli.output_dir.join(format!("atlas_{}.png", result.bin_index));
+				let item_path = &file_path_list[result.item_index];
+				Output {
+					bin_path: output_path.to_string_lossy().to_string(),
+					item_path: item_path.to_string_lossy().to_string(),
+					output: result.output,
+				}
+			})
+			.collect();
 		let bin_list = atlas.build();
 		(ConfigType::Pos(data), bin_list)
 	};
