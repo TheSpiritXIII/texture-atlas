@@ -8,7 +8,10 @@ edition = "2024"
 license = "MIT"
 
 [workspace.dependencies]
+anyhow = { version = "1.0.102" }
 clap = { version = "4.6", features = ["derive"] }
 image = { version = "0.25" }
 imageproc = { version = "0.26.1" }
 rand = { version = "0.10" }
+serde = { version = "1.0", features = ["derive"] }
+toml = { version = "1.1" }

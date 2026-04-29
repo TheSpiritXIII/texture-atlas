@@ -3,12 +3,16 @@ use std::fmt::Debug;
 use std::fmt::Display;
 use std::marker::PhantomData;
 
+#[cfg(feature = "serde")]
+use serde::Deserialize;
+#[cfg(feature = "serde")]
+use serde::Serialize;
+
 use crate::AtlasOptions;
 use crate::AtlasRect;
 use crate::Bin as AtlasBin;
 use crate::Packer as AtlasPacker;
 use crate::PackerOp;
-
 pub enum AtlasError<BinError, PackerError> {
 	Bin(BinError),
 	Packer(PackerError),
@@ -61,6 +65,13 @@ impl<T> AtlasAdd<T> {
 }
 
 #[derive(Debug)]
+#[cfg_attr(
+	feature = "serde",
+	derive(
+		Serialize,
+		Deserialize
+	)
+)]
 pub struct AtlasAddMulti<T> {
 	/// The bin index of the added entry.
 	pub bin_index: usize,

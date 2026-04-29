@@ -7,7 +7,9 @@ license.workspace = true
 [dependencies]
 image = { workspace = true, optional = true }
 imageproc = { workspace = true, optional = true }
+serde = { workspace = true, optional = true }
 
 [features]
-default = ["image"]
+default = ["image", "serde"]
 image = ["dep:image", "dep:imageproc"]
+serde = ["dep:serde"]
