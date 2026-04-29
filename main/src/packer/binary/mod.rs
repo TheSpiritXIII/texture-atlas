@@ -40,18 +40,13 @@ impl Default for BinaryPacker {
 	}
 }
 
-impl<Item> Packer<Item> for BinaryPacker
+impl<Item> Packer<Item, Pos2> for BinaryPacker
 where
 	Item: AtlasRect,
 {
-	type Output = Pos2;
 	type Error = Infallible;
 
-	fn add(
-		&mut self,
-		options: &AtlasOptions,
-		item: &Item,
-	) -> Result<PackerOp<Self::Output>, Self::Error> {
+	fn add(&mut self, options: &AtlasOptions, item: &Item) -> Result<PackerOp<Pos2>, Self::Error> {
 		let size = Size2::new(item.width(), item.height());
 		for (index, bin) in &mut self.bin_list.iter_mut().enumerate() {
 			if let Some(position) = bin.add_to_smallest_node(&size) {
@@ -71,7 +66,7 @@ where
 		&mut self,
 		options: &AtlasOptions,
 		group: &[T],
-	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Self::Output>), Self::Error>> {
+	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Pos2>), Self::Error>> {
 		let mut index_list: Vec<usize> = (0..group.len()).collect::<Vec<usize>>();
 		index_list.sort_by(|a, b| {
 			let item_a = group[*a].borrow();

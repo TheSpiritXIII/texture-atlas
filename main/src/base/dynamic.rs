@@ -86,39 +86,38 @@ pub struct AtlasAddMulti<T> {
 // TODO: Add unit tests.
 
 /// An atlas builder which allows unlimited bins.
-pub struct DynamicAtlas<Packer, Bin, Item>
+pub struct DynamicAtlas<Packer, Bin, Item, Output>
 where
-	Packer: AtlasPacker<Item>,
+	Packer: AtlasPacker<Item, Output>,
 	Bin: AtlasBin<Item>,
 	Item: AtlasRect,
-	for<'a> &'a Packer::Output: Into<Bin::Params>,
+	for<'a> &'a Output: Into<Bin::Params>,
 {
 	options: AtlasOptions,
 	packer: Packer,
 	bin_list: Vec<Bin>,
-	phantom: PhantomData<Item>,
+	phantom_item: PhantomData<Item>,
+	phantom_output: PhantomData<Output>,
 }
 
-impl<Packer, Bin, Item> DynamicAtlas<Packer, Bin, Item>
+impl<Packer, Bin, Item, Output> DynamicAtlas<Packer, Bin, Item, Output>
 where
-	Packer: AtlasPacker<Item>,
+	Packer: AtlasPacker<Item, Output>,
 	Bin: AtlasBin<Item>,
 	Item: AtlasRect,
-	for<'a> &'a Packer::Output: Into<Bin::Params>,
+	for<'a> &'a Output: Into<Bin::Params>,
 {
 	pub fn new(options: AtlasOptions, packer: Packer) -> Self {
 		Self {
 			options,
 			packer,
-			phantom: PhantomData,
 			bin_list: Vec::new(),
+			phantom_item: PhantomData,
+			phantom_output: PhantomData,
 		}
 	}
 
-	pub fn add(
-		&mut self,
-		item: &Item,
-	) -> AtlasResult<AtlasAdd<Packer::Output>, Bin::Error, Packer::Error> {
+	pub fn add(&mut self, item: &Item) -> AtlasResult<AtlasAdd<Output>, Bin::Error, Packer::Error> {
 		let op = self.packer.add(&self.options, item).map_err(AtlasError::Packer)?;
 		let output = Self::add_item_to(&self.options, &mut self.bin_list, item, op)?;
 		Ok(output)
@@ -127,7 +126,7 @@ where
 	pub fn add_all<T: Borrow<Item>>(
 		&mut self,
 		item_list: &[T],
-	) -> AtlasResult<Vec<AtlasAddMulti<Packer::Output>>, Bin::Error, Packer::Error> {
+	) -> AtlasResult<Vec<AtlasAddMulti<Output>>, Bin::Error, Packer::Error> {
 		let mut output = Vec::new();
 		for entry in self.packer.add_all(&self.options, item_list) {
 			let (item_index, op) = entry.map_err(AtlasError::Packer)?;
@@ -142,7 +141,7 @@ where
 	pub fn add_group<T: Borrow<Item>>(
 		&mut self,
 		item_list: &[&Item],
-	) -> AtlasResult<Vec<AtlasAddMulti<Packer::Output>>, Bin::Error, Packer::Error> {
+	) -> AtlasResult<Vec<AtlasAddMulti<Output>>, Bin::Error, Packer::Error> {
 		let mut output = Vec::new();
 		for entry in self.packer.add_group(&self.options, item_list) {
 			let (item_index, op) = entry.map_err(AtlasError::Packer)?;
@@ -158,8 +157,8 @@ where
 		options: &AtlasOptions,
 		bin_list: &mut Vec<Bin>,
 		item: &Item,
-		op: PackerOp<Packer::Output>,
-	) -> AtlasResult<AtlasAdd<Packer::Output>, Bin::Error, Packer::Error> {
+		op: PackerOp<Output>,
+	) -> AtlasResult<AtlasAdd<Output>, Bin::Error, Packer::Error> {
 		let (index, params) = match op {
 			PackerOp::NewBin(params) => {
 				let bin = Bin::new(options.max_width, options.max_height);

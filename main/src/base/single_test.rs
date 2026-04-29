@@ -79,7 +79,7 @@ impl<T> AtlasRect for IndexedBin<T> {
 #[test]
 fn empty() {
 	let packer = UniformPacker::new();
-	let atlas = SingleAtlas::<_, _, IndexedItem<Size2>>::new(new_options(), packer);
+	let atlas = SingleAtlas::<_, _, IndexedItem<Size2>, Pos2>::new(new_options(), packer);
 
 	let bin: Option<IndexedBin<Pos2>> = atlas.build();
 	assert!(bin.is_none());
@@ -88,7 +88,7 @@ fn empty() {
 #[test]
 fn missing_bin() {
 	let mut atlas =
-		SingleAtlas::<_, IndexedBin<Pos2>, _>::new(new_options(), AlwaysExistingBinPacker);
+		SingleAtlas::<_, IndexedBin<Pos2>, _, Pos2>::new(new_options(), AlwaysExistingBinPacker);
 
 	// TODO: Switch to assert_matches.
 	assert!(matches!(
@@ -105,7 +105,8 @@ fn missing_bin() {
 
 #[test]
 fn packer_error() {
-	let mut atlas = SingleAtlas::<_, IndexedBin<Pos2>, _>::new(new_options(), AlwaysErrorPacker);
+	let mut atlas =
+		SingleAtlas::<_, IndexedBin<Pos2>, _, Pos2>::new(new_options(), AlwaysErrorPacker);
 
 	// TODO: Switch to assert_matches.
 	assert!(matches!(
@@ -123,7 +124,7 @@ fn packer_error() {
 #[test]
 fn add_single_once() {
 	let packer = UniformPacker::new();
-	let mut atlas = SingleAtlas::<_, _, IndexedItem<Size2>>::new(new_options(), packer);
+	let mut atlas = SingleAtlas::<_, _, IndexedItem<Size2>, Pos2>::new(new_options(), packer);
 
 	assert!(
 		atlas
@@ -155,7 +156,7 @@ fn add_single_once() {
 #[test]
 fn add_single_many() {
 	let packer = UniformPacker::new();
-	let mut atlas = SingleAtlas::<_, _, IndexedItem<Size2>>::new(new_options(), packer);
+	let mut atlas = SingleAtlas::<_, _, IndexedItem<Size2>, Pos2>::new(new_options(), packer);
 
 	assert!(
 		atlas
@@ -223,7 +224,7 @@ fn add_single_many() {
 #[test]
 fn add_all_single_once() {
 	let packer = UniformPacker::new();
-	let mut atlas = SingleAtlas::<_, _, IndexedItem<Size2>>::new(new_options(), packer);
+	let mut atlas = SingleAtlas::<_, _, IndexedItem<Size2>, Pos2>::new(new_options(), packer);
 
 	assert!(
 		atlas
@@ -257,7 +258,7 @@ fn add_all_single_once() {
 #[test]
 fn add_all_single_many() {
 	let packer = UniformPacker::new();
-	let mut atlas = SingleAtlas::<_, _, IndexedItem<Size2>>::new(new_options(), packer);
+	let mut atlas = SingleAtlas::<_, _, IndexedItem<Size2>, Pos2>::new(new_options(), packer);
 
 	assert!(
 		atlas
@@ -331,7 +332,7 @@ fn add_all_single_many() {
 #[test]
 fn add_all_multi() {
 	let packer = UniformPacker::new();
-	let mut atlas = SingleAtlas::<_, _, IndexedItem<Size2>>::new(new_options(), packer);
+	let mut atlas = SingleAtlas::<_, _, IndexedItem<Size2>, Pos2>::new(new_options(), packer);
 
 	assert!(
 		atlas

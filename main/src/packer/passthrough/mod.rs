@@ -27,14 +27,13 @@ impl Default for PassthroughPacker {
 	}
 }
 
-impl<Item> Packer<Item> for PassthroughPacker
+impl<Item> Packer<Item, Pos2> for PassthroughPacker
 where
 	Item: AtlasRect,
 {
-	type Output = Pos2;
 	type Error = Infallible;
 
-	fn add(&mut self, _: &AtlasOptions, _: &Item) -> Result<PackerOp<Self::Output>, Self::Error> {
+	fn add(&mut self, _: &AtlasOptions, _: &Item) -> Result<PackerOp<Pos2>, Self::Error> {
 		Ok(PackerOp::NewBin(Pos2 {
 			x: 0,
 			y: 0,
@@ -45,7 +44,7 @@ where
 		&mut self,
 		options: &AtlasOptions,
 		group: &[T],
-	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Self::Output>), Self::Error>> {
+	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Pos2>), Self::Error>> {
 		(0..group.len()).map(|index| {
 			let output = self.add(options, group[index].borrow());
 			output.map(|x| (index, x))

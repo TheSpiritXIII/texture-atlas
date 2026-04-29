@@ -47,12 +47,13 @@ impl<T: PartialEq> PartialEq for PackerOp<T> {
 }
 
 /// Packs textures into a bin.
-pub trait Packer<Item: AtlasRect> {
-	/// The output type of the packer. This should contain a list of references of the items added
-	/// with metadata, e.g. position. Most packers will suffice with [`Pos2`](crate::Pos2).
-	// TODO: Add default. See: https://github.com/rust-lang/rust/issues/29661
-	type Output;
-
+///
+/// `Item` is the input that gets added to the bin.
+///
+/// `Output` is the output after items are added to the bin. This should contain a list of
+/// references of the items added with metadata, e.g. position. Most packers will suffice with
+/// [`Pos2`](crate::Pos2).
+pub trait Packer<Item: AtlasRect, Output> {
 	/// The error type of the packer. Generally, this is the error type of the page, but packers may
 	/// emit their own errors if needed.
 	// TODO: Add default. See: https://github.com/rust-lang/rust/issues/29661
@@ -60,11 +61,8 @@ pub trait Packer<Item: AtlasRect> {
 
 	/// Adds items to be placed on any available bin. `options` is always passed the same value
 	/// throughout the lifetime of the packer.
-	fn add(
-		&mut self,
-		options: &AtlasOptions,
-		item: &Item,
-	) -> Result<PackerOp<Self::Output>, Self::Error>;
+	fn add(&mut self, options: &AtlasOptions, item: &Item)
+	-> Result<PackerOp<Output>, Self::Error>;
 
 	/// Adds items to be placed on any available bin, optimizing the placement of items to reduce
 	/// the total number of bins. `options` is always passed the same value throughout the lifetime
@@ -77,7 +75,7 @@ pub trait Packer<Item: AtlasRect> {
 		&mut self,
 		options: &AtlasOptions,
 		group: &[T],
-	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Self::Output>), Self::Error>>;
+	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Output>), Self::Error>>;
 
 	/// Adds items to be placed on any available bin, prioritizing adding all given items to the
 	/// same bin. If a single bin does not have enough space, a new bin will be created and the
@@ -94,7 +92,7 @@ pub trait Packer<Item: AtlasRect> {
 		&mut self,
 		options: &AtlasOptions,
 		group: &[T],
-	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Self::Output>), Self::Error>> {
+	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Output>), Self::Error>> {
 		self.add_all(options, group)
 	}
 }

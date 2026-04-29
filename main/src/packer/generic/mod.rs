@@ -17,18 +17,13 @@ pub enum GenericPacker {
 	Binary(BinaryPacker),
 }
 
-impl<Item> Packer<Item> for GenericPacker
+impl<Item> Packer<Item, Pos2> for GenericPacker
 where
 	Item: AtlasRect,
 {
-	type Output = Pos2;
 	type Error = Infallible;
 
-	fn add(
-		&mut self,
-		options: &AtlasOptions,
-		item: &Item,
-	) -> Result<PackerOp<Self::Output>, Self::Error> {
+	fn add(&mut self, options: &AtlasOptions, item: &Item) -> Result<PackerOp<Pos2>, Self::Error> {
 		match self {
 			Self::Passthrough(packer) => packer.add(options, item),
 			Self::Binary(packer) => packer.add(options, item),
@@ -40,7 +35,7 @@ where
 		&mut self,
 		options: &AtlasOptions,
 		group: &[T],
-	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Self::Output>), Self::Error>> {
+	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Pos2>), Self::Error>> {
 		// TODO: Avoid extra allocations.
 		let items: Vec<_> = match self {
 			Self::Binary(packer) => packer.add_all(options, group).into_iter().collect(),
@@ -54,7 +49,7 @@ where
 		&mut self,
 		options: &AtlasOptions,
 		group: &[T],
-	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Self::Output>), Self::Error>> {
+	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Pos2>), Self::Error>> {
 		// TODO: Avoid extra allocations.
 		let items: Vec<_> = match self {
 			Self::Binary(packer) => packer.add_group(options, group).into_iter().collect(),

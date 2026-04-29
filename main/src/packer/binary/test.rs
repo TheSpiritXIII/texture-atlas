@@ -121,7 +121,7 @@ fn add_multiple_max_size() {
 	let rect_2 = Size2::new(100, 100);
 
 	let mut packer = BinaryPacker::new();
-	let result: Vec<_> = Packer::<Size2>::add_all(
+	let result: Vec<_> = Packer::<Size2, Pos2>::add_all(
 		&mut packer,
 		&options,
 		&[
@@ -147,7 +147,7 @@ fn add_multiple_max_width() {
 	let rect_2 = Size2::new(100, 100);
 
 	let mut packer = BinaryPacker::new();
-	let result: Vec<_> = Packer::<Size2>::add_all(
+	let result: Vec<_> = Packer::<Size2, Pos2>::add_all(
 		&mut packer,
 		&options,
 		&[
@@ -182,7 +182,7 @@ fn add_multiple_overflow_bin() {
 	let rect_2 = Size2::new(599, 599);
 
 	let mut packer = BinaryPacker::new();
-	let result: Vec<_> = Packer::<Size2>::add_all(
+	let result: Vec<_> = Packer::<Size2, Pos2>::add_all(
 		&mut packer,
 		&options,
 		&[
@@ -208,7 +208,7 @@ fn add_multiple_overflow_space() {
 	let rect_2 = Size2::new(600, 100);
 
 	let mut packer = BinaryPacker::new();
-	let result: Vec<_> = Packer::<Size2>::add_all(
+	let result: Vec<_> = Packer::<Size2, Pos2>::add_all(
 		&mut packer,
 		&options,
 		&[
@@ -244,7 +244,7 @@ fn add_multiple_underflow_then_underflow() {
 	let rect_3 = Size2::new(300, 300);
 
 	let mut packer = BinaryPacker::new();
-	let result: Vec<_> = Packer::<Size2>::add_all(
+	let result: Vec<_> = Packer::<Size2, Pos2>::add_all(
 		&mut packer,
 		&options,
 		&[
@@ -291,7 +291,7 @@ fn add_multiple_underflow_then_overflow_bin() {
 	let rect_3 = Size2::new(500, 500);
 
 	let mut packer = BinaryPacker::new();
-	let result: Vec<_> = Packer::<Size2>::add_all(
+	let result: Vec<_> = Packer::<Size2, Pos2>::add_all(
 		&mut packer,
 		&options,
 		&[
@@ -329,7 +329,7 @@ fn add_multiple_underflow_then_overflow_space() {
 	let rect_3 = Size2::new(50, 50);
 
 	let mut packer = BinaryPacker::new();
-	let result: Vec<_> = Packer::<Size2>::add_all(
+	let result: Vec<_> = Packer::<Size2, Pos2>::add_all(
 		&mut packer,
 		&options,
 		&[

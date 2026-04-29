@@ -13,7 +13,7 @@ use crate::new_bin;
 /// algorithms which tightly and deterministically pack items.
 pub fn assert_add_underflow<Packer, Error>(options: &AtlasOptions, packer: Packer)
 where
-	Packer: AtlasPacker<Size2, Output = Pos2, Error = Error> + Clone,
+	Packer: AtlasPacker<Size2, Pos2, Error = Error> + Clone,
 	Error: Debug + PartialEq,
 {
 	assert_add_underflow_small(options, packer.clone());
@@ -23,7 +23,7 @@ where
 
 pub fn assert_add_underflow_small<Packer, Error>(options: &AtlasOptions, mut packer: Packer)
 where
-	Packer: AtlasPacker<Size2, Output = Pos2, Error = Error> + Clone,
+	Packer: AtlasPacker<Size2, Pos2, Error = Error> + Clone,
 	Error: Debug + PartialEq,
 {
 	assert_eq!(
@@ -57,7 +57,7 @@ where
 
 pub fn assert_add_underflow_max_width<T: Debug + PartialEq>(
 	options: &AtlasOptions,
-	mut packer: impl AtlasPacker<Size2, Output = Pos2, Error = T>,
+	mut packer: impl AtlasPacker<Size2, Pos2, Error = T>,
 ) {
 	assert_eq!(packer.add(options, &Size2::new(MAX_WIDTH - 1, MAX_HEIGHT)), Ok(new_bin()),);
 	assert_eq!(
@@ -74,7 +74,7 @@ pub fn assert_add_underflow_max_width<T: Debug + PartialEq>(
 
 pub fn assert_add_underflow_max_height<T: Debug + PartialEq>(
 	options: &AtlasOptions,
-	mut packer: impl AtlasPacker<Size2, Output = Pos2, Error = T>,
+	mut packer: impl AtlasPacker<Size2, Pos2, Error = T>,
 ) {
 	assert_eq!(packer.add(options, &Size2::new(MAX_WIDTH, MAX_HEIGHT - 1)), Ok(new_bin()),);
 	assert_eq!(

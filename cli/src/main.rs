@@ -78,7 +78,7 @@ fn main() -> anyhow::Result<()> {
 		Algorithm::Uniform => GenericPacker::Uniform(UniformPacker::new()),
 	};
 	let mut atlas =
-		DynamicAtlas::<_, ScoredBin2<RgbaImage, RgbaImage>, RgbaImage>::new(options, packer);
+		DynamicAtlas::<_, ScoredBin2<RgbaImage, RgbaImage>, RgbaImage, Pos2>::new(options, packer);
 	// TODO: Consider thiserror for library errors so we could use with_context.
 	let data = atlas.add_all(&image_list).unwrap();
 	let bin_list = atlas.build();

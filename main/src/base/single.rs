@@ -8,17 +8,18 @@ use crate::Packer as AtlasPacker;
 use crate::PackerOp;
 
 // An atlas builder which only creates one bin. Does not allocate any heap memory.
-pub struct SingleAtlas<Packer, Bin, Item>
+pub struct SingleAtlas<Packer, Bin, Item, Output>
 where
-	Packer: AtlasPacker<Item>,
+	Packer: AtlasPacker<Item, Output>,
 	Bin: AtlasBin<Item>,
 	Item: AtlasRect,
-	for<'a> &'a Packer::Output: Into<Bin::Params>,
+	for<'a> &'a Output: Into<Bin::Params>,
 {
 	options: AtlasOptions,
 	packer: Packer,
 	bin: Option<Bin>,
-	phantom: PhantomData<Item>,
+	phantom_item: PhantomData<Item>,
+	phantom_output: PhantomData<Output>,
 }
 
 pub enum SingleAtlasError<BinError, PackerError> {
@@ -39,12 +40,12 @@ pub struct SingleAtlasEntry<T> {
 	pub output: T,
 }
 
-impl<Packer, Bin, Item> SingleAtlas<Packer, Bin, Item>
+impl<Packer, Bin, Item, Output> SingleAtlas<Packer, Bin, Item, Output>
 where
-	Packer: AtlasPacker<Item>,
+	Packer: AtlasPacker<Item, Output>,
 	Bin: AtlasBin<Item>,
 	Item: AtlasRect,
-	for<'a> &'a Packer::Output: Into<Bin::Params>,
+	for<'a> &'a Output: Into<Bin::Params>,
 {
 	/// Creates a new atlas.
 	pub fn new(options: AtlasOptions, packer: Packer) -> Self {
@@ -52,16 +53,14 @@ where
 			options,
 			packer,
 			bin: None,
-			phantom: PhantomData,
+			phantom_item: PhantomData,
+			phantom_output: PhantomData,
 		}
 	}
 
 	/// Adds a new item to the atlas. Prefer `add_all`, which allows additional optimizations to
 	/// ensure items are tightly packed
-	pub fn add(
-		&mut self,
-		item: &Item,
-	) -> SingleAtlasResult<Packer::Output, Bin::Error, Packer::Error> {
+	pub fn add(&mut self, item: &Item) -> SingleAtlasResult<Output, Bin::Error, Packer::Error> {
 		let op = self.packer.add(&self.options, item).map_err(SingleAtlasError::Packer)?;
 		let output = Self::add_item_to(&self.options, &mut self.bin, item, op)?;
 		Ok(output)
@@ -72,7 +71,7 @@ where
 	pub fn add_all<T: Borrow<Item>>(
 		&mut self,
 		item_list: &[T],
-	) -> SingleAtlasResult<Vec<SingleAtlasEntry<Packer::Output>>, Bin::Error, Packer::Error> {
+	) -> SingleAtlasResult<Vec<SingleAtlasEntry<Output>>, Bin::Error, Packer::Error> {
 		let mut output = Vec::with_capacity(item_list.len());
 		for entry in self.packer.add_all(&self.options, item_list) {
 			let (item_index, op) = entry.map_err(SingleAtlasError::Packer)?;
@@ -99,8 +98,8 @@ where
 		options: &AtlasOptions,
 		bin: &mut Option<Bin>,
 		item: &Item,
-		op: PackerOp<Packer::Output>,
-	) -> SingleAtlasResult<Packer::Output, Bin::Error, Packer::Error> {
+		op: PackerOp<Output>,
+	) -> SingleAtlasResult<Output, Bin::Error, Packer::Error> {
 		let (bin, params) = match bin {
 			Some(bin) => {
 				match op {

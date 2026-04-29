@@ -11,18 +11,17 @@ use crate::Pos2;
 // A packer that always returns `PackerOp::ExistingBin((0, Pos2::new(0, 0)))` when an item is added.
 pub(crate) struct AlwaysExistingBinPacker;
 
-impl<Item> Packer<Item> for AlwaysExistingBinPacker
+impl<Item> Packer<Item, Pos2> for AlwaysExistingBinPacker
 where
 	Item: AtlasRect,
 {
-	type Output = Pos2;
 	type Error = Infallible;
 
 	fn add(
 		&mut self,
 		_options: &AtlasOptions,
 		_item: &Item,
-	) -> Result<crate::PackerOp<Self::Output>, Self::Error> {
+	) -> Result<crate::PackerOp<Pos2>, Self::Error> {
 		Ok(PackerOp::ExistingBin((0, Pos2::new(0, 0))))
 	}
 
@@ -30,7 +29,7 @@ where
 		&mut self,
 		_options: &AtlasOptions,
 		_group: &[T],
-	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Self::Output>), Self::Error>> {
+	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Pos2>), Self::Error>> {
 		iter::once(Ok((0, PackerOp::ExistingBin((0, Pos2::new(0, 0))))))
 	}
 }
@@ -38,18 +37,17 @@ where
 // A packer that always returns an error when an item is added.
 pub(crate) struct AlwaysErrorPacker;
 
-impl<Item> Packer<Item> for AlwaysErrorPacker
+impl<Item> Packer<Item, Pos2> for AlwaysErrorPacker
 where
 	Item: AtlasRect,
 {
-	type Output = Pos2;
 	type Error = ();
 
 	fn add(
 		&mut self,
 		_options: &AtlasOptions,
 		_item: &Item,
-	) -> Result<crate::PackerOp<Self::Output>, Self::Error> {
+	) -> Result<crate::PackerOp<Pos2>, Self::Error> {
 		Err(())
 	}
 
@@ -57,7 +55,7 @@ where
 		&mut self,
 		_options: &AtlasOptions,
 		_group: &[T],
-	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Self::Output>), Self::Error>> {
+	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Pos2>), Self::Error>> {
 		Err(())
 	}
 }
