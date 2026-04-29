@@ -1,84 +1,80 @@
-# texture_atlas [![Build Status](https://travis-ci.org/TheSpiritXIII/Texture-Atlas.svg?branch=master)](https://travis-ci.org/TheSpiritXIII/Texture-Atlas) [![Coverage Status](https://coveralls.io/repos/github/TheSpiritXIII/Texture-Atlas/badge.svg?branch=master)](https://coveralls.io/github/TheSpiritXIII/Texture-Atlas?branch=master)
+# texture_atlas [![Build Status](https://travis-ci.org/TheSpiritXIII/Texture-Atlas.svg?branch=master)](https://travis-ci.org/TheSpiritXIII/Texture-Atlas) [![Coverage Status](https://coveralls.io/repos/github/TheSpiritXIII/Texture-Atlas/badge.svg?branch=master)](https://coveralls.io/github/TheSpiritXIII/Texture-Atlas?branch=main)
 
-> [!NOTE]
-> This repository is a work in progress and doesn't work yet. Use at your own risk!
+This crate provides various algorithms for bin-packing axis-aligned rectangles.
 
-This crate provides various algorithms for bin packing axis aligned rectangles.
+The most common use-case for this library is for game development. To reduce texture swapping on the GPU, multiple textures can be combined into fewer, larger textures.
 
-The most common use case for this library is for games. In order to reduce texture swapping on
-the GPU, multiple textures are combined into fewer, larger textures.
+## Basic Usage
 
-## Features
+A command-line tool is provided which can generate an atlas from a directory of images.
 
-This crate contains and provides basic tools for building and using bin packing algorithms.
+Alternatively, the library can also be used directly. This can be helpful for writing build scripts or when needing to extend the functionality of this library.
 
-The following bin packing algorithms, or generators, are implemented:
+The `image` feature is enabled by default, which allows interoperability with the `image` crate:
 
-- `PassthroughGenerator`
-- `BinaryTreeGenerator`
+```rust
+use std::num::NonZeroU32;
 
-All algorithms are expected to take and respect a size constraint and a flag indicating whether
-or not to rotate of rects.
+use image::RgbaImage;
+use texture_atlas::AtlasOptions;
+use texture_atlas::BinaryPacker;
+use texture_atlas::DynamicAtlas;
+use texture_atlas::Pos2;
 
-### Future
+// Pack a list of images into multiple atlases.
+fn pack(image_list: &[&RgbaImage]) -> Vec<RgbaImage> {
+	// Output a 1024x1024 image.
+	let options =
+		AtlasOptions::with_max_size(NonZeroU32::new(1024).unwrap(), NonZeroU32::new(1024).unwrap());
 
-This library is currently unstable. This is a list of tasks that will be done in the future
-sorted by importance:
+	// Take RgbaImage as input and output. Return the positions of each image.
+	let mut builder = DynamicAtlas::<_, RgbaImage, RgbaImage, Pos2>::new(
+		options,
+		// Use binary packing.
+		BinaryPacker::new(),
+	);
 
-- Improve tests and documentation.
-- Add basic CLI tool.
-- Add "Max Rects" generator.
-- Submit to creates.io.
-- ABI Stablizaation.
+	// Add the images to the builder. This will give you the aforementioned positions.
+	let _position_list = builder.add_all(image_list).unwrap();
 
-## Common Usage
-
-This library is intended to be used as a build script. It does not facilitate how data is loaded
-but users are welcome to create their own on top of this library.
-
-All atlas generation is done with a simple `AtlasRect` trait that must be implemented on
-whatever you wish to generate an atlas for. For convenience, this trait is pre-implemented for
-the `image` crate's `DynamicImage` struct and also any struct that implements
-`AsRef<DynamicImage>`.
-
-Before bin packing, you must have an instance of `AtlasBuilder`. There are two ways to achieve
-that: The first is using `Atlas::build` and passing an array to it. The second is using the
-provided `AtlasRectList` and its `build` function which calculates a lower bound on the number
-of bins that will be generated as you add rects to the list.
-
-At the heard of `AtlasBuilder` is a `generate` method which takes in an `AtlasGenerator`. The
-current recommended generator is the `BinaryTreeGenerator`. You can even call generate multiple
-times on the builder to find the best generator that generates the least amount of bins.
-
-After calling this method, you receive an `Atlas` struct which contains your generated bins. If
-you are using the `image` feature, then you can use `Atlas::as_images` to generate a vector of
-images corresponding to each generated bin.
-
-### Bins of Bins
-
-Occasionally, it is also useful to have certain rects together. For instance, in a game you may
-have multiple frames for a player walking animation. In this case, if the frames are in
-different bins, then this will incur a texture swapping overhead.
-
-To address these scenarios, you can generate a single bin for each groups of related rects and
-then pass these bins back into generator. Better support will come for these scenarios shortly.
-
-## Creating a Generator
-
-To create a new generator, create a struct and implement `AtlasGenerator` for it. The
-`AtlasGenerator` trait uses dynamic dispatch for instances where a generator can have settings,
-for instance multiple heuristic options. `PassthroughGenerator` is an example of a minimal
-generator.
-
-## The `image` Feature
-
-The `image` feature is turned on by default. To disable it, use the following in your
-`Cargo.toml`:
-
-```toml
-[dependencies.texture_atlas]
-default-features = false
+	// Output the resulting image atlases.
+	builder.build()
+}
 ```
 
-If you keep it enabled, you can create images for generated atlases and gain access to a few
-utility functions, such as border cropping.
+## Nomenclature
+
+- [`Bin`] stores items. For example, a bin could be a larger image which stores smaller images.
+- `Item` are the individual units that go into a bin. For example, small images.
+- [`Packer`] takes items and places them into bins.
+- `Params` is what a packer uses to tell bins how to place an item. For example, [`Pos2`] is the most basic parameter that simply contains an x any y position. The `2` suffix denotes that this is for 2-dimensional bins.
+- `Output` is what the packer outputs per-item. This allows you to figure out where am item got placed in which bin.
+
+## Advanced Features
+
+### Params
+
+The earlier example used [`Pos`]. This adds items to bins as-is. A more flexible approach is to use [`Rotate2`], which rotates your item to help more tightly pack your item.
+
+### Packers
+
+The earlier example used a [`BinaryPacker`]. 
+
+The full list of packers include:
+- [`BinaryPacker`]
+- [`PassthroughPacker`]
+- [`UniformPacker`]
+
+## Contributing
+
+The repository is a workspace with 3 sub-projects:
+- `main`: The library.
+- `cli`: The command-line tool.
+- `gen`: Generates random-colored images within a random range.
+
+The following script generates images and runs the command-line tool on them, which can help inspect how a packer behaves with real-world data:
+
+```shell
+cargo run -p image-generator -- --output-dir generated --amount 16 --min-width 16 --min-height 16 --max-width 128 --max-height 128
+RUST_LOG=info cargo run -p cli -- --input-dir generated --output-dir atlas --output-file atlas/output.toml --max-width 256 --max-height 256 --rotatable --format json binary
+```
