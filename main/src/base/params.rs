@@ -1,4 +1,3 @@
-/// Represents a position of a rect added to a 2d bin.
 /// Represents a position of a rect added to a 2D bin.
 #[derive(Clone, Copy, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
 pub struct Pos2 {
@@ -21,5 +20,24 @@ impl Pos2 {
 impl From<&Pos2> for Pos2 {
 	fn from(pos: &Pos2) -> Self {
 		*pos
+	}
+}
+
+/// Represents the position of a rect added to a 2D bin, possibly rotated.
+#[derive(Clone, Debug, Eq, Hash, Ord, PartialEq, PartialOrd)]
+pub struct Rotate2 {
+	/// The position of the rect.
+	pub pos: Pos2,
+
+	/// Whether the item was rotated 90 degrees clockwise.
+	pub rotate: bool,
+}
+
+impl From<&Pos2> for Rotate2 {
+	fn from(pos: &Pos2) -> Self {
+		Rotate2 {
+			pos: *pos,
+			rotate: false,
+		}
 	}
 }

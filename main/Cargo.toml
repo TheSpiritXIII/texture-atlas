@@ -6,6 +6,8 @@ license.workspace = true
 
 [dependencies]
 image = { workspace = true, optional = true }
+imageproc = { workspace = true, optional = true }
 
 [features]
 default = ["image"]
+image = ["dep:image", "dep:imageproc"]
