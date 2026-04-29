@@ -321,6 +321,7 @@ dependencies = [
  "image",
  "log",
  "serde",
+ "serde_json",
  "texture-atlas",
  "toml",
 ]

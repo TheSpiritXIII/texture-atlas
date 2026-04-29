@@ -46,6 +46,10 @@ impl From<&Pos2> for Pos2 {
 )]
 pub struct Rotate2 {
 	/// The position of the rect.
+	#[cfg_attr(
+		feature = "serde",
+		serde(flatten)
+	)]
 	pub pos: Pos2,
 
 	/// Whether the item was rotated 90 degrees clockwise.

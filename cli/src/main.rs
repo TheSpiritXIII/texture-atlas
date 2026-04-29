@@ -5,12 +5,11 @@ use std::path::PathBuf;
 use anyhow::Context;
 use clap::Parser;
 use clap::Subcommand;
+use clap::ValueEnum;
 use image::ImageReader;
 use image::RgbaImage;
 use log::info;
 use serde::Serialize;
-use texture_atlas::AtlasAdd;
-use texture_atlas::AtlasAddMulti;
 use texture_atlas::AtlasOptions;
 use texture_atlas::BinaryPacker;
 use texture_atlas::DynamicAtlas;
@@ -42,6 +41,9 @@ struct Cli {
 	#[arg(long)]
 	rotatable: bool,
 
+	#[arg(long)]
+	format: Format,
+
 	#[command(subcommand)]
 	algorithm: Algorithm,
 }
@@ -51,6 +53,12 @@ enum Algorithm {
 	Binary,
 	Passthrough,
 	Uniform,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq, ValueEnum)]
+enum Format {
+	Toml,
+	Json,
 }
 
 #[derive(Serialize)]
@@ -156,16 +164,36 @@ fn main() -> anyhow::Result<()> {
 
 	let value = match data {
 		ConfigType::Pos(data) => {
-			toml::to_string(&Config {
-				items: data,
-			})
-			.with_context(|| "Failed to generate TOML")?
+			match cli.format {
+				Format::Toml => {
+					toml::to_string(&Config {
+						items: data,
+					})
+					.with_context(|| "Failed to generate TOML")?
+				}
+				Format::Json => {
+					serde_json::to_string_pretty(&Config {
+						items: data,
+					})
+					.with_context(|| "Failed to generate TOML")?
+				}
+			}
 		}
 		ConfigType::Rotate(data) => {
-			toml::to_string(&Config {
-				items: data,
-			})
-			.with_context(|| "Failed to generate TOML")?
+			match cli.format {
+				Format::Toml => {
+					toml::to_string(&Config {
+						items: data,
+					})
+					.with_context(|| "Failed to generate TOML")?
+				}
+				Format::Json => {
+					serde_json::to_string_pretty(&Config {
+						items: data,
+					})
+					.with_context(|| "Failed to generate TOML")?
+				}
+			}
 		}
 	};
 	if let Some(output_file) = cli.output_file {
