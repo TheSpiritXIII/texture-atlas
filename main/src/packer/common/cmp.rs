@@ -5,7 +5,7 @@ use crate::AtlasRectExt;
 
 /// Represents the different ways to prioritize items to be added.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum SortKind {
+pub enum SortKind2 {
 	/// Sorts such that the greatest area comes first.
 	Area,
 	/// Sorts such that the greatest width comes first.
@@ -16,13 +16,13 @@ pub enum SortKind {
 	Maximum,
 }
 
-impl SortKind {
+impl SortKind2 {
 	pub fn cmp<T: AtlasRect>(&self, a: &T, b: &T) -> Ordering {
 		match self {
-			SortKind::Width => cmp_by_width(a, b),
-			SortKind::Height => cmp_by_height(a, b),
-			SortKind::Maximum => cmp_by_max(a, b),
-			SortKind::Area => cmp_by_area(a, b),
+			SortKind2::Width => cmp_by_width(a, b),
+			SortKind2::Height => cmp_by_height(a, b),
+			SortKind2::Maximum => cmp_by_max(a, b),
+			SortKind2::Area => cmp_by_area(a, b),
 		}
 	}
 }

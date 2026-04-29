@@ -8,7 +8,6 @@ use clap::Subcommand;
 use image::ImageReader;
 use image::RgbaImage;
 use log::info;
-use serde::Deserialize;
 use serde::Serialize;
 use texture_atlas::AtlasAddMulti;
 use texture_atlas::AtlasOptions;
@@ -17,6 +16,7 @@ use texture_atlas::DynamicAtlas;
 use texture_atlas::GenericPacker;
 use texture_atlas::PassthroughPacker;
 use texture_atlas::Pos2;
+use texture_atlas::Rotate2;
 use texture_atlas::Scored;
 use texture_atlas::ScoredBin2;
 use texture_atlas::UniformPacker;
@@ -38,6 +38,9 @@ struct Cli {
 	#[arg(long)]
 	max_height: NonZero<u32>,
 
+	#[arg(long)]
+	rotatable: bool,
+
 	#[command(subcommand)]
 	algorithm: Algorithm,
 }
@@ -49,9 +52,17 @@ enum Algorithm {
 	Uniform,
 }
 
-#[derive(Serialize, Deserialize)]
-struct Config {
-	items: Vec<AtlasAddMulti<Pos2>>,
+#[derive(Serialize)]
+struct Config<T>
+where
+	T: Serialize,
+{
+	items: Vec<AtlasAddMulti<T>>,
+}
+
+enum ConfigType {
+	Pos(Vec<AtlasAddMulti<Pos2>>),
+	Rotate(Vec<AtlasAddMulti<Rotate2>>),
 }
 
 fn main() -> anyhow::Result<()> {
@@ -77,11 +88,26 @@ fn main() -> anyhow::Result<()> {
 		Algorithm::Passthrough => GenericPacker::Passthrough(PassthroughPacker::new()),
 		Algorithm::Uniform => GenericPacker::Uniform(UniformPacker::new()),
 	};
-	let mut atlas =
-		DynamicAtlas::<_, ScoredBin2<RgbaImage, RgbaImage>, RgbaImage, Pos2>::new(options, packer);
-	// TODO: Consider thiserror for library errors so we could use with_context.
-	let data = atlas.add_all(&image_list).unwrap();
-	let bin_list = atlas.build();
+	let (data, bin_list) = if cli.rotatable {
+		let mut atlas =
+			DynamicAtlas::<_, ScoredBin2<RgbaImage, RgbaImage>, RgbaImage, Rotate2>::new(
+				options,
+				packer,
+			);
+		// TODO: Consider thiserror for library errors so we could use with_context.
+		let data = atlas.add_all(&image_list).unwrap();
+		let bin_list = atlas.build();
+		(ConfigType::Rotate(data), bin_list)
+	} else {
+		let mut atlas = DynamicAtlas::<_, ScoredBin2<RgbaImage, RgbaImage>, RgbaImage, Pos2>::new(
+			options,
+			packer,
+		);
+		// TODO: Consider thiserror for library errors so we could use with_context.
+		let data = atlas.add_all(&image_list).unwrap();
+		let bin_list = atlas.build();
+		(ConfigType::Pos(data), bin_list)
+	};
 
 	fs::create_dir_all(&cli.output_dir)
 		.with_context(|| format!("Failed to create output directory: {:?}", cli.output_dir))?;
@@ -92,10 +118,20 @@ fn main() -> anyhow::Result<()> {
 			.with_context(|| format!("Failed to save atlas image: {:?}", output_path))?;
 	}
 
-	let value = toml::to_string(&Config {
-		items: data,
-	})
-	.with_context(|| "Failed to generate TOML")?;
+	let value = match data {
+		ConfigType::Pos(data) => {
+			toml::to_string(&Config {
+				items: data,
+			})
+			.with_context(|| "Failed to generate TOML")?
+		}
+		ConfigType::Rotate(data) => {
+			toml::to_string(&Config {
+				items: data,
+			})
+			.with_context(|| "Failed to generate TOML")?
+		}
+	};
 	if let Some(output_file) = cli.output_file {
 		if let Some(parent) = output_file.parent() {
 			fs::create_dir_all(parent)

@@ -37,13 +37,18 @@ impl Default for UniformPacker {
 	}
 }
 
-impl<Item> Packer<Item, Pos2> for UniformPacker
+impl<Item, Output> Packer<Item, Output> for UniformPacker
 where
 	Item: AtlasRect,
+	Output: From<Pos2>,
 {
 	type Error = Infallible;
 
-	fn add(&mut self, options: &AtlasOptions, item: &Item) -> Result<PackerOp<Pos2>, Self::Error> {
+	fn add(
+		&mut self,
+		options: &AtlasOptions,
+		item: &Item,
+	) -> Result<PackerOp<Output>, Self::Error> {
 		let mut y = self.used.height;
 		if item.width() > options.max_width.get()
 			|| self.used.width > options.max_width.get() - item.width()
@@ -56,10 +61,13 @@ where
 		}
 		if item.height() > options.max_height.get() || y > options.max_height.get() - item.height()
 		{
-			let op = PackerOp::NewBin(Pos2 {
-				x: 0,
-				y: 0,
-			});
+			let op = PackerOp::NewBin(
+				Pos2 {
+					x: 0,
+					y: 0,
+				}
+				.into(),
+			);
 
 			self.bin_len += 1;
 			self.used.height = 0;
@@ -73,7 +81,8 @@ where
 			Pos2 {
 				x: self.used.width,
 				y,
-			},
+			}
+			.into(),
 		));
 
 		self.used.width += item.width();
@@ -85,7 +94,7 @@ where
 		&mut self,
 		options: &AtlasOptions,
 		group: &[T],
-	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Pos2>), Self::Error>> {
+	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Output>), Self::Error>> {
 		(0..group.len()).map(|index| {
 			let output = self.add(options, group[index].borrow());
 			output.map(|x| (index, x))

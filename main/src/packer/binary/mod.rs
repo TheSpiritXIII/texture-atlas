@@ -14,7 +14,9 @@ use crate::Fit2;
 use crate::Packer;
 use crate::PackerOp;
 use crate::Pos2;
+use crate::Rotate2;
 use crate::Size2;
+use crate::cmp_by_max;
 use crate::cmp_by_width;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -76,7 +78,7 @@ where
 		index_list.reverse();
 		index_list.into_iter().map(move |index| {
 			let item = group[index].borrow();
-			self.add(options, item).map(|x| (index, x))
+			self.add(options, item).map(|op| (index, op))
 		})
 	}
 }
@@ -163,5 +165,66 @@ impl BinaryBin {
 				unreachable!()
 			}
 		}
+	}
+}
+
+// // TODO: Consider merging with BinaryPacker if Packer gets more generalized.
+// #[derive(Clone, Debug, Eq, PartialEq)]
+// pub struct RotatableBinaryPacker {
+// 	packer: BinaryPacker,
+// }
+
+impl<Item> Packer<Item, Rotate2> for BinaryPacker
+where
+	Item: AtlasRect,
+{
+	type Error = Infallible;
+
+	fn add(
+		&mut self,
+		options: &AtlasOptions,
+		item: &Item,
+	) -> Result<PackerOp<Rotate2>, Self::Error> {
+		let (item, rotate) = if item.width() > item.height() {
+			(Size2::new(item.height(), item.width()), true)
+		} else {
+			(Size2::new(item.width(), item.height()), false)
+		};
+		let result = self.add(options, &item)?;
+		match result {
+			PackerOp::NewBin(pos) => {
+				Ok(PackerOp::NewBin(Rotate2 {
+					pos,
+					rotate,
+				}))
+			}
+			PackerOp::ExistingBin((index, pos)) => {
+				Ok(PackerOp::ExistingBin((
+					index,
+					Rotate2 {
+						pos,
+						rotate,
+					},
+				)))
+			}
+		}
+	}
+
+	fn add_all<T: Borrow<Item>>(
+		&mut self,
+		options: &AtlasOptions,
+		group: &[T],
+	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Rotate2>), Self::Error>> {
+		let mut index_list: Vec<usize> = (0..group.len()).collect::<Vec<usize>>();
+		index_list.sort_by(|a, b| {
+			let item_a = group[*a].borrow();
+			let item_b = group[*b].borrow();
+			cmp_by_max(item_a, item_b)
+		});
+		index_list.reverse();
+		index_list.into_iter().map(move |index| {
+			let item = group[index].borrow();
+			self.add(options, item).map(|op| (index, op))
+		})
 	}
 }
