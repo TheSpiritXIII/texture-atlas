@@ -117,7 +117,10 @@ where
 		}
 	}
 
-	pub fn add(&mut self, item: &Item) -> BuilderResult<BuilderAdd<Output>, Bin::Error, Packer::Error> {
+	pub fn add(
+		&mut self,
+		item: &Item,
+	) -> BuilderResult<BuilderAdd<Output>, Bin::Error, Packer::Error> {
 		let op = self.packer.add(&self.options, item).map_err(BuilderError::Packer)?;
 		let output = Self::add_item_to(&self.options, &mut self.bin_list, item, op)?;
 		Ok(output)

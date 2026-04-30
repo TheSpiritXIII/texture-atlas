@@ -12,5 +12,5 @@ image = { workspace = true }
 log = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
-texture-atlas = { path = "../main" }
+texture-atlas = { path = "../lib" }
 toml = { workspace = true }

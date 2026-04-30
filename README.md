@@ -68,7 +68,7 @@ The full list of packers include:
 ## Contributing
 
 The repository is a workspace with 3 sub-projects:
-- `main`: The library.
+- `lib`: The main library.
 - `cli`: The command-line tool.
 - `gen`: Generates random-colored images within a random range.
 
