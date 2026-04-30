@@ -6,8 +6,8 @@ mod builder;
 mod image;
 mod packer;
 
-pub mod util;
-
 pub use base::*;
 pub use builder::*;
+#[cfg(feature = "image")]
+pub use image::*;
 pub use packer::*;
