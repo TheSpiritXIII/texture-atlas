@@ -9,7 +9,6 @@ use serde::Deserialize;
 use serde::Serialize;
 
 use crate::AtlasOptions;
-use crate::AtlasRect;
 use crate::Bin as AtlasBin;
 use crate::BinAdd;
 use crate::Packer as AtlasPacker;
@@ -92,7 +91,6 @@ pub struct DynamicBuilder<Packer, Bin, Item, Output>
 where
 	Packer: AtlasPacker<Item, Output>,
 	Bin: AtlasBin<Item> + BinAdd<Item, Output>,
-	Item: AtlasRect,
 {
 	options: AtlasOptions,
 	packer: Packer,
@@ -105,7 +103,6 @@ impl<Packer, Bin, Item, Output> DynamicBuilder<Packer, Bin, Item, Output>
 where
 	Packer: AtlasPacker<Item, Output>,
 	Bin: AtlasBin<Item> + BinAdd<Item, Output>,
-	Item: AtlasRect,
 {
 	pub fn new(options: AtlasOptions, packer: Packer) -> Self {
 		Self {

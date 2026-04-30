@@ -15,7 +15,7 @@ pub trait Scored {
 pub struct ScoredBin2<Item, Bin>
 where
 	Item: AtlasRect,
-	Bin: AtlasBin<Item>,
+	Bin: AtlasBin<Item> + AtlasRect,
 {
 	bin: Bin,
 	score: usize,
@@ -25,7 +25,7 @@ where
 impl<Item, Bin> ScoredBin2<Item, Bin>
 where
 	Item: AtlasRect,
-	Bin: AtlasBin<Item>,
+	Bin: AtlasBin<Item> + AtlasRect,
 {
 	pub fn bin(&self) -> &Bin {
 		&self.bin
@@ -35,7 +35,7 @@ where
 impl<Item, Bin> AtlasBin<Item> for ScoredBin2<Item, Bin>
 where
 	Item: AtlasRect,
-	Bin: AtlasBin<Item>,
+	Bin: AtlasBin<Item> + AtlasRect,
 {
 	type Error = Bin::Error;
 
@@ -51,7 +51,7 @@ where
 impl<Item, Bin, Params> BinAdd<Item, Params> for ScoredBin2<Item, Bin>
 where
 	Item: AtlasRect,
-	Bin: AtlasBin<Item> + BinAdd<Item, Params>,
+	Bin: AtlasBin<Item> + BinAdd<Item, Params> + AtlasRect,
 {
 	fn item_add(&mut self, item: &Item, params: &Params) -> Result<(), Self::Error> {
 		self.bin.item_add(item, params)?;
@@ -64,7 +64,7 @@ where
 impl<Item, Bin> AtlasRect for ScoredBin2<Item, Bin>
 where
 	Item: AtlasRect,
-	Bin: AtlasBin<Item>,
+	Bin: AtlasBin<Item> + AtlasRect,
 {
 	fn width(&self) -> u32 {
 		self.bin.width()
@@ -78,7 +78,7 @@ where
 impl<Item, Bin> Scored for ScoredBin2<Item, Bin>
 where
 	Item: AtlasRect,
-	Bin: AtlasBin<Item>,
+	Bin: AtlasBin<Item> + AtlasRect,
 {
 	fn score(&self) -> f32 {
 		self.score as f32 / self.bin.area() as f32

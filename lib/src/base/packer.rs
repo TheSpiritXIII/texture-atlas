@@ -3,7 +3,6 @@ use std::fmt::Debug;
 use std::fmt::Formatter;
 
 use crate::AtlasOptions;
-use crate::AtlasRect;
 
 /// Represents operations from a packer.
 pub enum PackerOp<T> {
@@ -53,7 +52,7 @@ impl<T: PartialEq> PartialEq for PackerOp<T> {
 /// `Output` is the output after items are added to the bin. This should contain a list of
 /// references of the items added with metadata, e.g. position. Most packers will suffice with
 /// [`Pos2`](crate::Pos2).
-pub trait Packer<Item: AtlasRect, Output> {
+pub trait Packer<Item, Output> {
 	/// The error type of the packer. Generally, this is the error type of the page, but packers may
 	/// emit their own errors if needed.
 	// TODO: Add default. See: https://github.com/rust-lang/rust/issues/29661
