@@ -12,7 +12,7 @@ use log::info;
 use serde::Serialize;
 use texture_atlas::AtlasOptions;
 use texture_atlas::BinaryPacker;
-use texture_atlas::DynamicAtlas;
+use texture_atlas::DynamicBuilder;
 use texture_atlas::GenericPacker;
 use texture_atlas::PassthroughPacker;
 use texture_atlas::Pos2;
@@ -108,7 +108,7 @@ fn main() -> anyhow::Result<()> {
 	};
 	let (data, bin_list) = if cli.rotatable {
 		let mut atlas =
-			DynamicAtlas::<_, ScoredBin2<RgbaImage, RgbaImage>, RgbaImage, Rotate2>::new(
+			DynamicBuilder::<_, ScoredBin2<RgbaImage, RgbaImage>, RgbaImage, Rotate2>::new(
 				options,
 				packer,
 			);
@@ -130,7 +130,7 @@ fn main() -> anyhow::Result<()> {
 		let bin_list = atlas.build();
 		(ConfigType::Rotate(data), bin_list)
 	} else {
-		let mut atlas = DynamicAtlas::<_, ScoredBin2<RgbaImage, RgbaImage>, RgbaImage, Pos2>::new(
+		let mut atlas = DynamicBuilder::<_, ScoredBin2<RgbaImage, RgbaImage>, RgbaImage, Pos2>::new(
 			options,
 			packer,
 		);

@@ -18,7 +18,7 @@ use std::num::NonZeroU32;
 use image::RgbaImage;
 use texture_atlas::AtlasOptions;
 use texture_atlas::BinaryPacker;
-use texture_atlas::DynamicAtlas;
+use texture_atlas::DynamicBuilder;
 use texture_atlas::Pos2;
 
 // Pack a list of images into multiple atlases.
@@ -28,7 +28,7 @@ fn pack(image_list: &[&RgbaImage]) -> Vec<RgbaImage> {
 		AtlasOptions::with_max_size(NonZeroU32::new(1024).unwrap(), NonZeroU32::new(1024).unwrap());
 
 	// Take RgbaImage as input and output. Return the positions of each image.
-	let mut builder = DynamicAtlas::<_, RgbaImage, RgbaImage, Pos2>::new(
+	let mut builder = DynamicBuilder::<_, RgbaImage, RgbaImage, Pos2>::new(
 		options,
 		// Use binary packing.
 		BinaryPacker::new(),
@@ -54,7 +54,7 @@ fn pack(image_list: &[&RgbaImage]) -> Vec<RgbaImage> {
 
 ### Params
 
-The earlier example used [`Pos`]. This adds items to bins as-is. A more flexible approach is to use [`Rotate2`], which rotates your item to help more tightly pack your item.
+The earlier example used [`Pos2`]. This adds items to bins as-is. A more flexible approach is to use [`Rotate2`], which rotates your item to help more tightly pack your item.
 
 ### Packers
 

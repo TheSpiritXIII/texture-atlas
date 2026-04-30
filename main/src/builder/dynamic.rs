@@ -14,12 +14,13 @@ use crate::Bin as AtlasBin;
 use crate::BinAdd;
 use crate::Packer as AtlasPacker;
 use crate::PackerOp;
-pub enum AtlasError<BinError, PackerError> {
+
+pub enum BuilderError<BinError, PackerError> {
 	Bin(BinError),
 	Packer(PackerError),
 }
 
-impl<BinError, PackerError> Display for AtlasError<BinError, PackerError>
+impl<BinError, PackerError> Display for BuilderError<BinError, PackerError>
 where
 	BinError: Display,
 	PackerError: Display,
@@ -32,7 +33,7 @@ where
 	}
 }
 
-impl<BinError, PackerError> Debug for AtlasError<BinError, PackerError>
+impl<BinError, PackerError> Debug for BuilderError<BinError, PackerError>
 where
 	BinError: Debug,
 	PackerError: Debug,
@@ -45,19 +46,19 @@ where
 	}
 }
 
-pub type AtlasResult<T, BinError, PackerError> = Result<T, AtlasError<BinError, PackerError>>;
+pub type BuilderResult<T, BinError, PackerError> = Result<T, BuilderError<BinError, PackerError>>;
 
 #[derive(Debug)]
-pub struct AtlasAdd<T> {
+pub struct BuilderAdd<T> {
 	/// The bin index of the added entry.
 	pub bin_index: usize,
 	/// The entry data.
 	pub output: T,
 }
 
-impl<T> AtlasAdd<T> {
-	pub(crate) fn with_item_index(self, item_index: usize) -> AtlasAddMulti<T> {
-		AtlasAddMulti {
+impl<T> BuilderAdd<T> {
+	pub(crate) fn with_item_index(self, item_index: usize) -> BuilderAddMulti<T> {
+		BuilderAddMulti {
 			bin_index: self.bin_index,
 			item_index,
 			output: self.output,
@@ -73,7 +74,7 @@ impl<T> AtlasAdd<T> {
 		Deserialize
 	)
 )]
-pub struct AtlasAddMulti<T> {
+pub struct BuilderAddMulti<T> {
 	/// The bin index of the added entry.
 	pub bin_index: usize,
 	/// The item index from the original slice that was added.
@@ -87,7 +88,7 @@ pub struct AtlasAddMulti<T> {
 // TODO: Add unit tests.
 
 /// An atlas builder which allows unlimited bins.
-pub struct DynamicAtlas<Packer, Bin, Item, Output>
+pub struct DynamicBuilder<Packer, Bin, Item, Output>
 where
 	Packer: AtlasPacker<Item, Output>,
 	Bin: AtlasBin<Item> + BinAdd<Item, Output>,
@@ -100,7 +101,7 @@ where
 	phantom_output: PhantomData<Output>,
 }
 
-impl<Packer, Bin, Item, Output> DynamicAtlas<Packer, Bin, Item, Output>
+impl<Packer, Bin, Item, Output> DynamicBuilder<Packer, Bin, Item, Output>
 where
 	Packer: AtlasPacker<Item, Output>,
 	Bin: AtlasBin<Item> + BinAdd<Item, Output>,
@@ -116,8 +117,8 @@ where
 		}
 	}
 
-	pub fn add(&mut self, item: &Item) -> AtlasResult<AtlasAdd<Output>, Bin::Error, Packer::Error> {
-		let op = self.packer.add(&self.options, item).map_err(AtlasError::Packer)?;
+	pub fn add(&mut self, item: &Item) -> BuilderResult<BuilderAdd<Output>, Bin::Error, Packer::Error> {
+		let op = self.packer.add(&self.options, item).map_err(BuilderError::Packer)?;
 		let output = Self::add_item_to(&self.options, &mut self.bin_list, item, op)?;
 		Ok(output)
 	}
@@ -125,10 +126,10 @@ where
 	pub fn add_all<T: Borrow<Item>>(
 		&mut self,
 		item_list: &[T],
-	) -> AtlasResult<Vec<AtlasAddMulti<Output>>, Bin::Error, Packer::Error> {
+	) -> BuilderResult<Vec<BuilderAddMulti<Output>>, Bin::Error, Packer::Error> {
 		let mut output = Vec::new();
 		for entry in self.packer.add_all(&self.options, item_list) {
-			let (item_index, op) = entry.map_err(AtlasError::Packer)?;
+			let (item_index, op) = entry.map_err(BuilderError::Packer)?;
 			let item = item_list[item_index].borrow();
 
 			let entry = Self::add_item_to(&self.options, &mut self.bin_list, item, op)?;
@@ -140,10 +141,10 @@ where
 	pub fn add_group<T: Borrow<Item>>(
 		&mut self,
 		item_list: &[&Item],
-	) -> AtlasResult<Vec<AtlasAddMulti<Output>>, Bin::Error, Packer::Error> {
+	) -> BuilderResult<Vec<BuilderAddMulti<Output>>, Bin::Error, Packer::Error> {
 		let mut output = Vec::new();
 		for entry in self.packer.add_group(&self.options, item_list) {
-			let (item_index, op) = entry.map_err(AtlasError::Packer)?;
+			let (item_index, op) = entry.map_err(BuilderError::Packer)?;
 			let item = item_list[item_index];
 
 			let entry = Self::add_item_to(&self.options, &mut self.bin_list, item, op)?;
@@ -157,7 +158,7 @@ where
 		bin_list: &mut Vec<Bin>,
 		item: &Item,
 		op: PackerOp<Output>,
-	) -> AtlasResult<AtlasAdd<Output>, Bin::Error, Packer::Error> {
+	) -> BuilderResult<BuilderAdd<Output>, Bin::Error, Packer::Error> {
 		let (index, params) = match op {
 			PackerOp::NewBin(params) => {
 				let bin = Bin::new(options.max_width, options.max_height);
@@ -167,8 +168,8 @@ where
 			}
 			PackerOp::ExistingBin((bin, params)) => (bin, params),
 		};
-		bin_list[index].item_add(item, &params).map_err(AtlasError::Bin)?;
-		Ok(AtlasAdd {
+		bin_list[index].item_add(item, &params).map_err(BuilderError::Bin)?;
+		Ok(BuilderAdd {
 			bin_index: index,
 			output: params,
 		})

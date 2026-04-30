@@ -9,7 +9,7 @@ use crate::Packer as AtlasPacker;
 use crate::PackerOp;
 
 // An atlas builder which only creates one bin. Does not allocate any heap memory.
-pub struct SingleAtlas<Packer, Bin, Item, Output>
+pub struct SingleBuilder<Packer, Bin, Item, Output>
 where
 	Packer: AtlasPacker<Item, Output>,
 	Bin: AtlasBin<Item> + BinAdd<Item, Output>,
@@ -22,25 +22,25 @@ where
 	phantom_output: PhantomData<Output>,
 }
 
-pub enum SingleAtlasError<BinError, PackerError> {
+pub enum SingleBuilderError<BinError, PackerError> {
 	Bin(BinError),
 	Packer(PackerError),
 	MissingBin,
 	DoesNotFit,
 }
 
-pub type SingleAtlasResult<T, BinError, PackerError> =
-	Result<T, SingleAtlasError<BinError, PackerError>>;
+pub type SingleBuilderResult<T, BinError, PackerError> =
+	Result<T, SingleBuilderError<BinError, PackerError>>;
 
 #[derive(Debug)]
-pub struct SingleAtlasEntry<T> {
+pub struct SingleBuilderEntry<T> {
 	/// The item index from the original slice that was added.
 	pub item_index: usize,
 	/// The entry data.
 	pub output: T,
 }
 
-impl<Packer, Bin, Item, Output> SingleAtlas<Packer, Bin, Item, Output>
+impl<Packer, Bin, Item, Output> SingleBuilder<Packer, Bin, Item, Output>
 where
 	Packer: AtlasPacker<Item, Output>,
 	Bin: AtlasBin<Item> + BinAdd<Item, Output>,
@@ -59,8 +59,8 @@ where
 
 	/// Adds a new item to the atlas. Prefer `add_all`, which allows additional optimizations to
 	/// ensure items are tightly packed
-	pub fn add(&mut self, item: &Item) -> SingleAtlasResult<Output, Bin::Error, Packer::Error> {
-		let op = self.packer.add(&self.options, item).map_err(SingleAtlasError::Packer)?;
+	pub fn add(&mut self, item: &Item) -> SingleBuilderResult<Output, Bin::Error, Packer::Error> {
+		let op = self.packer.add(&self.options, item).map_err(SingleBuilderError::Packer)?;
 		let output = Self::add_item_to(&self.options, &mut self.bin, item, op)?;
 		Ok(output)
 	}
@@ -70,14 +70,14 @@ where
 	pub fn add_all<T: Borrow<Item>>(
 		&mut self,
 		item_list: &[T],
-	) -> SingleAtlasResult<Vec<SingleAtlasEntry<Output>>, Bin::Error, Packer::Error> {
+	) -> SingleBuilderResult<Vec<SingleBuilderEntry<Output>>, Bin::Error, Packer::Error> {
 		let mut output = Vec::with_capacity(item_list.len());
 		for entry in self.packer.add_all(&self.options, item_list) {
-			let (item_index, op) = entry.map_err(SingleAtlasError::Packer)?;
+			let (item_index, op) = entry.map_err(SingleBuilderError::Packer)?;
 			let item = item_list[item_index].borrow();
 
 			let entry = Self::add_item_to(&self.options, &mut self.bin, item, op)?;
-			output.push(SingleAtlasEntry {
+			output.push(SingleBuilderEntry {
 				item_index,
 				output: entry,
 			});
@@ -98,12 +98,12 @@ where
 		bin: &mut Option<Bin>,
 		item: &Item,
 		op: PackerOp<Output>,
-	) -> SingleAtlasResult<Output, Bin::Error, Packer::Error> {
+	) -> SingleBuilderResult<Output, Bin::Error, Packer::Error> {
 		let (bin, params) = match bin {
 			Some(bin) => {
 				match op {
 					PackerOp::NewBin(_) => {
-						return Err(SingleAtlasError::DoesNotFit);
+						return Err(SingleBuilderError::DoesNotFit);
 					}
 					PackerOp::ExistingBin((_, params)) => (bin, params),
 				}
@@ -111,13 +111,13 @@ where
 			None => {
 				// TODO: Might not need to handle this case if we create bin in constructor somehow.
 				let PackerOp::NewBin(params) = op else {
-					return Err(SingleAtlasError::MissingBin);
+					return Err(SingleBuilderError::MissingBin);
 				};
 				let bin = bin.insert(Bin::new(options.max_width, options.max_height));
 				(bin, params)
 			}
 		};
-		bin.item_add(item, &params).map_err(SingleAtlasError::Bin)?;
+		bin.item_add(item, &params).map_err(SingleBuilderError::Bin)?;
 		Ok(params)
 	}
 }
