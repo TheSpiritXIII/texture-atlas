@@ -1,4 +1,4 @@
-use crate::AtlasRect;
+use crate::Item2;
 use crate::Pos2;
 use crate::Size2;
 
@@ -53,7 +53,7 @@ impl Node {
 	}
 }
 
-impl AtlasRect for Node {
+impl Item2 for Node {
 	fn width(&self) -> u32 {
 		self.size.width
 	}

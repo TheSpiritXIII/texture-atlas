@@ -3,9 +3,9 @@ use std::num::NonZero;
 use crate::AlwaysErrorPacker;
 use crate::AlwaysExistingBinPacker;
 use crate::AtlasOptions;
-use crate::AtlasRect;
 use crate::Bin;
 use crate::BinAdd;
+use crate::Item2;
 use crate::Pos2;
 use crate::SingleBuilder;
 use crate::SingleBuilderError;
@@ -22,9 +22,9 @@ struct IndexedItem<T> {
 	item: T,
 }
 
-impl<T> AtlasRect for IndexedItem<T>
+impl<T> Item2 for IndexedItem<T>
 where
-	T: AtlasRect,
+	T: Item2,
 {
 	fn width(&self) -> u32 {
 		self.item.width()
@@ -44,7 +44,7 @@ struct IndexedBin<T> {
 
 impl<T> Bin<IndexedItem<T>> for IndexedBin<Pos2>
 where
-	T: AtlasRect + Clone,
+	T: Item2 + Clone,
 {
 	type Error = ();
 
@@ -59,7 +59,7 @@ where
 
 impl<T> BinAdd<IndexedItem<T>, Pos2> for IndexedBin<Pos2>
 where
-	T: AtlasRect + Clone,
+	T: Item2 + Clone,
 {
 	fn item_add(&mut self, item: &IndexedItem<T>, params: &Pos2) -> Result<(), Self::Error> {
 		self.data.push((item.index, *params));
@@ -67,7 +67,7 @@ where
 	}
 }
 
-impl<T> AtlasRect for IndexedBin<T> {
+impl<T> Item2 for IndexedBin<T> {
 	fn width(&self) -> u32 {
 		self.width.get()
 	}

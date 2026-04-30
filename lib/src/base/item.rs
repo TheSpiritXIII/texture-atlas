@@ -1,5 +1,6 @@
-/// Represents an axis aligned rectangle to be packed in a bin.
-pub trait AtlasRect {
+/// Represents a 2-dimensional axis aligned rectangle to be packed in a bin. [`Size2`] is a basic
+/// implementation of it.
+pub trait Item2 {
 	/// The width size dimension of the rectangle.
 	fn width(&self) -> u32;
 
@@ -29,8 +30,8 @@ impl Fit2 {
 	}
 }
 
-// Common methods for all `AtlasRect` types.
-pub trait AtlasRectExt: AtlasRect {
+// Common methods for all [`Item2`] types.
+pub trait Item2Ext: Item2 {
 	fn fit(&self, other: &Size2) -> Fit2 {
 		match self.width().cmp(&other.width) {
 			std::cmp::Ordering::Equal => {
@@ -62,7 +63,7 @@ pub trait AtlasRectExt: AtlasRect {
 	}
 }
 
-impl<T> AtlasRectExt for T where T: AtlasRect {}
+impl<T> Item2Ext for T where T: Item2 {}
 
 /// An axis-aligned rectangle.
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
@@ -83,7 +84,7 @@ impl Size2 {
 	}
 }
 
-impl AtlasRect for Size2 {
+impl Item2 for Size2 {
 	fn width(&self) -> u32 {
 		self.width
 	}

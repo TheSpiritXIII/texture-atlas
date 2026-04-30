@@ -3,7 +3,7 @@ use std::convert::Infallible;
 use std::iter;
 
 use crate::AtlasOptions;
-use crate::AtlasRect;
+use crate::Item2;
 use crate::Packer;
 use crate::PackerOp;
 use crate::Pos2;
@@ -13,7 +13,7 @@ pub(crate) struct AlwaysExistingBinPacker;
 
 impl<Item> Packer<Item, Pos2> for AlwaysExistingBinPacker
 where
-	Item: AtlasRect,
+	Item: Item2,
 {
 	type Error = Infallible;
 
@@ -39,7 +39,7 @@ pub(crate) struct AlwaysErrorPacker;
 
 impl<Item> Packer<Item, Pos2> for AlwaysErrorPacker
 where
-	Item: AtlasRect,
+	Item: Item2,
 {
 	type Error = ();
 

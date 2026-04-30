@@ -8,9 +8,9 @@ use std::convert::Infallible;
 use node::Node;
 
 use crate::AtlasOptions;
-use crate::AtlasRect;
-use crate::AtlasRectExt;
 use crate::Fit2;
+use crate::Item2;
+use crate::Item2Ext;
 use crate::Packer;
 use crate::PackerOp;
 use crate::Pos2;
@@ -44,7 +44,7 @@ impl Default for BinaryPacker {
 
 impl<Item> Packer<Item, Pos2> for BinaryPacker
 where
-	Item: AtlasRect,
+	Item: Item2,
 {
 	type Error = Infallible;
 
@@ -176,7 +176,7 @@ impl BinaryBin {
 
 impl<Item> Packer<Item, Rotate2> for BinaryPacker
 where
-	Item: AtlasRect,
+	Item: Item2,
 {
 	type Error = Infallible;
 

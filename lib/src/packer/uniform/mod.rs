@@ -5,7 +5,7 @@ use std::borrow::Borrow;
 use std::convert::Infallible;
 
 use crate::AtlasOptions;
-use crate::AtlasRect;
+use crate::Item2;
 use crate::Packer;
 use crate::PackerOp;
 use crate::Pos2;
@@ -39,7 +39,7 @@ impl Default for UniformPacker {
 
 impl<Item, Output> Packer<Item, Output> for UniformPacker
 where
-	Item: AtlasRect,
+	Item: Item2,
 	Output: From<Pos2>,
 {
 	type Error = Infallible;

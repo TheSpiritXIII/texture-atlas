@@ -4,9 +4,9 @@ use image::DynamicImage;
 use image::ImageBuffer;
 use image::Pixel;
 
-use crate::AtlasRect;
+use crate::Item2;
 
-impl AtlasRect for DynamicImage {
+impl Item2 for DynamicImage {
 	fn width(&self) -> u32 {
 		DynamicImage::width(self)
 	}
@@ -15,7 +15,7 @@ impl AtlasRect for DynamicImage {
 	}
 }
 
-impl<P, Container> AtlasRect for ImageBuffer<P, Container>
+impl<P, Container> Item2 for ImageBuffer<P, Container>
 where
 	P: Pixel,
 	Container: Deref<Target = [P::Subpixel]>,

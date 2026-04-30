@@ -1,8 +1,8 @@
 use std::convert::Infallible;
 
 use crate::AtlasOptions;
-use crate::AtlasRect;
 use crate::BinaryPacker;
+use crate::Item2;
 use crate::Packer;
 use crate::PackerOp;
 use crate::PassthroughPacker;
@@ -20,7 +20,7 @@ pub enum GenericPacker {
 
 impl<Item> Packer<Item, Pos2> for GenericPacker
 where
-	Item: AtlasRect,
+	Item: Item2,
 {
 	type Error = Infallible;
 
@@ -67,7 +67,7 @@ where
 
 impl<Item> Packer<Item, Rotate2> for GenericPacker
 where
-	Item: AtlasRect,
+	Item: Item2,
 {
 	type Error = Infallible;
 

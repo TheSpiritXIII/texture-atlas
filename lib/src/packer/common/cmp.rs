@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 
-use crate::AtlasRect;
-use crate::AtlasRectExt;
+use crate::Item2;
+use crate::Item2Ext;
 
 /// Represents the different ways to prioritize items to be added.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -17,7 +17,7 @@ pub enum SortKind2 {
 }
 
 impl SortKind2 {
-	pub fn cmp<T: AtlasRect>(&self, a: &T, b: &T) -> Ordering {
+	pub fn cmp<T: Item2>(&self, a: &T, b: &T) -> Ordering {
 		match self {
 			SortKind2::Width => cmp_by_width(a, b),
 			SortKind2::Height => cmp_by_height(a, b),
@@ -28,7 +28,7 @@ impl SortKind2 {
 }
 
 /// Compares the areas of the two items. If the area is the same, uses [`cmp_by_max`].
-pub fn cmp_by_area<T: AtlasRect>(a: &T, b: &T) -> Ordering {
+pub fn cmp_by_area<T: Item2>(a: &T, b: &T) -> Ordering {
 	let area_ordering = a.area().cmp(&b.area());
 	if area_ordering == Ordering::Equal {
 		cmp_by_max(a, b)
@@ -47,17 +47,17 @@ fn cmp_by_size(a: (u32, u32), b: (u32, u32)) -> Ordering {
 }
 
 /// Sorts by the item's width.
-pub fn cmp_by_width<T: AtlasRect>(a: &T, b: &T) -> Ordering {
+pub fn cmp_by_width<T: Item2>(a: &T, b: &T) -> Ordering {
 	cmp_by_size((a.width(), a.height()), (b.width(), b.height()))
 }
 
 /// Sorts by the item's height.
-pub fn cmp_by_height<T: AtlasRect>(a: &T, b: &T) -> Ordering {
+pub fn cmp_by_height<T: Item2>(a: &T, b: &T) -> Ordering {
 	cmp_by_size((a.height(), a.width()), (b.height(), b.width()))
 }
 
 /// Sorts by the item's largest side. If the largest sides are the same, uses [`cmp_by_width`].
-pub fn cmp_by_max<T: AtlasRect>(a: &T, b: &T) -> Ordering {
+pub fn cmp_by_max<T: Item2>(a: &T, b: &T) -> Ordering {
 	let size_a = if a.width() > a.height() {
 		(a.width(), a.height())
 	} else {

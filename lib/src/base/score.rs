@@ -1,9 +1,9 @@
 use std::marker::PhantomData;
 
-use crate::AtlasRect;
-use crate::AtlasRectExt;
 use crate::Bin as AtlasBin;
 use crate::BinAdd;
+use crate::Item2;
+use crate::Item2Ext;
 
 /// An algorithm which can be scored.
 pub trait Scored {
@@ -14,8 +14,8 @@ pub trait Scored {
 /// A delegating bin which tracks a score of the wrapped bin.
 pub struct ScoredBin2<Item, Bin>
 where
-	Item: AtlasRect,
-	Bin: AtlasBin<Item> + AtlasRect,
+	Item: Item2,
+	Bin: AtlasBin<Item> + Item2,
 {
 	bin: Bin,
 	score: usize,
@@ -24,8 +24,8 @@ where
 
 impl<Item, Bin> ScoredBin2<Item, Bin>
 where
-	Item: AtlasRect,
-	Bin: AtlasBin<Item> + AtlasRect,
+	Item: Item2,
+	Bin: AtlasBin<Item> + Item2,
 {
 	pub fn bin(&self) -> &Bin {
 		&self.bin
@@ -34,8 +34,8 @@ where
 
 impl<Item, Bin> AtlasBin<Item> for ScoredBin2<Item, Bin>
 where
-	Item: AtlasRect,
-	Bin: AtlasBin<Item> + AtlasRect,
+	Item: Item2,
+	Bin: AtlasBin<Item> + Item2,
 {
 	type Error = Bin::Error;
 
@@ -50,8 +50,8 @@ where
 
 impl<Item, Bin, Params> BinAdd<Item, Params> for ScoredBin2<Item, Bin>
 where
-	Item: AtlasRect,
-	Bin: AtlasBin<Item> + BinAdd<Item, Params> + AtlasRect,
+	Item: Item2,
+	Bin: AtlasBin<Item> + BinAdd<Item, Params> + Item2,
 {
 	fn item_add(&mut self, item: &Item, params: &Params) -> Result<(), Self::Error> {
 		self.bin.item_add(item, params)?;
@@ -61,10 +61,10 @@ where
 	}
 }
 
-impl<Item, Bin> AtlasRect for ScoredBin2<Item, Bin>
+impl<Item, Bin> Item2 for ScoredBin2<Item, Bin>
 where
-	Item: AtlasRect,
-	Bin: AtlasBin<Item> + AtlasRect,
+	Item: Item2,
+	Bin: AtlasBin<Item> + Item2,
 {
 	fn width(&self) -> u32 {
 		self.bin.width()
@@ -77,8 +77,8 @@ where
 
 impl<Item, Bin> Scored for ScoredBin2<Item, Bin>
 where
-	Item: AtlasRect,
-	Bin: AtlasBin<Item> + AtlasRect,
+	Item: Item2,
+	Bin: AtlasBin<Item> + Item2,
 {
 	fn score(&self) -> f32 {
 		self.score as f32 / self.bin.area() as f32
