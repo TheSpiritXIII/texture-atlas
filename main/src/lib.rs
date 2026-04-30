@@ -5,7 +5,6 @@ mod base;
 mod image;
 mod packer;
 
-pub mod r#gen;
 pub mod util;
 
 pub use base::*;
