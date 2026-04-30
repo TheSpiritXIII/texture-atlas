@@ -27,7 +27,7 @@ impl Default for PassthroughPacker {
 	}
 }
 
-impl<Item, Output> Packer<Item, Output> for PassthroughPacker
+impl<Item, Output> Packer<Item, Output, AtlasOptions> for PassthroughPacker
 where
 	Item: Item2,
 	Output: From<Pos2>,

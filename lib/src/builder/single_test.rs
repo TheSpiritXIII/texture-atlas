@@ -46,12 +46,13 @@ impl<T> Bin<IndexedItem<T>> for IndexedBin<Pos2>
 where
 	T: Item2 + Clone,
 {
+	type Options = AtlasOptions;
 	type Error = ();
 
-	fn new(width: NonZero<u32>, height: NonZero<u32>) -> Self {
+	fn new(options: &Self::Options) -> Self {
 		Self {
-			width,
-			height,
+			width: options.max_width,
+			height: options.max_height,
 			data: Vec::new(),
 		}
 	}

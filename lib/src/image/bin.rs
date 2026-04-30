@@ -1,11 +1,10 @@
-use std::num::NonZero;
-
 use image::GenericImage;
 use image::ImageBuffer;
 use image::ImageError;
 use image::Pixel;
 use image::imageops::rotate90;
 
+use crate::AtlasOptions;
 use crate::Bin;
 use crate::BinAdd;
 use crate::Pos2;
@@ -16,10 +15,11 @@ impl<P> Bin<ImageBuffer<P, Vec<P::Subpixel>>> for ImageBuffer<P, Vec<P::Subpixel
 where
 	P: Pixel + 'static,
 {
+	type Options = AtlasOptions;
 	type Error = ImageError;
 
-	fn new(width: NonZero<u32>, height: NonZero<u32>) -> Self {
-		ImageBuffer::<P, Vec<P::Subpixel>>::new(width.get(), height.get())
+	fn new(options: &Self::Options) -> Self {
+		ImageBuffer::<P, Vec<P::Subpixel>>::new(options.max_width.get(), options.max_height.get())
 	}
 }
 

@@ -1,14 +1,13 @@
-use std::num::NonZero;
-
-// TODO: Add options type that goes into the constructor.
-
 /// Represents a single bin in an atlas.
 pub trait Bin<Item> {
+	/// The options type when creating a new bin.
+	type Options;
+
 	/// The error type when adding an item to the bin.
 	type Error;
 
 	/// Creates a new bin with the given maximum size.
-	fn new(width: NonZero<u32>, height: NonZero<u32>) -> Self;
+	fn new(options: &Self::Options) -> Self;
 }
 
 /// Determines how an item `Item` is added to a bin, given a parameter type `Params`.

@@ -42,7 +42,7 @@ impl Default for BinaryPacker {
 	}
 }
 
-impl<Item> Packer<Item, Pos2> for BinaryPacker
+impl<Item> Packer<Item, Pos2, AtlasOptions> for BinaryPacker
 where
 	Item: Item2,
 {
@@ -174,7 +174,7 @@ impl BinaryBin {
 // 	packer: BinaryPacker,
 // }
 
-impl<Item> Packer<Item, Rotate2> for BinaryPacker
+impl<Item> Packer<Item, Rotate2, AtlasOptions> for BinaryPacker
 where
 	Item: Item2,
 {

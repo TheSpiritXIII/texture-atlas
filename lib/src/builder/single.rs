@@ -1,7 +1,6 @@
 use std::borrow::Borrow;
 use std::marker::PhantomData;
 
-use crate::AtlasOptions;
 use crate::Bin as AtlasBin;
 use crate::BinAdd;
 use crate::Packer as AtlasPacker;
@@ -10,10 +9,10 @@ use crate::PackerOp;
 // An atlas builder which only creates one bin. Does not allocate any heap memory.
 pub struct SingleBuilder<Packer, Bin, Item, Output>
 where
-	Packer: AtlasPacker<Item, Output>,
+	Packer: AtlasPacker<Item, Output, Bin::Options>,
 	Bin: AtlasBin<Item> + BinAdd<Item, Output>,
 {
-	options: AtlasOptions,
+	options: Bin::Options,
 	packer: Packer,
 	bin: Option<Bin>,
 	phantom_item: PhantomData<Item>,
@@ -40,11 +39,11 @@ pub struct SingleBuilderEntry<T> {
 
 impl<Packer, Bin, Item, Output> SingleBuilder<Packer, Bin, Item, Output>
 where
-	Packer: AtlasPacker<Item, Output>,
+	Packer: AtlasPacker<Item, Output, Bin::Options>,
 	Bin: AtlasBin<Item> + BinAdd<Item, Output>,
 {
 	/// Creates a new atlas.
-	pub fn new(options: AtlasOptions, packer: Packer) -> Self {
+	pub fn new(options: Bin::Options, packer: Packer) -> Self {
 		Self {
 			options,
 			packer,
@@ -91,7 +90,7 @@ where
 	}
 
 	fn add_item_to(
-		options: &AtlasOptions,
+		options: &Bin::Options,
 		bin: &mut Option<Bin>,
 		item: &Item,
 		op: PackerOp<Output>,
@@ -110,7 +109,7 @@ where
 				let PackerOp::NewBin(params) = op else {
 					return Err(SingleBuilderError::MissingBin);
 				};
-				let bin = bin.insert(Bin::new(options.max_width, options.max_height));
+				let bin = bin.insert(Bin::new(options));
 				(bin, params)
 			}
 		};

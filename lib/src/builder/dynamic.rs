@@ -8,7 +8,6 @@ use serde::Deserialize;
 #[cfg(feature = "serde")]
 use serde::Serialize;
 
-use crate::AtlasOptions;
 use crate::Bin as AtlasBin;
 use crate::BinAdd;
 use crate::Packer as AtlasPacker;
@@ -89,10 +88,10 @@ pub struct BuilderAddMulti<T> {
 /// An atlas builder which allows unlimited bins.
 pub struct DynamicBuilder<Packer, Bin, Item, Output>
 where
-	Packer: AtlasPacker<Item, Output>,
+	Packer: AtlasPacker<Item, Output, Bin::Options>,
 	Bin: AtlasBin<Item> + BinAdd<Item, Output>,
 {
-	options: AtlasOptions,
+	options: Bin::Options,
 	packer: Packer,
 	bin_list: Vec<Bin>,
 	phantom_item: PhantomData<Item>,
@@ -101,10 +100,10 @@ where
 
 impl<Packer, Bin, Item, Output> DynamicBuilder<Packer, Bin, Item, Output>
 where
-	Packer: AtlasPacker<Item, Output>,
+	Packer: AtlasPacker<Item, Output, Bin::Options>,
 	Bin: AtlasBin<Item> + BinAdd<Item, Output>,
 {
-	pub fn new(options: AtlasOptions, packer: Packer) -> Self {
+	pub fn new(options: Bin::Options, packer: Packer) -> Self {
 		Self {
 			options,
 			packer,
@@ -154,14 +153,14 @@ where
 	}
 
 	fn add_item_to(
-		options: &AtlasOptions,
+		options: &Bin::Options,
 		bin_list: &mut Vec<Bin>,
 		item: &Item,
 		op: PackerOp<Output>,
 	) -> BuilderResult<BuilderAdd<Output>, Bin::Error, Packer::Error> {
 		let (index, params) = match op {
 			PackerOp::NewBin(params) => {
-				let bin = Bin::new(options.max_width, options.max_height);
+				let bin = Bin::new(options);
 				bin_list.push(bin);
 				let last_index = bin_list.len() - 1;
 				(last_index, params)

@@ -11,7 +11,7 @@ use crate::Pos2;
 // A packer that always returns `PackerOp::ExistingBin((0, Pos2::new(0, 0)))` when an item is added.
 pub(crate) struct AlwaysExistingBinPacker;
 
-impl<Item> Packer<Item, Pos2> for AlwaysExistingBinPacker
+impl<Item> Packer<Item, Pos2, AtlasOptions> for AlwaysExistingBinPacker
 where
 	Item: Item2,
 {
@@ -37,7 +37,7 @@ where
 // A packer that always returns an error when an item is added.
 pub(crate) struct AlwaysErrorPacker;
 
-impl<Item> Packer<Item, Pos2> for AlwaysErrorPacker
+impl<Item> Packer<Item, Pos2, AtlasOptions> for AlwaysErrorPacker
 where
 	Item: Item2,
 {

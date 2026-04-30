@@ -37,11 +37,12 @@ where
 	Item: Item2,
 	Bin: AtlasBin<Item> + Item2,
 {
+	type Options = Bin::Options;
 	type Error = Bin::Error;
 
-	fn new(width: std::num::NonZero<u32>, height: std::num::NonZero<u32>) -> Self {
+	fn new(options: &Self::Options) -> Self {
 		Self {
-			bin: Bin::new(width, height),
+			bin: Bin::new(options),
 			score: 0,
 			phantom: PhantomData,
 		}

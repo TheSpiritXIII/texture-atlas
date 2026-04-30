@@ -37,7 +37,7 @@ impl Default for UniformPacker {
 	}
 }
 
-impl<Item, Output> Packer<Item, Output> for UniformPacker
+impl<Item, Output> Packer<Item, Output, AtlasOptions> for UniformPacker
 where
 	Item: Item2,
 	Output: From<Pos2>,

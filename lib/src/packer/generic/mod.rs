@@ -18,7 +18,7 @@ pub enum GenericPacker {
 	Binary(BinaryPacker),
 }
 
-impl<Item> Packer<Item, Pos2> for GenericPacker
+impl<Item> Packer<Item, Pos2, AtlasOptions> for GenericPacker
 where
 	Item: Item2,
 {
@@ -40,7 +40,9 @@ where
 		// TODO: Avoid extra allocations.
 		let items: Vec<_> = match self {
 			Self::Binary(packer) => {
-				Packer::<Item, Pos2>::add_all(packer, options, group).into_iter().collect()
+				Packer::<Item, Pos2, AtlasOptions>::add_all(packer, options, group)
+					.into_iter()
+					.collect()
 			}
 			Self::Passthrough(packer) => packer.add_all(options, group).into_iter().collect(),
 			Self::Uniform(packer) => packer.add_all(options, group).into_iter().collect(),
@@ -56,7 +58,9 @@ where
 		// TODO: Avoid extra allocations.
 		let items: Vec<_> = match self {
 			Self::Binary(packer) => {
-				Packer::<Item, Pos2>::add_group(packer, options, group).into_iter().collect()
+				Packer::<Item, Pos2, AtlasOptions>::add_group(packer, options, group)
+					.into_iter()
+					.collect()
 			}
 			Self::Passthrough(packer) => packer.add_group(options, group).into_iter().collect(),
 			Self::Uniform(packer) => packer.add_group(options, group).into_iter().collect(),
@@ -65,7 +69,7 @@ where
 	}
 }
 
-impl<Item> Packer<Item, Rotate2> for GenericPacker
+impl<Item> Packer<Item, Rotate2, AtlasOptions> for GenericPacker
 where
 	Item: Item2,
 {
@@ -91,7 +95,9 @@ where
 		// TODO: Avoid extra allocations.
 		let items: Vec<_> = match self {
 			Self::Binary(packer) => {
-				Packer::<Item, Rotate2>::add_all(packer, options, group).into_iter().collect()
+				Packer::<Item, Rotate2, AtlasOptions>::add_all(packer, options, group)
+					.into_iter()
+					.collect()
 			}
 			Self::Passthrough(packer) => packer.add_all(options, group).into_iter().collect(),
 			Self::Uniform(packer) => packer.add_all(options, group).into_iter().collect(),
@@ -107,7 +113,9 @@ where
 		// TODO: Avoid extra allocations.
 		let items: Vec<_> = match self {
 			Self::Binary(packer) => {
-				Packer::<Item, Rotate2>::add_group(packer, options, group).into_iter().collect()
+				Packer::<Item, Rotate2, AtlasOptions>::add_group(packer, options, group)
+					.into_iter()
+					.collect()
 			}
 			Self::Passthrough(packer) => packer.add_group(options, group).into_iter().collect(),
 			Self::Uniform(packer) => packer.add_group(options, group).into_iter().collect(),
