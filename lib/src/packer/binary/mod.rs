@@ -96,7 +96,7 @@ impl BinaryBin {
 			height: options.max_height.get(),
 		});
 
-		let node_list = match node.fit2(item) {
+		let node_list = match node.fit(item) {
 			Fit2::Total | Fit2::None => vec![],
 			Fit2::Within => {
 				let (a, b) = node.split(item);
@@ -122,7 +122,7 @@ impl BinaryBin {
 
 	pub fn add_to_smallest_node(&mut self, item: &Size2) -> Option<Pos2> {
 		for (index, node) in self.node_list.iter().enumerate() {
-			let fit = node.fit2(item);
+			let fit = node.fit(item);
 			if !fit.fits() {
 				continue;
 			}

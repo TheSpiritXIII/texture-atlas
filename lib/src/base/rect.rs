@@ -1,6 +1,3 @@
-use crate::util::Rect;
-use crate::util::RotatableRect;
-
 /// Represents an axis aligned rectangle to be packed in a bin.
 pub trait AtlasRect {
 	/// The width size dimension of the rectangle.
@@ -34,7 +31,7 @@ impl Fit2 {
 
 // Common methods for all `AtlasRect` types.
 pub trait AtlasRectExt: AtlasRect {
-	fn fit2(&self, other: &Size2) -> Fit2 {
+	fn fit(&self, other: &Size2) -> Fit2 {
 		match self.width().cmp(&other.width) {
 			std::cmp::Ordering::Equal => {
 				match self.height().cmp(&other.height) {
@@ -62,25 +59,6 @@ pub trait AtlasRectExt: AtlasRect {
 	/// Returns true if this rectangle has an area of 0.
 	fn empty(&self) -> bool {
 		self.width() == 0 || self.height() == 0
-	}
-
-	/// Returns the dimensions of this rectangle.
-	fn dimensions(&self) -> Rect {
-		Rect::new(self.width(), self.height())
-	}
-
-	/// Returns the dimensions of this rect with width and height inverted.
-	fn dimensions_rotated(&self) -> Rect {
-		Rect::new(self.height(), self.width())
-	}
-
-	/// Returns a rect with the longest dimension being its width and its other being its height.
-	fn dimensions_longest(&self) -> RotatableRect {
-		if self.width() >= self.height() {
-			RotatableRect::new(self.width(), self.height(), false)
-		} else {
-			RotatableRect::new(self.height(), self.width(), true)
-		}
 	}
 }
 
