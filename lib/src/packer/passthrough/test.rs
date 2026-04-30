@@ -1,6 +1,6 @@
 use std::num::NonZero;
 
-use crate::AtlasOptions;
+use crate::Options2;
 use crate::Packer;
 use crate::PackerOp;
 use crate::PassthroughPacker;
@@ -8,8 +8,8 @@ use crate::Pos2;
 use crate::Size2;
 use crate::assert_add_overflow;
 
-fn new_options() -> AtlasOptions {
-	AtlasOptions::with_max_size(NonZero::new(1024).unwrap(), NonZero::new(1024).unwrap())
+fn new_options() -> Options2 {
+	Options2::with_max_size(NonZero::new(1024).unwrap(), NonZero::new(1024).unwrap())
 }
 
 #[test]

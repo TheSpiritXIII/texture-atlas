@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use crate::AtlasOptions;
+use crate::Options2;
 use crate::Packer as AtlasPacker;
 use crate::Pos2;
 use crate::Size2;
@@ -10,9 +10,9 @@ pub const MAX_WIDTH: u32 = 1024;
 pub const MAX_HEIGHT: u32 = 1024;
 
 /// Asserts overflow behavior for various algorithm-agnostic size scenarios.
-pub fn assert_add_overflow<Packer, Error>(options: &AtlasOptions, packer: Packer)
+pub fn assert_add_overflow<Packer, Error>(options: &Options2, packer: Packer)
 where
-	Packer: AtlasPacker<Size2, Pos2, AtlasOptions, Error = Error> + Clone,
+	Packer: AtlasPacker<Size2, Pos2, Options2, Error = Error> + Clone,
 	Error: Debug + PartialEq,
 {
 	assert_add_overflow_with(
@@ -37,12 +37,12 @@ where
 
 /// Asserts overflow behavior for a specific size and scenario.
 pub fn assert_add_overflow_with<Packer, Error>(
-	options: &AtlasOptions,
+	options: &Options2,
 	packer: Packer,
 	size: Size2,
 	scenario: &str,
 ) where
-	Packer: AtlasPacker<Size2, Pos2, AtlasOptions, Error = Error> + Clone,
+	Packer: AtlasPacker<Size2, Pos2, Options2, Error = Error> + Clone,
 	Error: Debug + PartialEq,
 {
 	assert_add_overflow_then_small(options, packer.clone(), size, scenario);
@@ -57,8 +57,8 @@ pub fn assert_add_overflow_with<Packer, Error>(
 
 /// Tests adding a large item first, then a small one, expecting overflow.
 pub fn assert_add_overflow_then_small<T: Debug + PartialEq>(
-	options: &AtlasOptions,
-	mut packer: impl AtlasPacker<Size2, Pos2, AtlasOptions, Error = T>,
+	options: &Options2,
+	mut packer: impl AtlasPacker<Size2, Pos2, Options2, Error = T>,
 	size: Size2,
 	scenario: &str,
 ) {
@@ -78,8 +78,8 @@ pub fn assert_add_overflow_then_small<T: Debug + PartialEq>(
 
 /// Tests adding a small item first, then a large one, expecting overflow.
 pub fn assert_add_small_then_overflow<T: Debug + PartialEq>(
-	options: &AtlasOptions,
-	mut packer: impl AtlasPacker<Size2, Pos2, AtlasOptions, Error = T>,
+	options: &Options2,
+	mut packer: impl AtlasPacker<Size2, Pos2, Options2, Error = T>,
 	size: Size2,
 	scenario: &str,
 ) {
@@ -99,8 +99,8 @@ pub fn assert_add_small_then_overflow<T: Debug + PartialEq>(
 
 /// Tests add_all with large item first, then small, expecting overflow.
 pub fn assert_add_all_overflow_then_small<T: Debug + PartialEq>(
-	options: &AtlasOptions,
-	mut packer: impl AtlasPacker<Size2, Pos2, AtlasOptions, Error = T>,
+	options: &Options2,
+	mut packer: impl AtlasPacker<Size2, Pos2, Options2, Error = T>,
 	size: Size2,
 	scenario: &str,
 ) {
@@ -120,8 +120,8 @@ pub fn assert_add_all_overflow_then_small<T: Debug + PartialEq>(
 
 /// Tests add_all with small item first, then large, expecting overflow.
 pub fn assert_add_all_small_then_overflow<T: Debug + PartialEq>(
-	options: &AtlasOptions,
-	mut packer: impl AtlasPacker<Size2, Pos2, AtlasOptions, Error = T>,
+	options: &Options2,
+	mut packer: impl AtlasPacker<Size2, Pos2, Options2, Error = T>,
 	size: Size2,
 	scenario: &str,
 ) {
@@ -141,8 +141,8 @@ pub fn assert_add_all_small_then_overflow<T: Debug + PartialEq>(
 
 /// Tests add_group with large item first, then small, expecting overflow.
 pub fn assert_add_group_overflow_then_small<T: Debug + PartialEq>(
-	options: &AtlasOptions,
-	mut packer: impl AtlasPacker<Size2, Pos2, AtlasOptions, Error = T>,
+	options: &Options2,
+	mut packer: impl AtlasPacker<Size2, Pos2, Options2, Error = T>,
 	size: Size2,
 	scenario: &str,
 ) {
@@ -162,8 +162,8 @@ pub fn assert_add_group_overflow_then_small<T: Debug + PartialEq>(
 
 /// Tests add_group with small item first, then large, expecting overflow.
 pub fn assert_add_group_small_then_overflow<T: Debug + PartialEq>(
-	options: &AtlasOptions,
-	mut packer: impl AtlasPacker<Size2, Pos2, AtlasOptions, Error = T>,
+	options: &Options2,
+	mut packer: impl AtlasPacker<Size2, Pos2, Options2, Error = T>,
 	size: Size2,
 	scenario: &str,
 ) {

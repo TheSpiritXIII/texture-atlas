@@ -1,8 +1,8 @@
 use std::convert::Infallible;
 
-use crate::AtlasOptions;
 use crate::BinaryPacker;
 use crate::Item2;
+use crate::Options2;
 use crate::Packer;
 use crate::PackerOp;
 use crate::PassthroughPacker;
@@ -18,13 +18,13 @@ pub enum GenericPacker {
 	Binary(BinaryPacker),
 }
 
-impl<Item> Packer<Item, Pos2, AtlasOptions> for GenericPacker
+impl<Item> Packer<Item, Pos2, Options2> for GenericPacker
 where
 	Item: Item2,
 {
 	type Error = Infallible;
 
-	fn add(&mut self, options: &AtlasOptions, item: &Item) -> Result<PackerOp<Pos2>, Self::Error> {
+	fn add(&mut self, options: &Options2, item: &Item) -> Result<PackerOp<Pos2>, Self::Error> {
 		match self {
 			Self::Passthrough(packer) => packer.add(options, item),
 			Self::Binary(packer) => packer.add(options, item),
@@ -34,13 +34,13 @@ where
 
 	fn add_all<T: std::borrow::Borrow<Item>>(
 		&mut self,
-		options: &AtlasOptions,
+		options: &Options2,
 		group: &[T],
 	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Pos2>), Self::Error>> {
 		// TODO: Avoid extra allocations.
 		let items: Vec<_> = match self {
 			Self::Binary(packer) => {
-				Packer::<Item, Pos2, AtlasOptions>::add_all(packer, options, group)
+				Packer::<Item, Pos2, Options2>::add_all(packer, options, group)
 					.into_iter()
 					.collect()
 			}
@@ -52,13 +52,13 @@ where
 
 	fn add_group<T: std::borrow::Borrow<Item>>(
 		&mut self,
-		options: &AtlasOptions,
+		options: &Options2,
 		group: &[T],
 	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Pos2>), Self::Error>> {
 		// TODO: Avoid extra allocations.
 		let items: Vec<_> = match self {
 			Self::Binary(packer) => {
-				Packer::<Item, Pos2, AtlasOptions>::add_group(packer, options, group)
+				Packer::<Item, Pos2, Options2>::add_group(packer, options, group)
 					.into_iter()
 					.collect()
 			}
@@ -69,17 +69,13 @@ where
 	}
 }
 
-impl<Item> Packer<Item, Rotate2, AtlasOptions> for GenericPacker
+impl<Item> Packer<Item, Rotate2, Options2> for GenericPacker
 where
 	Item: Item2,
 {
 	type Error = Infallible;
 
-	fn add(
-		&mut self,
-		options: &AtlasOptions,
-		item: &Item,
-	) -> Result<PackerOp<Rotate2>, Self::Error> {
+	fn add(&mut self, options: &Options2, item: &Item) -> Result<PackerOp<Rotate2>, Self::Error> {
 		match self {
 			Self::Binary(packer) => packer.add(options, item),
 			Self::Passthrough(packer) => packer.add(options, item),
@@ -89,13 +85,13 @@ where
 
 	fn add_all<T: std::borrow::Borrow<Item>>(
 		&mut self,
-		options: &AtlasOptions,
+		options: &Options2,
 		group: &[T],
 	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Rotate2>), Self::Error>> {
 		// TODO: Avoid extra allocations.
 		let items: Vec<_> = match self {
 			Self::Binary(packer) => {
-				Packer::<Item, Rotate2, AtlasOptions>::add_all(packer, options, group)
+				Packer::<Item, Rotate2, Options2>::add_all(packer, options, group)
 					.into_iter()
 					.collect()
 			}
@@ -107,13 +103,13 @@ where
 
 	fn add_group<T: std::borrow::Borrow<Item>>(
 		&mut self,
-		options: &AtlasOptions,
+		options: &Options2,
 		group: &[T],
 	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Rotate2>), Self::Error>> {
 		// TODO: Avoid extra allocations.
 		let items: Vec<_> = match self {
 			Self::Binary(packer) => {
-				Packer::<Item, Rotate2, AtlasOptions>::add_group(packer, options, group)
+				Packer::<Item, Rotate2, Options2>::add_group(packer, options, group)
 					.into_iter()
 					.collect()
 			}

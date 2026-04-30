@@ -4,9 +4,9 @@ use image::ImageError;
 use image::Pixel;
 use image::imageops::rotate90;
 
-use crate::AtlasOptions;
 use crate::Bin;
 use crate::BinAdd;
+use crate::Options2;
 use crate::Pos2;
 use crate::Rotate2;
 
@@ -15,7 +15,7 @@ impl<P> Bin<ImageBuffer<P, Vec<P::Subpixel>>> for ImageBuffer<P, Vec<P::Subpixel
 where
 	P: Pixel + 'static,
 {
-	type Options = AtlasOptions;
+	type Options = Options2;
 	type Error = ImageError;
 
 	fn new(options: &Self::Options) -> Self {

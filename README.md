@@ -45,6 +45,7 @@ fn pack(image_list: &[&RgbaImage]) -> Vec<RgbaImage> {
 ## Nomenclature
 
 - [`Bin`] stores items. For example, a bin could be a larger image which stores smaller images.
+- `Options` determines how bins are created. For example, 2-dimensional bins generally use [`Options2`].
 - `Item` are the individual units that go into a bin. For example, small images. [`Item2`] is a trait that items can implement to support build-in packers.
 - [`Packer`] takes items and places them into bins.
 - `Params` is what a packer uses to tell bins how to place an item. For example, [`Pos2`] is the most basic parameter that simply contains an x any y position. The `2` suffix denotes that this is for 2-dimensional bins.

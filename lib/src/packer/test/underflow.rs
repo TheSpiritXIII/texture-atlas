@@ -1,8 +1,8 @@
 use std::fmt::Debug;
 
-use crate::AtlasOptions;
 use crate::MAX_HEIGHT;
 use crate::MAX_WIDTH;
+use crate::Options2;
 use crate::Packer as AtlasPacker;
 use crate::PackerOp;
 use crate::Pos2;
@@ -11,9 +11,9 @@ use crate::new_bin;
 
 /// Asserts underflow behavior for various algorithm-agnostic size scenarios. This primarily helps
 /// algorithms which tightly and deterministically pack items.
-pub fn assert_add_underflow<Packer, Error>(options: &AtlasOptions, packer: Packer)
+pub fn assert_add_underflow<Packer, Error>(options: &Options2, packer: Packer)
 where
-	Packer: AtlasPacker<Size2, Pos2, AtlasOptions, Error = Error> + Clone,
+	Packer: AtlasPacker<Size2, Pos2, Options2, Error = Error> + Clone,
 	Error: Debug + PartialEq,
 {
 	assert_add_underflow_small(options, packer.clone());
@@ -21,9 +21,9 @@ where
 	assert_add_underflow_max_height(options, packer);
 }
 
-pub fn assert_add_underflow_small<Packer, Error>(options: &AtlasOptions, mut packer: Packer)
+pub fn assert_add_underflow_small<Packer, Error>(options: &Options2, mut packer: Packer)
 where
-	Packer: AtlasPacker<Size2, Pos2, AtlasOptions, Error = Error> + Clone,
+	Packer: AtlasPacker<Size2, Pos2, Options2, Error = Error> + Clone,
 	Error: Debug + PartialEq,
 {
 	assert_eq!(
@@ -56,8 +56,8 @@ where
 }
 
 pub fn assert_add_underflow_max_width<T: Debug + PartialEq>(
-	options: &AtlasOptions,
-	mut packer: impl AtlasPacker<Size2, Pos2, AtlasOptions, Error = T>,
+	options: &Options2,
+	mut packer: impl AtlasPacker<Size2, Pos2, Options2, Error = T>,
 ) {
 	assert_eq!(packer.add(options, &Size2::new(MAX_WIDTH - 1, MAX_HEIGHT)), Ok(new_bin()),);
 	assert_eq!(
@@ -73,8 +73,8 @@ pub fn assert_add_underflow_max_width<T: Debug + PartialEq>(
 }
 
 pub fn assert_add_underflow_max_height<T: Debug + PartialEq>(
-	options: &AtlasOptions,
-	mut packer: impl AtlasPacker<Size2, Pos2, AtlasOptions, Error = T>,
+	options: &Options2,
+	mut packer: impl AtlasPacker<Size2, Pos2, Options2, Error = T>,
 ) {
 	assert_eq!(packer.add(options, &Size2::new(MAX_WIDTH, MAX_HEIGHT - 1)), Ok(new_bin()),);
 	assert_eq!(

@@ -10,10 +10,10 @@ use image::ImageReader;
 use image::RgbaImage;
 use log::info;
 use serde::Serialize;
-use texture_atlas::AtlasOptions;
 use texture_atlas::BinaryPacker;
 use texture_atlas::DynamicBuilder;
 use texture_atlas::GenericPacker;
+use texture_atlas::Options2;
 use texture_atlas::PassthroughPacker;
 use texture_atlas::Pos2;
 use texture_atlas::Rotate2;
@@ -100,7 +100,7 @@ fn main() -> anyhow::Result<()> {
 		}
 	}
 
-	let options = AtlasOptions::with_max_size(cli.max_width, cli.max_height);
+	let options = Options2::with_max_size(cli.max_width, cli.max_height);
 	let packer: GenericPacker = match cli.algorithm {
 		Algorithm::Binary => GenericPacker::Binary(BinaryPacker::new()),
 		Algorithm::Passthrough => GenericPacker::Passthrough(PassthroughPacker::new()),

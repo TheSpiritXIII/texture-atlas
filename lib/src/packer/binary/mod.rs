@@ -7,10 +7,10 @@ use std::convert::Infallible;
 
 use node::Node;
 
-use crate::AtlasOptions;
 use crate::Fit2;
 use crate::Item2;
 use crate::Item2Ext;
+use crate::Options2;
 use crate::Packer;
 use crate::PackerOp;
 use crate::Pos2;
@@ -31,7 +31,7 @@ impl BinaryPacker {
 		}
 	}
 
-	fn add_bin(&mut self, options: &AtlasOptions, item: &Size2) {
+	fn add_bin(&mut self, options: &Options2, item: &Size2) {
 		self.bin_list.push(BinaryBin::new(options, item));
 	}
 }
@@ -42,13 +42,13 @@ impl Default for BinaryPacker {
 	}
 }
 
-impl<Item> Packer<Item, Pos2, AtlasOptions> for BinaryPacker
+impl<Item> Packer<Item, Pos2, Options2> for BinaryPacker
 where
 	Item: Item2,
 {
 	type Error = Infallible;
 
-	fn add(&mut self, options: &AtlasOptions, item: &Item) -> Result<PackerOp<Pos2>, Self::Error> {
+	fn add(&mut self, options: &Options2, item: &Item) -> Result<PackerOp<Pos2>, Self::Error> {
 		let size = Size2::new(item.width(), item.height());
 		for (index, bin) in &mut self.bin_list.iter_mut().enumerate() {
 			if let Some(position) = bin.add_to_smallest_node(&size) {
@@ -66,7 +66,7 @@ where
 
 	fn add_all<T: Borrow<Item>>(
 		&mut self,
-		options: &AtlasOptions,
+		options: &Options2,
 		group: &[T],
 	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Pos2>), Self::Error>> {
 		let mut index_list: Vec<usize> = (0..group.len()).collect::<Vec<usize>>();
@@ -90,7 +90,7 @@ struct BinaryBin {
 }
 
 impl BinaryBin {
-	pub fn new(options: &AtlasOptions, item: &Size2) -> Self {
+	pub fn new(options: &Options2, item: &Size2) -> Self {
 		let node = Node::new(Size2 {
 			width: options.max_width.get(),
 			height: options.max_height.get(),
@@ -174,17 +174,13 @@ impl BinaryBin {
 // 	packer: BinaryPacker,
 // }
 
-impl<Item> Packer<Item, Rotate2, AtlasOptions> for BinaryPacker
+impl<Item> Packer<Item, Rotate2, Options2> for BinaryPacker
 where
 	Item: Item2,
 {
 	type Error = Infallible;
 
-	fn add(
-		&mut self,
-		options: &AtlasOptions,
-		item: &Item,
-	) -> Result<PackerOp<Rotate2>, Self::Error> {
+	fn add(&mut self, options: &Options2, item: &Item) -> Result<PackerOp<Rotate2>, Self::Error> {
 		let (item, rotate) = if item.width() > item.height() {
 			(Size2::new(item.height(), item.width()), true)
 		} else {
@@ -212,7 +208,7 @@ where
 
 	fn add_all<T: Borrow<Item>>(
 		&mut self,
-		options: &AtlasOptions,
+		options: &Options2,
 		group: &[T],
 	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Rotate2>), Self::Error>> {
 		let mut index_list: Vec<usize> = (0..group.len()).collect::<Vec<usize>>();

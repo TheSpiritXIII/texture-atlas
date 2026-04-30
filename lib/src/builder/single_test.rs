@@ -2,18 +2,18 @@ use std::num::NonZero;
 
 use crate::AlwaysErrorPacker;
 use crate::AlwaysExistingBinPacker;
-use crate::AtlasOptions;
 use crate::Bin;
 use crate::BinAdd;
 use crate::Item2;
+use crate::Options2;
 use crate::Pos2;
 use crate::SingleBuilder;
 use crate::SingleBuilderError;
 use crate::Size2;
 use crate::UniformPacker;
 
-fn new_options() -> AtlasOptions {
-	AtlasOptions::with_max_size(NonZero::new(1024).unwrap(), NonZero::new(1024).unwrap())
+fn new_options() -> Options2 {
+	Options2::with_max_size(NonZero::new(1024).unwrap(), NonZero::new(1024).unwrap())
 }
 
 // TODO: Might be useful for other tests. Maybe even code?
@@ -46,7 +46,7 @@ impl<T> Bin<IndexedItem<T>> for IndexedBin<Pos2>
 where
 	T: Item2 + Clone,
 {
-	type Options = AtlasOptions;
+	type Options = Options2;
 	type Error = ();
 
 	fn new(options: &Self::Options) -> Self {

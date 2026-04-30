@@ -4,8 +4,8 @@ mod test;
 use std::borrow::Borrow;
 use std::convert::Infallible;
 
-use crate::AtlasOptions;
 use crate::Item2;
+use crate::Options2;
 use crate::Packer;
 use crate::PackerOp;
 use crate::Pos2;
@@ -37,18 +37,14 @@ impl Default for UniformPacker {
 	}
 }
 
-impl<Item, Output> Packer<Item, Output, AtlasOptions> for UniformPacker
+impl<Item, Output> Packer<Item, Output, Options2> for UniformPacker
 where
 	Item: Item2,
 	Output: From<Pos2>,
 {
 	type Error = Infallible;
 
-	fn add(
-		&mut self,
-		options: &AtlasOptions,
-		item: &Item,
-	) -> Result<PackerOp<Output>, Self::Error> {
+	fn add(&mut self, options: &Options2, item: &Item) -> Result<PackerOp<Output>, Self::Error> {
 		let mut y = self.used.height;
 		if item.width() > options.max_width.get()
 			|| self.used.width > options.max_width.get() - item.width()
@@ -92,7 +88,7 @@ where
 
 	fn add_all<T: Borrow<Item>>(
 		&mut self,
-		options: &AtlasOptions,
+		options: &Options2,
 		group: &[T],
 	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Output>), Self::Error>> {
 		(0..group.len()).map(|index| {

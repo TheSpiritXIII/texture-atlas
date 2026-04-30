@@ -1,8 +1,8 @@
 use std::num::NonZero;
 
-use crate::AtlasOptions;
 use crate::MAX_HEIGHT;
 use crate::MAX_WIDTH;
+use crate::Options2;
 use crate::Packer;
 use crate::PackerOp;
 use crate::Pos2;
@@ -12,8 +12,8 @@ use crate::assert_add_overflow;
 use crate::assert_add_underflow;
 use crate::new_bin;
 
-fn new_options() -> AtlasOptions {
-	AtlasOptions::with_max_size(NonZero::new(MAX_WIDTH).unwrap(), NonZero::new(MAX_HEIGHT).unwrap())
+fn new_options() -> Options2 {
+	Options2::with_max_size(NonZero::new(MAX_WIDTH).unwrap(), NonZero::new(MAX_HEIGHT).unwrap())
 }
 
 #[test]
@@ -38,7 +38,7 @@ fn add_rows() {
 	assert_fill_bin(&options, &mut packer, 1);
 }
 
-fn assert_fill_bin(options: &AtlasOptions, packer: &mut UniformPacker, bin_index: usize) {
+fn assert_fill_bin(options: &Options2, packer: &mut UniformPacker, bin_index: usize) {
 	assert_eq!(
 		packer.add(options, &Size2::new(MAX_WIDTH / 2, MAX_HEIGHT / 2)),
 		Ok(new_bin()),
