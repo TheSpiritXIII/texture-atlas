@@ -51,8 +51,9 @@ pub fn assert_add_overflow_with<Packer, Error>(
 	assert_add_all_overflow_then_small(options, packer.clone(), size, scenario);
 	assert_add_all_small_then_overflow(options, packer.clone(), size, scenario);
 
-	assert_add_group_overflow_then_small(options, packer.clone(), size, scenario);
-	assert_add_group_small_then_overflow(options, packer, size, scenario);
+	// TODO: Reintroduce add_group
+	// assert_add_group_overflow_then_small(options, packer.clone(), size, scenario);
+	// assert_add_group_small_then_overflow(options, packer, size, scenario);
 }
 
 /// Tests adding a large item first, then a small one, expecting overflow.
@@ -139,44 +140,45 @@ pub fn assert_add_all_small_then_overflow<T: Debug + PartialEq>(
 	);
 }
 
-/// Tests add_group with large item first, then small, expecting overflow.
-pub fn assert_add_group_overflow_then_small<T: Debug + PartialEq>(
-	options: &Options2,
-	mut packer: impl AtlasPacker<Size2, Pos2, Options2, Error = T>,
-	size: Size2,
-	scenario: &str,
-) {
-	assert_eq!(
-		packer.add_group(options, &[size]).into_iter().collect::<Vec<_>>(),
-		vec![Ok((0, new_bin()))],
-		"{}: initial large item must have new bin",
-		scenario
-	);
-	assert_eq!(
-		packer.add_group(options, &[Size2::new(1, 1)]).into_iter().collect::<Vec<_>>(),
-		vec![Ok((0, new_bin()))],
-		"{}: small item must be overflowed to new bin",
-		scenario
-	);
-}
+// TODO: Reintroduce add_group
+// /// Tests add_group with large item first, then small, expecting overflow.
+// pub fn assert_add_group_overflow_then_small<T: Debug + PartialEq>(
+// 	options: &Options2,
+// 	mut packer: impl AtlasPacker<Size2, Pos2, Options2, Error = T>,
+// 	size: Size2,
+// 	scenario: &str,
+// ) {
+// 	assert_eq!(
+// 		packer.add_group(options, &[size]).into_iter().collect::<Vec<_>>(),
+// 		vec![Ok((0, new_bin()))],
+// 		"{}: initial large item must have new bin",
+// 		scenario
+// 	);
+// 	assert_eq!(
+// 		packer.add_group(options, &[Size2::new(1, 1)]).into_iter().collect::<Vec<_>>(),
+// 		vec![Ok((0, new_bin()))],
+// 		"{}: small item must be overflowed to new bin",
+// 		scenario
+// 	);
+// }
 
-/// Tests add_group with small item first, then large, expecting overflow.
-pub fn assert_add_group_small_then_overflow<T: Debug + PartialEq>(
-	options: &Options2,
-	mut packer: impl AtlasPacker<Size2, Pos2, Options2, Error = T>,
-	size: Size2,
-	scenario: &str,
-) {
-	assert_eq!(
-		packer.add_group(options, &[Size2::new(1, 1)]).into_iter().collect::<Vec<_>>(),
-		vec![Ok((0, new_bin()))],
-		"{}: initial small item must have new bin",
-		scenario
-	);
-	assert_eq!(
-		packer.add_group(options, &[size]).into_iter().collect::<Vec<_>>(),
-		vec![Ok((0, new_bin()))],
-		"{}: large item must have overflowed to new bin",
-		scenario
-	);
-}
+// /// Tests add_group with small item first, then large, expecting overflow.
+// pub fn assert_add_group_small_then_overflow<T: Debug + PartialEq>(
+// 	options: &Options2,
+// 	mut packer: impl AtlasPacker<Size2, Pos2, Options2, Error = T>,
+// 	size: Size2,
+// 	scenario: &str,
+// ) {
+// 	assert_eq!(
+// 		packer.add_group(options, &[Size2::new(1, 1)]).into_iter().collect::<Vec<_>>(),
+// 		vec![Ok((0, new_bin()))],
+// 		"{}: initial small item must have new bin",
+// 		scenario
+// 	);
+// 	assert_eq!(
+// 		packer.add_group(options, &[size]).into_iter().collect::<Vec<_>>(),
+// 		vec![Ok((0, new_bin()))],
+// 		"{}: large item must have overflowed to new bin",
+// 		scenario
+// 	);
+// }

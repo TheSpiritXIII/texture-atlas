@@ -73,22 +73,23 @@ pub trait Packer<Item, Output, Options> {
 		group: &[T],
 	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Output>), Self::Error>>;
 
-	/// Adds items to be placed on any available bin, prioritizing adding all given items to the
-	/// same bin. If a single bin does not have enough space, a new bin will be created and the
-	/// items will be placed there, overflowing only if needed. `options` is always passed the same
-	/// value throughout the lifetime of the packer.
-	///
-	/// This method returns an iterator containing a tuple with the item index and the operation
-	/// done on it. This is not guaranteed to be linear. For example, some packers may use a
-	/// heuristic such as inserting largest items first.
-	///
-	/// Implementing this is optional for packers. By default, this has the same behavior as
-	/// `add_all`.
-	fn add_group<T: Borrow<Item>>(
-		&mut self,
-		options: &Options,
-		group: &[T],
-	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Output>), Self::Error>> {
-		self.add_all(options, group)
-	}
+	// TODO: Reintroduce add_group
+	// /// Adds items to be placed on any available bin, prioritizing adding all given items to the
+	// /// same bin. If a single bin does not have enough space, a new bin will be created and the
+	// /// items will be placed there, overflowing only if needed. `options` is always passed the
+	// same /// value throughout the lifetime of the packer.
+	// ///
+	// /// This method returns an iterator containing a tuple with the item index and the operation
+	// /// done on it. This is not guaranteed to be linear. For example, some packers may use a
+	// /// heuristic such as inserting largest items first.
+	// ///
+	// /// Implementing this is optional for packers. By default, this has the same behavior as
+	// /// `add_all`.
+	// fn add_group<T: Borrow<Item>>(
+	// 	&mut self,
+	// 	options: &Options,
+	// 	group: &[T],
+	// ) -> impl IntoIterator<Item = Result<(usize, PackerOp<Output>), Self::Error>> {
+	// 	self.add_all(options, group)
+	// }
 }
