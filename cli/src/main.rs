@@ -7,11 +7,12 @@ use clap::Args;
 use clap::Parser;
 use clap::Subcommand;
 use clap::ValueEnum;
+use cli_types::Config;
+use cli_types::Output;
 use image::GenericImageView;
 use image::ImageReader;
 use image::RgbaImage;
 use log::info;
-use serde::Serialize;
 use texture_atlas::BinaryPacker;
 use texture_atlas::DynamicBuilder;
 use texture_atlas::GenericPacker;
@@ -92,21 +93,6 @@ enum Algorithm {
 enum Format {
 	Toml,
 	Json,
-}
-
-#[derive(Serialize)]
-pub struct Output<T> {
-	pub bin_path: String,
-	pub item_path: String,
-	pub output: T,
-}
-
-#[derive(Serialize)]
-struct Config<T>
-where
-	T: Serialize,
-{
-	items: Vec<Output<T>>,
 }
 
 enum ConfigType {
@@ -212,13 +198,13 @@ fn main() -> anyhow::Result<()> {
 			match cli.output.format {
 				Format::Toml => {
 					toml::to_string(&Config {
-						items: data,
+						output_list: data,
 					})
 					.with_context(|| "Failed to generate TOML")?
 				}
 				Format::Json => {
 					serde_json::to_string_pretty(&Config {
-						items: data,
+						output_list: data,
 					})
 					.with_context(|| "Failed to generate TOML")?
 				}
@@ -228,13 +214,13 @@ fn main() -> anyhow::Result<()> {
 			match cli.output.format {
 				Format::Toml => {
 					toml::to_string(&Config {
-						items: data,
+						output_list: data,
 					})
 					.with_context(|| "Failed to generate TOML")?
 				}
 				Format::Json => {
 					serde_json::to_string_pretty(&Config {
-						items: data,
+						output_list: data,
 					})
 					.with_context(|| "Failed to generate TOML")?
 				}

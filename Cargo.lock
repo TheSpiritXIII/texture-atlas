@@ -338,6 +338,7 @@ version = "0.5.0"
 dependencies = [
  "anyhow",
  "clap",
+ "cli-types",
  "env_logger",
  "image",
  "log",
@@ -345,6 +346,13 @@ dependencies = [
  "serde_json",
  "texture-atlas",
  "toml",
+]
+
+[[package]]
+name = "cli-types"
+version = "0.5.0"
+dependencies = [
+ "serde",
 ]
 
 [[package]]

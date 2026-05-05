@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["cli", "gen", "lib"]
+members = ["cli", "cli-types", "gen", "lib"]
 
 [workspace.package]
 version = "0.5.0"
