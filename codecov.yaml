@@ -1,0 +1,5 @@
+component_management:
+  individual_components:
+    - component_id: "lib"
+      paths:
+        - "lib/"
