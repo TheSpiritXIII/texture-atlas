@@ -1,4 +1,4 @@
-# texture-atlas ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/TheSpiritXIII/texture-atlas/Rust) [![Coverage Status](https://coveralls.io/repos/github/TheSpiritXIII/Texture-Atlas/badge.svg?branch=master)](https://coveralls.io/github/TheSpiritXIII/Texture-Atlas?branch=main)
+# texture-atlas ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/TheSpiritXIII/texture-atlas/build.yml) ![Codecov](https://img.shields.io/codecov/c/github/TheSpiritXIII/texture-atlas)
 
 This crate provides various algorithms for bin-packing axis-aligned rectangles.
 
