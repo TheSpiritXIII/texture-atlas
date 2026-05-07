@@ -2,12 +2,14 @@ mod generic;
 
 use std::fs;
 use std::num::NonZero;
+use std::path::Path;
 use std::path::PathBuf;
 
 use anyhow::Context;
 use clap::Args;
 use clap::Parser;
 use clap::ValueEnum;
+use image::DynamicImage;
 use image::GenericImageView;
 use image::ImageReader;
 use image::RgbaImage;
@@ -41,55 +43,79 @@ struct AtlasArgs {
 	#[command(subcommand)]
 	algorithm: Algorithm,
 
+	/// Maximum width of each atlas.
 	#[arg(long)]
 	max_width: NonZero<u32>,
 
+	/// Maximum height of each atlas.
 	#[arg(long)]
 	max_height: NonZero<u32>,
 
+	/// Margin around each atlas.
 	#[arg(long)]
 	margin: u32,
 
+	/// Spacing between items when packed into an atlas.
 	#[arg(
 		long,
 		default_value_t = 1
 	)]
 	spacing: u32,
 
+	/// Allow rotation of items to improve utilization and potentially reduce the total number of
+	/// atlases.
 	#[arg(long)]
 	rotatable: bool,
 }
 
 #[derive(Args)]
 struct InputArgs {
+	// TODO: Support recursive inputs.
+	/// Directory containing input images. If any file is not an image, it will be skipped.
+	/// Directories will also be skipped (recursive inputs are not yet supported).
 	#[arg(long)]
 	input_dir: PathBuf,
 }
 
 #[derive(Args)]
 struct OutputArgs {
+	/// Directory to save output atlas images.
 	#[arg(long)]
 	output_dir: PathBuf,
 
-	#[arg(long)]
-	output_file: Option<PathBuf>,
-
+	/// Whether to crop the atlas images.
 	#[arg(long)]
 	crop: bool,
 
+	/// File path to save the layout output.
+	#[arg(long)]
+	output_file: Option<PathBuf>,
+
+	/// Format for the layout output file.
 	#[arg(long)]
 	format: Format,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq, ValueEnum)]
 enum Format {
+	/// TOML format
 	Toml,
+	/// JSON format
 	Json,
 }
 
 enum ConfigType {
 	Pos(Vec<Item<Pos2>>),
 	Rotate(Vec<Item<Rotate2>>),
+}
+
+// TODO: Use try blocks when they're ready.
+fn parse(path: &impl AsRef<Path>) -> anyhow::Result<DynamicImage> {
+	let image = ImageReader::open(path.as_ref())
+		.with_context(|| format!("Failed to open image: {:?}", path.as_ref().display()))?
+		.decode()
+		.with_context(|| format!("Failed to decode image: {:?}", path.as_ref().display()))?;
+	Ok(image)
 }
 
 fn main() -> anyhow::Result<()> {
@@ -101,13 +127,17 @@ fn main() -> anyhow::Result<()> {
 	for entry in cli.input.input_dir.read_dir().with_context(|| "Failed to read input directory")? {
 		let entry = entry.with_context(|| "Failed to read directory entry")?;
 		let path = entry.path();
-		if path.is_file() {
-			let image = ImageReader::open(&path)
-				.with_context(|| format!("Failed to open image: {:?}", path))?
-				.decode()
-				.with_context(|| format!("Failed to decode image: {:?}", path))?;
-			file_path_list.push(path);
-			image_list.push(image.to_rgba8());
+		if !path.is_file() {
+			continue;
+		}
+		match parse(&path) {
+			Ok(image) => {
+				file_path_list.push(path);
+				image_list.push(image.to_rgba8());
+			}
+			Err(err) => {
+				info!("Skipping unsupported file due to {:?}: {:?}", err, path.display());
+			}
 		}
 	}
 

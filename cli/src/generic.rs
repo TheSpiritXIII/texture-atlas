@@ -14,8 +14,11 @@ use texture_atlas::UniformPacker;
 /// Encapsulates every built-in packer type.
 #[derive(Subcommand)]
 pub enum Algorithm {
+	/// Binary tree packing algorithm.
 	Binary,
+	/// Passthrough packer.
 	Passthrough,
+	/// Uniform grid packing algorithm.
 	Uniform,
 }
 
