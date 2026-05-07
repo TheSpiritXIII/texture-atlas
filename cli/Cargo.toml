@@ -7,11 +7,11 @@ license.workspace = true
 [dependencies]
 anyhow = { workspace = true }
 clap = { workspace = true }
-cli-types = { path = "../cli-types" }
 env_logger = { workspace = true }
 image = { workspace = true }
 log = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 texture-atlas = { path = "../lib" }
+texture-atlas-cli-types = { path = "../cli-types" }
 toml = { workspace = true }

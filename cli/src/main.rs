@@ -7,8 +7,6 @@ use clap::Args;
 use clap::Parser;
 use clap::Subcommand;
 use clap::ValueEnum;
-use cli_types::Config;
-use cli_types::Output;
 use image::GenericImageView;
 use image::ImageReader;
 use image::RgbaImage;
@@ -24,6 +22,8 @@ use texture_atlas::Rotate2;
 use texture_atlas::Scored;
 use texture_atlas::ScoredBin2;
 use texture_atlas::UniformPacker;
+use texture_atlas_cli_types::Config;
+use texture_atlas_cli_types::Item;
 
 #[derive(Parser)]
 struct Cli {
@@ -96,8 +96,8 @@ enum Format {
 }
 
 enum ConfigType {
-	Pos(Vec<Output<Pos2>>),
-	Rotate(Vec<Output<Rotate2>>),
+	Pos(Vec<Item<Pos2>>),
+	Rotate(Vec<Item<Rotate2>>),
 }
 
 fn main() -> anyhow::Result<()> {
@@ -142,10 +142,10 @@ fn main() -> anyhow::Result<()> {
 				let output_path =
 					cli.output.output_dir.join(format!("atlas_{}.png", result.bin_index));
 				let item_path = &file_path_list[result.item_index];
-				Output {
+				Item {
 					bin_path: output_path.to_string_lossy().to_string(),
 					item_path: item_path.to_string_lossy().to_string(),
-					output: result.output,
+					layout: result.output,
 				}
 			})
 			.collect();
@@ -165,10 +165,10 @@ fn main() -> anyhow::Result<()> {
 				let output_path =
 					cli.output.output_dir.join(format!("atlas_{}.png", result.bin_index));
 				let item_path = &file_path_list[result.item_index];
-				Output {
+				Item {
 					bin_path: output_path.to_string_lossy().to_string(),
 					item_path: item_path.to_string_lossy().to_string(),
-					output: result.output,
+					layout: result.output,
 				}
 			})
 			.collect();
@@ -198,13 +198,13 @@ fn main() -> anyhow::Result<()> {
 			match cli.output.format {
 				Format::Toml => {
 					toml::to_string(&Config {
-						output_list: data,
+						item_list: data,
 					})
 					.with_context(|| "Failed to generate TOML")?
 				}
 				Format::Json => {
 					serde_json::to_string_pretty(&Config {
-						output_list: data,
+						item_list: data,
 					})
 					.with_context(|| "Failed to generate TOML")?
 				}
@@ -214,13 +214,13 @@ fn main() -> anyhow::Result<()> {
 			match cli.output.format {
 				Format::Toml => {
 					toml::to_string(&Config {
-						output_list: data,
+						item_list: data,
 					})
 					.with_context(|| "Failed to generate TOML")?
 				}
 				Format::Json => {
 					serde_json::to_string_pretty(&Config {
-						output_list: data,
+						item_list: data,
 					})
 					.with_context(|| "Failed to generate TOML")?
 				}

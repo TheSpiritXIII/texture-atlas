@@ -1,8 +1,12 @@
 [package]
-name = "cli-types"
+name = "texture-atlas-cli-types"
 version.workspace = true
 edition.workspace = true
 license.workspace = true
 
 [dependencies]
+texture-atlas = { path = "../lib" }
 serde = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }
