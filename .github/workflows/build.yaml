@@ -43,7 +43,7 @@ jobs:
       - name: Rustfmt Check
         uses: actions-rust-lang/rustfmt@v1
 
-  format:
+  doc:
     name: cargo doc
     runs-on: ubuntu-latest
     steps:
