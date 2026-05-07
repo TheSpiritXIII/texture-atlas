@@ -19,6 +19,10 @@ use crate::Size2;
 use crate::cmp_by_max;
 use crate::cmp_by_width;
 
+/// A packer that uses binary trees to fit items, subdividing the space as items are added.
+///
+/// Note, while this packer supports rotated items, the algorithm is currently very rudimentary. It
+/// does not attempt to fit items in both rotated and unrotated configurations.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct BinaryPacker {
 	bin_list: Vec<BinaryBin>,

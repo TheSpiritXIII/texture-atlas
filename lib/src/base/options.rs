@@ -50,17 +50,20 @@ impl Options2 {
 		self.clone()
 	}
 
-	/// Returns the max width of the bin. Packers should use [`max_logical_width`].
+	/// Returns the max width of the bin. Packers should use
+	/// [`max_logical_width`][Self::max_logical_width].
 	pub fn max_width(&self) -> u32 {
 		self.max_width.get()
 	}
 
-	/// Returns the max height of the bin. Packers should use [`max_logical_height`].
+	/// Returns the max height of the bin. Packers should use
+	/// [`max_logical_height`][Self::max_logical_height].
 	pub fn max_height(&self) -> u32 {
 		self.max_height.get()
 	}
 
-	/// Returns the max size of the bin. Packers should use [`max_logical_size`].
+	/// Returns the max size of the bin. Packers should use
+	/// [`max_logical_size`][Self::max_logical_size].
 	pub fn max_size(&self) -> Size2 {
 		Size2::new(self.max_width(), self.max_height())
 	}
