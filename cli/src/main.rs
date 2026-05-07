@@ -1,3 +1,5 @@
+mod generic;
+
 use std::fs;
 use std::num::NonZero;
 use std::path::PathBuf;
@@ -5,25 +7,22 @@ use std::path::PathBuf;
 use anyhow::Context;
 use clap::Args;
 use clap::Parser;
-use clap::Subcommand;
 use clap::ValueEnum;
 use image::GenericImageView;
 use image::ImageReader;
 use image::RgbaImage;
 use log::info;
-use texture_atlas::BinaryPacker;
 use texture_atlas::DynamicBuilder;
-use texture_atlas::GenericPacker;
 use texture_atlas::ImageExt;
 use texture_atlas::Options2;
-use texture_atlas::PassthroughPacker;
 use texture_atlas::Pos2;
 use texture_atlas::Rotate2;
 use texture_atlas::Scored;
 use texture_atlas::ScoredBin2;
-use texture_atlas::UniformPacker;
 use texture_atlas_cli_types::Config;
 use texture_atlas_cli_types::Item;
+
+use crate::generic::Algorithm;
 
 #[derive(Parser)]
 struct Cli {
@@ -82,13 +81,6 @@ struct OutputArgs {
 	format: Format,
 }
 
-#[derive(Subcommand)]
-enum Algorithm {
-	Binary,
-	Passthrough,
-	Uniform,
-}
-
 #[derive(Clone, Copy, Debug, Eq, PartialEq, ValueEnum)]
 enum Format {
 	Toml,
@@ -122,11 +114,7 @@ fn main() -> anyhow::Result<()> {
 	let options = Options2::with_max_size(cli.atlas.max_width, cli.atlas.max_height)
 		.and_margin(cli.atlas.margin)
 		.and_spacing(cli.atlas.spacing);
-	let packer: GenericPacker = match cli.atlas.algorithm {
-		Algorithm::Binary => GenericPacker::Binary(BinaryPacker::new()),
-		Algorithm::Passthrough => GenericPacker::Passthrough(PassthroughPacker::new()),
-		Algorithm::Uniform => GenericPacker::Uniform(UniformPacker::new()),
-	};
+	let packer = cli.atlas.algorithm.into_packer();
 	let (data, bin_list) = if cli.atlas.rotatable {
 		let mut atlas =
 			DynamicBuilder::<_, ScoredBin2<RgbaImage, RgbaImage>, RgbaImage, Rotate2>::new(

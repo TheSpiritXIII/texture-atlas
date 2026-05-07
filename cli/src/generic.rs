@@ -1,15 +1,35 @@
 use std::convert::Infallible;
 
-use crate::BinaryPacker;
-use crate::Item2;
-use crate::Options2;
-use crate::Packer;
-use crate::PackerOp;
-use crate::PassthroughPacker;
-use crate::Pos2;
-use crate::Rotate2;
-use crate::UniformPacker;
+use clap::Subcommand;
+use texture_atlas::BinaryPacker;
+use texture_atlas::Item2;
+use texture_atlas::Options2;
+use texture_atlas::Packer;
+use texture_atlas::PackerOp;
+use texture_atlas::PassthroughPacker;
+use texture_atlas::Pos2;
+use texture_atlas::Rotate2;
+use texture_atlas::UniformPacker;
 
+/// Encapsulates every built-in packer type.
+#[derive(Subcommand)]
+pub enum Algorithm {
+	Binary,
+	Passthrough,
+	Uniform,
+}
+
+impl Algorithm {
+	pub fn into_packer(self) -> GenericPacker {
+		match self {
+			Self::Binary => GenericPacker::Binary(BinaryPacker::new()),
+			Self::Passthrough => GenericPacker::Passthrough(PassthroughPacker::new()),
+			Self::Uniform => GenericPacker::Uniform(UniformPacker::new()),
+		}
+	}
+}
+
+// TODO: Consider making this private. Return impl Packer.
 /// Encapsulates every built-in packer.
 #[derive(Debug)]
 pub enum GenericPacker {
