@@ -1,3 +1,18 @@
+//! A CLI for the `texture-atlas` library.
+//!
+//! ## Example Usage:
+//!
+//! The follow script takes all images in `input/` and outputs atlases in `output/`. The layout data
+//! is stored in `output/output.json`. See `texture-atlas-cli-types` for `serde`-compatible types
+//! from this crate for parsing this data.
+//!
+//! ```shell
+//! RUST_LOG=INFO texture-atlas-cli --input-dir input --output-dir output --output-file output/output.json \
+//!   --max-width 256 --max-height 256 --rotatable --format json binary
+//! ```
+//!
+//! To see all possible arguments, run `texture-atlas-cli --help`.
+
 mod generic;
 
 use std::fs;
@@ -26,6 +41,7 @@ use texture_atlas_cli_types::Item;
 
 use crate::generic::Algorithm;
 
+/// Combines multiple images into fewer large atlas images.
 #[derive(Parser)]
 struct Cli {
 	#[command(flatten)]
@@ -52,7 +68,10 @@ struct AtlasArgs {
 	max_height: NonZero<u32>,
 
 	/// Margin around each atlas.
-	#[arg(long)]
+	#[arg(
+		long,
+		default_value_t = 1
+	)]
 	margin: u32,
 
 	/// Spacing between items when packed into an atlas.
@@ -64,7 +83,10 @@ struct AtlasArgs {
 
 	/// Allow rotation of items to improve utilization and potentially reduce the total number of
 	/// atlases.
-	#[arg(long)]
+	#[arg(
+		long,
+		default_value_t = false
+	)]
 	rotatable: bool,
 }
 
@@ -84,7 +106,10 @@ struct OutputArgs {
 	output_dir: PathBuf,
 
 	/// Whether to crop the atlas images.
-	#[arg(long)]
+	#[arg(
+		long,
+		default_value_t = false
+	)]
 	crop: bool,
 
 	/// File path to save the layout output.
