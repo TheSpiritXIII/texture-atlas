@@ -29,6 +29,7 @@ use image::GenericImageView;
 use image::ImageReader;
 use image::RgbaImage;
 use log::info;
+use serde::Deserialize;
 use texture_atlas::DynamicBuilder;
 use texture_atlas::ImageExt;
 use texture_atlas::Options2;
@@ -41,8 +42,9 @@ use texture_atlas_cli_types::Item;
 
 use crate::generic::Algorithm;
 
+// TODO: Config file.
 /// Combines multiple images into fewer large atlas images.
-#[derive(Parser)]
+#[derive(Deserialize, Parser)]
 struct Cli {
 	#[command(flatten)]
 	pub atlas: AtlasArgs,
@@ -54,7 +56,7 @@ struct Cli {
 	pub output: OutputArgs,
 }
 
-#[derive(Args)]
+#[derive(Args, Deserialize)]
 struct AtlasArgs {
 	#[command(subcommand)]
 	algorithm: Algorithm,
@@ -90,16 +92,16 @@ struct AtlasArgs {
 	rotatable: bool,
 }
 
-#[derive(Args)]
+#[derive(Args, Deserialize)]
 struct InputArgs {
 	// TODO: Support recursive inputs.
 	/// Directory containing input images. If any file is not an image, it will be skipped.
 	/// Directories will also be skipped (recursive inputs are not yet supported).
 	#[arg(long)]
-	input_dir: PathBuf,
+	input_dir: Vec<PathBuf>,
 }
 
-#[derive(Args)]
+#[derive(Args, Deserialize)]
 struct OutputArgs {
 	/// Directory to save output atlas images.
 	#[arg(long)]
@@ -121,7 +123,7 @@ struct OutputArgs {
 	format: Format,
 }
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq, ValueEnum)]
+#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, ValueEnum)]
 enum Format {
 	/// TOML format
 	Toml,
@@ -149,19 +151,21 @@ fn main() -> anyhow::Result<()> {
 
 	let mut file_path_list = Vec::new();
 	let mut image_list = Vec::new();
-	for entry in cli.input.input_dir.read_dir().with_context(|| "Failed to read input directory")? {
-		let entry = entry.with_context(|| "Failed to read directory entry")?;
-		let path = entry.path();
-		if !path.is_file() {
-			continue;
-		}
-		match parse(&path) {
-			Ok(image) => {
-				file_path_list.push(path);
-				image_list.push(image.to_rgba8());
+	for input_dir in &cli.input.input_dir {
+		for entry in input_dir.read_dir().with_context(|| "Failed to read input directory")? {
+			let entry = entry.with_context(|| "Failed to read directory entry")?;
+			let path = entry.path();
+			if !path.is_file() {
+				continue;
 			}
-			Err(err) => {
-				info!("Skipping unsupported file due to {:?}: {:?}", err, path.display());
+			match parse(&path) {
+				Ok(image) => {
+					file_path_list.push(path);
+					image_list.push(image.to_rgba8());
+				}
+				Err(err) => {
+					info!("Skipping unsupported file due to {:?}: {:?}", err, path.display());
+				}
 			}
 		}
 	}

@@ -1,6 +1,7 @@
 use std::convert::Infallible;
 
 use clap::Subcommand;
+use serde::Deserialize;
 use texture_atlas::BinaryPacker;
 use texture_atlas::Item2;
 use texture_atlas::Options2;
@@ -12,7 +13,7 @@ use texture_atlas::Rotate2;
 use texture_atlas::UniformPacker;
 
 /// Encapsulates every built-in packer type.
-#[derive(Subcommand)]
+#[derive(Deserialize, Subcommand)]
 pub enum Algorithm {
 	/// Binary tree packing algorithm.
 	Binary,
