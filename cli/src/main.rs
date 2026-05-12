@@ -30,6 +30,7 @@ use image::ImageReader;
 use image::RgbaImage;
 use log::info;
 use serde::Deserialize;
+use serde::Serialize;
 use texture_atlas::DynamicBuilder;
 use texture_atlas::ImageExt;
 use texture_atlas::Options2;
@@ -129,6 +130,20 @@ enum Format {
 	Toml,
 	/// JSON format
 	Json,
+}
+
+impl Format {
+	pub fn to_string(&self, serialize: &impl Serialize) -> anyhow::Result<String> {
+		match self {
+			Self::Toml => {
+				Ok(toml::to_string(serialize).with_context(|| "Failed to serialize TOML")?)
+			}
+			Self::Json => {
+				Ok(serde_json::to_string_pretty(serialize)
+					.with_context(|| "Failed to serialize JSON")?)
+			}
+		}
+	}
 }
 
 enum ConfigType {
@@ -242,38 +257,16 @@ fn main() -> anyhow::Result<()> {
 
 	let value = match data {
 		ConfigType::Pos(data) => {
-			match cli.output.format {
-				Format::Toml => {
-					toml::to_string(&Config {
-						item_list: data,
-					})
-					.with_context(|| "Failed to generate TOML")?
-				}
-				Format::Json => {
-					serde_json::to_string_pretty(&Config {
-						item_list: data,
-					})
-					.with_context(|| "Failed to generate TOML")?
-				}
-			}
+			cli.output.format.to_string(&Config {
+				item_list: data,
+			})
 		}
 		ConfigType::Rotate(data) => {
-			match cli.output.format {
-				Format::Toml => {
-					toml::to_string(&Config {
-						item_list: data,
-					})
-					.with_context(|| "Failed to generate TOML")?
-				}
-				Format::Json => {
-					serde_json::to_string_pretty(&Config {
-						item_list: data,
-					})
-					.with_context(|| "Failed to generate TOML")?
-				}
-			}
+			cli.output.format.to_string(&Config {
+				item_list: data,
+			})
 		}
-	};
+	}?;
 	if let Some(output_file) = cli.output.output_file {
 		if let Some(parent) = output_file.parent() {
 			fs::create_dir_all(parent)
