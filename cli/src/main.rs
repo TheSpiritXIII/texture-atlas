@@ -133,7 +133,7 @@ enum Format {
 }
 
 impl Format {
-	pub fn to_string(&self, serialize: &impl Serialize) -> anyhow::Result<String> {
+	pub fn to_string(self, serialize: &impl Serialize) -> anyhow::Result<String> {
 		match self {
 			Self::Toml => {
 				Ok(toml::to_string(serialize).with_context(|| "Failed to serialize TOML")?)
