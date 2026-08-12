@@ -151,8 +151,25 @@ enum ConfigType {
 	Rotate(Vec<Item<Rotate2>>),
 }
 
+impl ConfigType {
+	fn into_string(self, format: Format) -> anyhow::Result<String> {
+		match self {
+			ConfigType::Pos(data) => {
+				format.to_string(&Config {
+					item_list: data,
+				})
+			}
+			ConfigType::Rotate(data) => {
+				format.to_string(&Config {
+					item_list: data,
+				})
+			}
+		}
+	}
+}
+
 // TODO: Use try blocks when they're ready.
-fn parse(path: &impl AsRef<Path>) -> anyhow::Result<DynamicImage> {
+fn parse(path: impl AsRef<Path>) -> anyhow::Result<DynamicImage> {
 	let image = ImageReader::open(path.as_ref())
 		.with_context(|| format!("Failed to open image: {:?}", path.as_ref().display()))?
 		.decode()
@@ -255,18 +272,7 @@ fn main() -> anyhow::Result<()> {
 			.with_context(|| format!("Failed to save atlas image: {:?}", output_path))?;
 	}
 
-	let value = match data {
-		ConfigType::Pos(data) => {
-			cli.output.format.to_string(&Config {
-				item_list: data,
-			})
-		}
-		ConfigType::Rotate(data) => {
-			cli.output.format.to_string(&Config {
-				item_list: data,
-			})
-		}
-	}?;
+	let value = data.into_string(cli.output.format)?;
 	if let Some(output_file) = cli.output.output_file {
 		if let Some(parent) = output_file.parent() {
 			fs::create_dir_all(parent)
@@ -279,8 +285,8 @@ fn main() -> anyhow::Result<()> {
 	}
 
 	info!("Done!");
-	info!("Input images: {}%", image_list.len());
-	info!("Output images: {}%", bin_list.len());
+	info!("Input images: {}", image_list.len());
+	info!("Output images: {}", bin_list.len());
 	info!("Score: {:.2}%", bin_list.as_slice().score() * 100.0);
 
 	Ok(())
