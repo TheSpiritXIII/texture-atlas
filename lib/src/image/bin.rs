@@ -1,3 +1,4 @@
+use image::DynamicImage;
 use image::GenericImage;
 use image::ImageBuffer;
 use image::ImageError;
@@ -10,8 +11,19 @@ use crate::Options2;
 use crate::Pos2;
 use crate::Rotate2;
 
-// TODO: Could do DynamicImage if we have a special constructor.
 impl<P> Bin<ImageBuffer<P, Vec<P::Subpixel>>> for ImageBuffer<P, Vec<P::Subpixel>>
+where
+	P: Pixel + 'static,
+{
+	type Options = Options2;
+	type Error = ImageError;
+
+	fn new(options: &Self::Options) -> Self {
+		ImageBuffer::<P, Vec<P::Subpixel>>::new(options.max_width(), options.max_height())
+	}
+}
+
+impl<P> Bin<DynamicImage> for ImageBuffer<P, Vec<P::Subpixel>>
 where
 	P: Pixel + 'static,
 {
@@ -49,6 +61,33 @@ where
 			self.copy_from(rect, params.pos.x, params.pos.y)
 		} else {
 			let image_rotated = rotate90(rect);
+			self.copy_from(&image_rotated, params.pos.x, params.pos.y)
+		}
+	}
+}
+
+impl<P> BinAdd<DynamicImage, Pos2> for ImageBuffer<P, Vec<P::Subpixel>>
+where
+	P: Pixel + 'static,
+	P::Subpixel: 'static,
+	DynamicImage: image::GenericImageView<Pixel = P>,
+{
+	fn item_add(&mut self, rect: &DynamicImage, params: &Pos2) -> Result<(), Self::Error> {
+		self.copy_from(rect, params.x, params.y)
+	}
+}
+
+impl<P> BinAdd<DynamicImage, Rotate2> for ImageBuffer<P, Vec<P::Subpixel>>
+where
+	P: Pixel + 'static,
+	P::Subpixel: 'static,
+	DynamicImage: image::GenericImageView<Pixel = P>,
+{
+	fn item_add(&mut self, rect: &DynamicImage, params: &Rotate2) -> Result<(), Self::Error> {
+		if !params.rotate {
+			self.copy_from(rect, params.pos.x, params.pos.y)
+		} else {
+			let image_rotated = rect.rotate90();
 			self.copy_from(&image_rotated, params.pos.x, params.pos.y)
 		}
 	}
