@@ -1615,6 +1615,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "texture-atlas-bench"
+version = "0.5.0"
+dependencies = [
+ "anyhow",
+ "clap",
+ "env_logger",
+]
+
+[[package]]
 name = "texture-atlas-cli"
 version = "0.5.0"
 dependencies = [
