@@ -70,12 +70,12 @@ The full list of packers include:
 
 The repository is a workspace separated as follows:
 
-| Package Name            | Directory Name | Description                                                 |
-| ----------------------- | -------------- | ----------------------------------------------------------- |
-| texture-atlas           | `lib`          | The main library.                                           |
-| texture-atlas-cli       | `cli`          | The command-line tool.                                      |
-| texture-atlas-cli-types | `cli-types`    | Types for parsing the command-line tool output.             |
-| image-generator         | `gen`          | Generates random-colored images within a random size range. |
+| Package Name            | Directory Name | Description                                                                           |
+| ----------------------- | -------------- | --------------------------------------------------------------------------------------|
+| texture-atlas           | `lib`          | The main library.                                                                     |
+| texture-atlas-cli       | `cli`          | The command-line tool.                                                                |
+| texture-atlas-cli-types | `cli-types`    | Types for parsing the command-line tool output.                                       |
+| image-generator         | `gen`          | Library and CLI tool that generates random-colored images within a random size range. |
 
 The following script generates images and runs the command-line tool on them, which can help inspect how a packer behaves with real-world data:
 
