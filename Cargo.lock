@@ -1621,6 +1621,10 @@ dependencies = [
  "anyhow",
  "clap",
  "env_logger",
+ "image",
+ "image-generator",
+ "log",
+ "texture-atlas",
 ]
 
 [[package]]

@@ -9,3 +9,7 @@ publish = false
 anyhow = { workspace = true }
 clap = { workspace = true }
 env_logger = { workspace = true }
+image = { workspace = true }
+image-generator = { path = "../gen" }
+log = { workspace = true }
+texture-atlas = { path = "../lib" }
