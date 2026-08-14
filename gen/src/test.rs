@@ -47,3 +47,24 @@ fn seed_random() {
 	let seed_bytes = str_to_seed(&seed_str);
 	assert_eq!(seed_to_str(&seed_bytes), seed_str);
 }
+
+#[test]
+fn generate_args_iterator() {
+	let args = crate::GenerateArgs {
+		amount: 15,
+		options: ImageOptions {
+			min_width: 8,
+			min_height: 8,
+			max_width: 32,
+			max_height: 32,
+		},
+		seed: None,
+	};
+	let (mut rng, _) = args.rng();
+	let images: Vec<_> = args.generate(&mut rng).collect();
+	assert_eq!(images.len(), 15);
+	for img in images {
+		assert!(img.width() >= 8 && img.width() <= 32);
+		assert!(img.height() >= 8 && img.height() <= 32);
+	}
+}

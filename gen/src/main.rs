@@ -3,9 +3,8 @@ use std::io;
 use std::path::PathBuf;
 
 use clap::Parser;
-use image_generator::ImageOptions;
-use image_generator::rng_with_random_seed;
-use image_generator::rng_with_seed;
+use image_generator::GenerateArgs;
+use log::info;
 
 #[derive(Parser)]
 struct Cli {
@@ -13,32 +12,21 @@ struct Cli {
 	#[arg(long)]
 	output_dir: PathBuf,
 
-	/// How many images to generate.
-	#[arg(long)]
-	amount: u16,
-
 	#[command(flatten)]
-	options: ImageOptions,
-
-	/// The seed to use to generate images.
-	#[arg(long)]
-	seed: Option<String>,
+	generate: GenerateArgs,
 }
 
 fn main() -> io::Result<()> {
+	env_logger::init();
 	let cli = Cli::parse();
-	let mut rng = if let Some(seed) = &cli.seed {
-		rng_with_seed(seed)
-	} else {
-		let (rng, seed) = rng_with_random_seed();
-		println!("Generated seed: {seed}");
-		rng
-	};
+	let (mut rng, seed) = cli.generate.rng();
+	if cli.generate.seed.is_none() {
+		info!("Generated seed: {seed}");
+	}
 
 	fs::create_dir_all(&cli.output_dir)?;
-	for i in 0..cli.amount {
+	for (i, image) in cli.generate.generate(&mut rng).enumerate() {
 		let output_path = cli.output_dir.join(format!("image_{}.png", i));
-		let image = cli.options.generate(&mut rng);
 		image.save(&output_path).unwrap();
 	}
 	Ok(())

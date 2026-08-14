@@ -732,7 +732,9 @@ version = "0.5.0"
 dependencies = [
  "chacha20",
  "clap",
+ "env_logger",
  "image",
+ "log",
  "rand 0.10.1",
 ]
 
