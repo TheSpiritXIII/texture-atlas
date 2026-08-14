@@ -18,7 +18,7 @@ where
 	Bin: AtlasBin<Item> + Item2,
 {
 	bin: Bin,
-	score: usize,
+	score: u64,
 	phantom: PhantomData<Item>,
 }
 
@@ -56,8 +56,7 @@ where
 {
 	fn item_add(&mut self, item: &Item, params: &Params) -> Result<(), Self::Error> {
 		self.bin.item_add(item, params)?;
-		// TODO: Avoid casting.
-		self.score += item.area() as usize;
+		self.score += item.area();
 		Ok(())
 	}
 }

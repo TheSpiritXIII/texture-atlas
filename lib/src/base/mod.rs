@@ -4,6 +4,8 @@ mod options;
 mod packer;
 mod params;
 mod score;
+#[cfg(test)]
+mod score_test;
 
 pub use bin::*;
 pub use item::*;

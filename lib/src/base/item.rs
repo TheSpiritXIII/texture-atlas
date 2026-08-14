@@ -1,3 +1,8 @@
+use std::convert::Infallible;
+
+use crate::Bin;
+use crate::BinAdd;
+
 /// Represents a 2-dimensional axis aligned rectangle to be packed in a bin. [`Size2`] is a basic
 /// implementation of it.
 pub trait Item2 {
@@ -95,5 +100,20 @@ impl Item2 for Size2 {
 
 	fn height(&self) -> u32 {
 		self.height
+	}
+}
+
+impl Bin<Size2> for Size2 {
+	type Options = Size2;
+	type Error = Infallible;
+
+	fn new(options: &Self::Options) -> Self {
+		*options
+	}
+}
+
+impl<Params> BinAdd<Size2, Params> for Size2 {
+	fn item_add(&mut self, _item: &Size2, _params: &Params) -> Result<(), Self::Error> {
+		Ok(())
 	}
 }
