@@ -31,9 +31,12 @@ use image::RgbaImage;
 use log::info;
 use serde::Deserialize;
 use serde::Serialize;
+use texture_atlas::Bin;
+use texture_atlas::BinAdd;
 use texture_atlas::DynamicBuilder;
 use texture_atlas::ImageExt;
 use texture_atlas::Options2;
+use texture_atlas::Packer;
 use texture_atlas::Pos2;
 use texture_atlas::Rotate2;
 use texture_atlas::Scored;
@@ -42,6 +45,7 @@ use texture_atlas_cli_types::Config;
 use texture_atlas_cli_types::Item;
 
 use crate::generic::Algorithm;
+use crate::generic::GenericPacker;
 
 // TODO: Config file.
 /// Combines multiple images into fewer large atlas images.
@@ -96,8 +100,8 @@ struct AtlasArgs {
 #[derive(Args, Deserialize)]
 struct InputArgs {
 	// TODO: Support recursive inputs.
-	/// Directory containing input images. If any file is not an image, it will be skipped.
-	/// Directories will also be skipped (recursive inputs are not yet supported).
+	/// Directory containing input images. If any file is not an image, it will be skipped. Nested
+	/// directories will also be skipped (recursive inputs are not yet supported).
 	#[arg(long)]
 	input_dir: Vec<PathBuf>,
 }
@@ -146,34 +150,51 @@ impl Format {
 	}
 }
 
-enum ConfigType {
-	Pos(Vec<Item<Pos2>>),
-	Rotate(Vec<Item<Rotate2>>),
+fn create_atlas<Output>(
+	options: Options2,
+	packer: GenericPacker,
+	image_list: &[RgbaImage],
+	file_path_list: &[PathBuf],
+	output_dir: &Path,
+	format: Format,
+) -> anyhow::Result<(String, Vec<ScoredBin2<RgbaImage, RgbaImage>>)>
+where
+	Output: Serialize,
+	GenericPacker: Packer<RgbaImage, Output, Options2>,
+	<GenericPacker as Packer<RgbaImage, Output, Options2>>::Error:
+		std::error::Error + Send + Sync + 'static,
+	ScoredBin2<RgbaImage, RgbaImage>: Bin<RgbaImage> + BinAdd<RgbaImage, Output>,
+{
+	let mut atlas = DynamicBuilder::<_, ScoredBin2<RgbaImage, RgbaImage>, RgbaImage, Output>::new(
+		options,
+		packer,
+	);
+	let data: Vec<Item<Output>> = atlas
+		.add_all(image_list)
+		.with_context(|| "Failed to pack images into atlas")?
+		.into_iter()
+		.map(|result| {
+			let output_path = output_dir.join(format!("atlas_{}.png", result.bin_index));
+			let item_path = &file_path_list[result.item_index];
+			Item {
+				bin_path: output_path.to_string_lossy().to_string(),
+				item_path: item_path.to_string_lossy().to_string(),
+				layout: result.output,
+			}
+		})
+		.collect();
+	let bin_list = atlas.build();
+	let value = format.to_string(&Config {
+		item_list: data,
+	})?;
+	Ok((value, bin_list))
 }
 
-impl ConfigType {
-	fn into_string(self, format: Format) -> anyhow::Result<String> {
-		match self {
-			ConfigType::Pos(data) => {
-				format.to_string(&Config {
-					item_list: data,
-				})
-			}
-			ConfigType::Rotate(data) => {
-				format.to_string(&Config {
-					item_list: data,
-				})
-			}
-		}
-	}
-}
-
-// TODO: Use try blocks when they're ready.
 fn parse(path: impl AsRef<Path>) -> anyhow::Result<DynamicImage> {
 	let image = ImageReader::open(path.as_ref())
-		.with_context(|| format!("Failed to open image: {:?}", path.as_ref().display()))?
+		.with_context(|| format!("Failed to open image: {}", path.as_ref().display()))?
 		.decode()
-		.with_context(|| format!("Failed to decode image: {:?}", path.as_ref().display()))?;
+		.with_context(|| format!("Failed to decode image: {}", path.as_ref().display()))?;
 	Ok(image)
 }
 
@@ -206,51 +227,24 @@ fn main() -> anyhow::Result<()> {
 		.and_margin(cli.atlas.margin)
 		.and_spacing(cli.atlas.spacing);
 	let packer = cli.atlas.algorithm.into_packer();
-	let (data, bin_list) = if cli.atlas.rotatable {
-		let mut atlas =
-			DynamicBuilder::<_, ScoredBin2<RgbaImage, RgbaImage>, RgbaImage, Rotate2>::new(
-				options,
-				packer,
-			);
-		let data = atlas
-			.add_all(&image_list)
-			.with_context(|| "Failed to pack images into atlas")?
-			.into_iter()
-			.map(|result| {
-				let output_path =
-					cli.output.output_dir.join(format!("atlas_{}.png", result.bin_index));
-				let item_path = &file_path_list[result.item_index];
-				Item {
-					bin_path: output_path.to_string_lossy().to_string(),
-					item_path: item_path.to_string_lossy().to_string(),
-					layout: result.output,
-				}
-			})
-			.collect();
-		let bin_list = atlas.build();
-		(ConfigType::Rotate(data), bin_list)
-	} else {
-		let mut atlas = DynamicBuilder::<_, ScoredBin2<RgbaImage, RgbaImage>, RgbaImage, Pos2>::new(
+	let (value, bin_list) = if cli.atlas.rotatable {
+		create_atlas::<Rotate2>(
 			options,
 			packer,
-		);
-		let data = atlas
-			.add_all(&image_list)
-			.with_context(|| "Failed to pack images into atlas")?
-			.into_iter()
-			.map(|result| {
-				let output_path =
-					cli.output.output_dir.join(format!("atlas_{}.png", result.bin_index));
-				let item_path = &file_path_list[result.item_index];
-				Item {
-					bin_path: output_path.to_string_lossy().to_string(),
-					item_path: item_path.to_string_lossy().to_string(),
-					layout: result.output,
-				}
-			})
-			.collect();
-		let bin_list = atlas.build();
-		(ConfigType::Pos(data), bin_list)
+			&image_list,
+			&file_path_list,
+			&cli.output.output_dir,
+			cli.output.format,
+		)?
+	} else {
+		create_atlas::<Pos2>(
+			options,
+			packer,
+			&image_list,
+			&file_path_list,
+			&cli.output.output_dir,
+			cli.output.format,
+		)?
 	};
 
 	fs::create_dir_all(&cli.output.output_dir).with_context(|| {
@@ -270,7 +264,6 @@ fn main() -> anyhow::Result<()> {
 			.with_context(|| format!("Failed to save atlas image: {:?}", output_path))?;
 	}
 
-	let value = data.into_string(cli.output.format)?;
 	if let Some(output_file) = cli.output.output_file {
 		if let Some(parent) = output_file.parent() {
 			fs::create_dir_all(parent)
