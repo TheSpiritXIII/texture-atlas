@@ -137,14 +137,11 @@ enum Format {
 }
 
 impl Format {
-	pub fn to_string(self, serialize: &impl Serialize) -> anyhow::Result<String> {
+	pub fn serialize_to_string(self, serialize: &impl Serialize) -> anyhow::Result<String> {
 		match self {
-			Self::Toml => {
-				Ok(toml::to_string(serialize).with_context(|| "Failed to serialize TOML")?)
-			}
+			Self::Toml => toml::to_string(serialize).with_context(|| "Failed to serialize TOML"),
 			Self::Json => {
-				Ok(serde_json::to_string_pretty(serialize)
-					.with_context(|| "Failed to serialize JSON")?)
+				serde_json::to_string_pretty(serialize).with_context(|| "Failed to serialize JSON")
 			}
 		}
 	}
@@ -175,16 +172,18 @@ where
 		.into_iter()
 		.map(|result| {
 			let output_path = output_dir.join(format!("atlas_{}.png", result.bin_index));
-			let item_path = &file_path_list[result.item_index];
-			Item {
-				bin_path: output_path.to_string_lossy().to_string(),
-				item_path: item_path.to_string_lossy().to_string(),
+			let item_path = file_path_list
+				.get(result.item_index)
+				.ok_or_else(|| anyhow::anyhow!("Invalid item index: {}", result.item_index))?;
+			Ok(Item {
+				bin_path: output_path.to_string_lossy().into_owned(),
+				item_path: item_path.to_string_lossy().into_owned(),
 				layout: result.output,
-			}
+			})
 		})
-		.collect();
+		.collect::<anyhow::Result<Vec<_>>>()?;
 	let bin_list = atlas.build();
-	let value = format.to_string(&Config {
+	let value = format.serialize_to_string(&Config {
 		item_list: data,
 	})?;
 	Ok((value, bin_list))
@@ -205,7 +204,10 @@ fn main() -> anyhow::Result<()> {
 	let mut file_path_list = Vec::new();
 	let mut image_list = Vec::new();
 	for input_dir in &cli.input.input_dir {
-		for entry in input_dir.read_dir().with_context(|| "Failed to read input directory")? {
+		let entries = input_dir
+			.read_dir()
+			.with_context(|| format!("Failed to read input directory: {}", input_dir.display()))?;
+		for entry in entries {
 			let entry = entry.with_context(|| "Failed to read directory entry")?;
 			let path = entry.path();
 			if !path.is_file() {
