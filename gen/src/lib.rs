@@ -15,22 +15,22 @@ pub struct ImageOptions {
 	/// The minimum width for generated images. The image width will be random between this and
 	/// `max_width`.
 	#[arg(long)]
-	min_width: u32,
+	pub min_width: u32,
 
 	/// The minimum height for generated images. The image height will be random between this and
 	/// `max_height`.
 	#[arg(long)]
-	min_height: u32,
+	pub min_height: u32,
 
 	/// The maximum width for generated images. The image width will be random between `min_width`
 	/// and this.
 	#[arg(long)]
-	max_width: u32,
+	pub max_width: u32,
 
 	/// The maximum height for generated images. The image height will be random between
 	/// `min_height` and this.
 	#[arg(long)]
-	max_height: u32,
+	pub max_height: u32,
 }
 
 impl ImageOptions {
