@@ -15,6 +15,7 @@
 
 mod generic;
 
+use std::collections::VecDeque;
 use std::fs;
 use std::num::NonZero;
 use std::path::Path;
@@ -99,11 +100,16 @@ struct AtlasArgs {
 
 #[derive(Args, Deserialize)]
 struct InputArgs {
-	// TODO: Support recursive inputs.
-	/// Directory containing input images. If any file is not an image, it will be skipped. Nested
-	/// directories will also be skipped (recursive inputs are not yet supported).
+	/// Directory containing input images. If any file is not an image, it will be skipped.
 	#[arg(long)]
 	input_dir: Vec<PathBuf>,
+
+	/// Recursively search all input directories for images.
+	#[arg(
+		long,
+		default_value_t = false
+	)]
+	recursive: bool,
 }
 
 #[derive(Args, Deserialize)]
@@ -197,19 +203,27 @@ fn parse(path: impl AsRef<Path>) -> anyhow::Result<DynamicImage> {
 	Ok(image)
 }
 
-fn main() -> anyhow::Result<()> {
-	env_logger::init();
-	let cli = Cli::parse();
-
+fn load_images(
+	input_dirs: &[PathBuf],
+	recursive: bool,
+) -> anyhow::Result<(Vec<PathBuf>, Vec<RgbaImage>)> {
 	let mut file_path_list = Vec::new();
 	let mut image_list = Vec::new();
-	for input_dir in &cli.input.input_dir {
-		let entries = input_dir
+	let mut queue: VecDeque<PathBuf> = input_dirs.iter().cloned().collect();
+
+	while let Some(dir) = queue.pop_front() {
+		let entries = dir
 			.read_dir()
-			.with_context(|| format!("Failed to read input directory: {}", input_dir.display()))?;
+			.with_context(|| format!("Failed to read input directory: {}", dir.display()))?;
 		for entry in entries {
 			let entry = entry.with_context(|| "Failed to read directory entry")?;
 			let path = entry.path();
+			if path.is_dir() {
+				if recursive {
+					queue.push_back(path);
+				}
+				continue;
+			}
 			if !path.is_file() {
 				continue;
 			}
@@ -224,6 +238,15 @@ fn main() -> anyhow::Result<()> {
 			}
 		}
 	}
+
+	Ok((file_path_list, image_list))
+}
+
+fn main() -> anyhow::Result<()> {
+	env_logger::init();
+	let cli = Cli::parse();
+
+	let (file_path_list, image_list) = load_images(&cli.input.input_dir, cli.input.recursive)?;
 
 	let options = Options2::with_max_size(cli.atlas.max_width, cli.atlas.max_height)
 		.and_margin(cli.atlas.margin)
