@@ -22,6 +22,7 @@ use std::path::PathBuf;
 
 use anyhow::Context;
 use clap::Parser;
+use image::DynamicImage;
 use image::GenericImageView;
 use image::RgbaImage;
 use log::info;
@@ -46,22 +47,23 @@ use crate::generic::GenericPacker;
 fn create_atlas<Output>(
 	options: Options2,
 	packer: GenericPacker,
-	image_list: &[RgbaImage],
+	image_list: &[DynamicImage],
 	file_path_list: &[PathBuf],
 	output_dir: &Path,
 	format: Format,
-) -> anyhow::Result<(String, Vec<ScoredBin2<RgbaImage, RgbaImage>>)>
+) -> anyhow::Result<(String, Vec<ScoredBin2<DynamicImage, RgbaImage>>)>
 where
 	Output: Serialize,
-	GenericPacker: Packer<RgbaImage, Output, Options2>,
-	<GenericPacker as Packer<RgbaImage, Output, Options2>>::Error:
+	GenericPacker: Packer<DynamicImage, Output, Options2>,
+	<GenericPacker as Packer<DynamicImage, Output, Options2>>::Error:
 		std::error::Error + Send + Sync + 'static,
-	ScoredBin2<RgbaImage, RgbaImage>: Bin<RgbaImage> + BinAdd<RgbaImage, Output>,
+	ScoredBin2<DynamicImage, RgbaImage>: Bin<DynamicImage> + BinAdd<DynamicImage, Output>,
 {
-	let mut atlas = DynamicBuilder::<_, ScoredBin2<RgbaImage, RgbaImage>, RgbaImage, Output>::new(
-		options,
-		packer,
-	);
+	let mut atlas =
+		DynamicBuilder::<_, ScoredBin2<DynamicImage, RgbaImage>, DynamicImage, Output>::new(
+			options,
+			packer,
+		);
 	let data: Vec<Item<Output>> = atlas
 		.add_all(image_list)
 		.with_context(|| "Failed to pack images into atlas")?

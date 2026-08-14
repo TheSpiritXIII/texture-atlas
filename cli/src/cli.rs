@@ -9,7 +9,6 @@ use clap::Parser;
 use clap::ValueEnum;
 use image::DynamicImage;
 use image::ImageReader;
-use image::RgbaImage;
 use log::info;
 use serde::Deserialize;
 use serde::Serialize;
@@ -81,8 +80,7 @@ pub struct InputArgs {
 }
 
 impl InputArgs {
-	// TODO: Can we load DynamicImage?
-	pub fn load(&self) -> anyhow::Result<(Vec<PathBuf>, Vec<RgbaImage>)> {
+	pub fn load(&self) -> anyhow::Result<(Vec<PathBuf>, Vec<DynamicImage>)> {
 		let mut file_path_list = Vec::new();
 		let mut image_list = Vec::new();
 		let mut queue: VecDeque<PathBuf> = self.input_dir.iter().cloned().collect();
@@ -106,7 +104,7 @@ impl InputArgs {
 				match parse(&path) {
 					Ok(image) => {
 						file_path_list.push(path);
-						image_list.push(image.to_rgba8());
+						image_list.push(image);
 					}
 					Err(err) => {
 						info!("Skipping unsupported file due to {}: {}", err, path.display());
@@ -147,6 +145,8 @@ pub struct OutputArgs {
 	/// Format for the layout output file.
 	#[arg(long)]
 	pub format: Format,
+
+	// TODO: Support larger color channels than 8-bit.
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, ValueEnum)]
