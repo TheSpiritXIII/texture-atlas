@@ -13,24 +13,18 @@
 //!
 //! To see all possible arguments, run `texture-atlas-cli --help`.
 
+mod cli;
 mod generic;
 
-use std::collections::VecDeque;
 use std::fs;
-use std::num::NonZero;
 use std::path::Path;
 use std::path::PathBuf;
 
 use anyhow::Context;
-use clap::Args;
 use clap::Parser;
-use clap::ValueEnum;
-use image::DynamicImage;
 use image::GenericImageView;
-use image::ImageReader;
 use image::RgbaImage;
 use log::info;
-use serde::Deserialize;
 use serde::Serialize;
 use texture_atlas::Bin;
 use texture_atlas::BinAdd;
@@ -45,113 +39,9 @@ use texture_atlas::ScoredBin2;
 use texture_atlas_cli_types::Config;
 use texture_atlas_cli_types::Item;
 
-use crate::generic::Algorithm;
+use crate::cli::Cli;
+use crate::cli::Format;
 use crate::generic::GenericPacker;
-
-// TODO: Config file.
-/// Combines multiple images into fewer large atlas images.
-#[derive(Deserialize, Parser)]
-struct Cli {
-	#[command(flatten)]
-	pub atlas: AtlasArgs,
-
-	#[command(flatten)]
-	pub input: InputArgs,
-
-	#[command(flatten)]
-	pub output: OutputArgs,
-}
-
-#[derive(Args, Deserialize)]
-struct AtlasArgs {
-	#[command(subcommand)]
-	algorithm: Algorithm,
-
-	/// Maximum width of each atlas.
-	#[arg(long)]
-	max_width: NonZero<u32>,
-
-	/// Maximum height of each atlas.
-	#[arg(long)]
-	max_height: NonZero<u32>,
-
-	/// Margin around each atlas.
-	#[arg(
-		long,
-		default_value_t = 1
-	)]
-	margin: u32,
-
-	/// Spacing between items when packed into an atlas.
-	#[arg(
-		long,
-		default_value_t = 1
-	)]
-	spacing: u32,
-
-	/// Allow rotation of items to improve utilization and potentially reduce the total number of
-	/// atlases.
-	#[arg(
-		long,
-		default_value_t = false
-	)]
-	rotatable: bool,
-}
-
-#[derive(Args, Deserialize)]
-struct InputArgs {
-	/// Directory containing input images. If any file is not an image, it will be skipped.
-	#[arg(long)]
-	input_dir: Vec<PathBuf>,
-
-	/// Recursively search all input directories for images.
-	#[arg(
-		long,
-		default_value_t = false
-	)]
-	recursive: bool,
-}
-
-#[derive(Args, Deserialize)]
-struct OutputArgs {
-	/// Directory to save output atlas images.
-	#[arg(long)]
-	output_dir: PathBuf,
-
-	/// Whether to crop the atlas images.
-	#[arg(
-		long,
-		default_value_t = false
-	)]
-	crop: bool,
-
-	/// File path to save the layout output.
-	#[arg(long)]
-	output_file: Option<PathBuf>,
-
-	/// Format for the layout output file.
-	#[arg(long)]
-	format: Format,
-}
-
-#[derive(Clone, Copy, Debug, Deserialize, Eq, PartialEq, ValueEnum)]
-enum Format {
-	/// TOML format
-	Toml,
-	/// JSON format
-	Json,
-}
-
-impl Format {
-	pub fn serialize_to_string(self, serialize: &impl Serialize) -> anyhow::Result<String> {
-		match self {
-			Self::Toml => toml::to_string(serialize).with_context(|| "Failed to serialize TOML"),
-			Self::Json => {
-				serde_json::to_string_pretty(serialize).with_context(|| "Failed to serialize JSON")
-			}
-		}
-	}
-}
 
 fn create_atlas<Output>(
 	options: Options2,
@@ -195,58 +85,11 @@ where
 	Ok((value, bin_list))
 }
 
-fn parse(path: impl AsRef<Path>) -> anyhow::Result<DynamicImage> {
-	let image = ImageReader::open(path.as_ref())
-		.with_context(|| format!("Failed to open image: {}", path.as_ref().display()))?
-		.decode()
-		.with_context(|| format!("Failed to decode image: {}", path.as_ref().display()))?;
-	Ok(image)
-}
-
-fn load_images(
-	input_dirs: &[PathBuf],
-	recursive: bool,
-) -> anyhow::Result<(Vec<PathBuf>, Vec<RgbaImage>)> {
-	let mut file_path_list = Vec::new();
-	let mut image_list = Vec::new();
-	let mut queue: VecDeque<PathBuf> = input_dirs.iter().cloned().collect();
-
-	while let Some(dir) = queue.pop_front() {
-		let entries = dir
-			.read_dir()
-			.with_context(|| format!("Failed to read input directory: {}", dir.display()))?;
-		for entry in entries {
-			let entry = entry.with_context(|| "Failed to read directory entry")?;
-			let path = entry.path();
-			if path.is_dir() {
-				if recursive {
-					queue.push_back(path);
-				}
-				continue;
-			}
-			if !path.is_file() {
-				continue;
-			}
-			match parse(&path) {
-				Ok(image) => {
-					file_path_list.push(path);
-					image_list.push(image.to_rgba8());
-				}
-				Err(err) => {
-					info!("Skipping unsupported file due to {:?}: {:?}", err, path.display());
-				}
-			}
-		}
-	}
-
-	Ok((file_path_list, image_list))
-}
-
 fn main() -> anyhow::Result<()> {
 	env_logger::init();
 	let cli = Cli::parse();
 
-	let (file_path_list, image_list) = load_images(&cli.input.input_dir, cli.input.recursive)?;
+	let (file_path_list, image_list) = cli.input.load()?;
 
 	let options = Options2::with_max_size(cli.atlas.max_width, cli.atlas.max_height)
 		.and_margin(cli.atlas.margin)
