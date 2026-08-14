@@ -1609,6 +1609,7 @@ dependencies = [
  "image",
  "imageproc",
  "serde",
+ "thiserror",
 ]
 
 [[package]]

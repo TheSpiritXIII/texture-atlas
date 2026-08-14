@@ -212,10 +212,9 @@ fn main() -> anyhow::Result<()> {
 				options,
 				packer,
 			);
-		// TODO: Consider thiserror for library errors so we could use with_context.
 		let data = atlas
 			.add_all(&image_list)
-			.unwrap()
+			.with_context(|| "Failed to pack images into atlas")?
 			.into_iter()
 			.map(|result| {
 				let output_path =
@@ -235,10 +234,9 @@ fn main() -> anyhow::Result<()> {
 			options,
 			packer,
 		);
-		// TODO: Consider thiserror for library errors so we could use with_context.
 		let data = atlas
 			.add_all(&image_list)
-			.unwrap()
+			.with_context(|| "Failed to pack images into atlas")?
 			.into_iter()
 			.map(|result| {
 				let output_path =

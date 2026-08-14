@@ -1,6 +1,8 @@
 use std::borrow::Borrow;
 use std::marker::PhantomData;
 
+use thiserror::Error;
+
 use crate::Bin as AtlasBin;
 use crate::BinAdd;
 use crate::Packer as AtlasPacker;
@@ -19,10 +21,15 @@ where
 	phantom_output: PhantomData<Output>,
 }
 
+#[derive(Error, Debug)]
 pub enum SingleBuilderError<BinError, PackerError> {
-	Bin(BinError),
-	Packer(PackerError),
+	#[error("Bin error: {0}")]
+	Bin(#[source] BinError),
+	#[error("Packer error: {0}")]
+	Packer(#[source] PackerError),
+	#[error("Missing bin")]
 	MissingBin,
+	#[error("Item does not fit in single bin")]
 	DoesNotFit,
 }
 

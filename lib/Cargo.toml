@@ -8,6 +8,7 @@ license.workspace = true
 image = { workspace = true, optional = true }
 imageproc = { workspace = true, optional = true }
 serde = { workspace = true, optional = true }
+thiserror = { workspace = true }
 
 [features]
 default = ["image", "serde"]

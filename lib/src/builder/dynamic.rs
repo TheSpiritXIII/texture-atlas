@@ -1,47 +1,24 @@
 use std::borrow::Borrow;
 use std::fmt::Debug;
-use std::fmt::Display;
 use std::marker::PhantomData;
 
 #[cfg(feature = "serde")]
 use serde::Deserialize;
 #[cfg(feature = "serde")]
 use serde::Serialize;
+use thiserror::Error;
 
 use crate::Bin as AtlasBin;
 use crate::BinAdd;
 use crate::Packer as AtlasPacker;
 use crate::PackerOp;
 
+#[derive(Error, Debug)]
 pub enum BuilderError<BinError, PackerError> {
-	Bin(BinError),
-	Packer(PackerError),
-}
-
-impl<BinError, PackerError> Display for BuilderError<BinError, PackerError>
-where
-	BinError: Display,
-	PackerError: Display,
-{
-	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-		match self {
-			Self::Bin(e) => write!(f, "Bin error: {}", e),
-			Self::Packer(e) => write!(f, "Packer error: {}", e),
-		}
-	}
-}
-
-impl<BinError, PackerError> Debug for BuilderError<BinError, PackerError>
-where
-	BinError: Debug,
-	PackerError: Debug,
-{
-	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-		match self {
-			Self::Bin(e) => f.debug_tuple("Bin").field(e).finish(),
-			Self::Packer(e) => f.debug_tuple("Packer").field(e).finish(),
-		}
-	}
+	#[error("Bin error: {0}")]
+	Bin(#[source] BinError),
+	#[error("Packer error: {0}")]
+	Packer(#[source] PackerError),
 }
 
 pub type BuilderResult<T, BinError, PackerError> = Result<T, BuilderError<BinError, PackerError>>;
