@@ -83,3 +83,22 @@ The following script generates images and runs the command-line tool on them, wh
 cargo run -p image-generator -- --output-dir generated --amount 16 --min-width 16 --min-height 16 --max-width 128 --max-height 128 --seed 31e9c6818c72a1325826f1b25551204171fdf9e8574201c08447112f3bdbc844
 RUST_LOG=info cargo run -p texture-atlas-cli -- --input-dir generated --output-dir atlas --output-file atlas/output.json --max-width 256 --max-height 256 --rotatable --format json binary
 ```
+
+[`Bin`]: Bin
+[`Bin`]: https://docs.rs/texture-atlas/latest/texture_atlas/trait.Bin.html
+[`Options2`]: Options2
+[`Options2`]: https://docs.rs/texture-atlas/latest/texture_atlas/struct.Options2.html
+[`Item2`]: Item2
+[`Item2`]: https://docs.rs/texture-atlas/latest/texture_atlas/trait.Item2.html
+[`Packer`]: Packer
+[`Packer`]: https://docs.rs/texture-atlas/latest/texture_atlas/trait.Packer.html
+[`Pos2`]: Pos2
+[`Pos2`]: https://docs.rs/texture-atlas/latest/texture_atlas/struct.Pos2.html
+[`Rotate2`]: Rotate2
+[`Rotate2`]: https://docs.rs/texture-atlas/latest/texture_atlas/struct.Rotate2.html
+[`BinaryPacker`]: BinaryPacker
+[`BinaryPacker`]: https://docs.rs/texture-atlas/latest/texture_atlas/struct.BinaryPacker.html
+[`PassthroughPacker`]: PassthroughPacker
+[`PassthroughPacker`]: https://docs.rs/texture-atlas/latest/texture_atlas/struct.PassthroughPacker.html
+[`UniformPacker`]: UniformPacker
+[`UniformPacker`]: https://docs.rs/texture-atlas/latest/texture_atlas/struct.UniformPacker.html
