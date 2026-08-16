@@ -11,19 +11,7 @@ use crate::Options2;
 use crate::Pos2;
 use crate::Rotate2;
 
-impl<P> Bin<ImageBuffer<P, Vec<P::Subpixel>>> for ImageBuffer<P, Vec<P::Subpixel>>
-where
-	P: Pixel + 'static,
-{
-	type Options = Options2;
-	type Error = ImageError;
-
-	fn new(options: &Self::Options) -> Self {
-		ImageBuffer::<P, Vec<P::Subpixel>>::new(options.max_width(), options.max_height())
-	}
-}
-
-impl<P> Bin<DynamicImage> for ImageBuffer<P, Vec<P::Subpixel>>
+impl<P> Bin for ImageBuffer<P, Vec<P::Subpixel>>
 where
 	P: Pixel + 'static,
 {

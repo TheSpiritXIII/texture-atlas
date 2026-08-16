@@ -12,7 +12,7 @@ use crate::PackerOp;
 pub struct SingleBuilder<Packer, Bin, Item, Output>
 where
 	Packer: AtlasPacker<Item, Output, Bin::Options>,
-	Bin: AtlasBin<Item> + BinAdd<Item, Output>,
+	Bin: AtlasBin + BinAdd<Item, Output>,
 {
 	options: Bin::Options,
 	packer: Packer,
@@ -47,7 +47,7 @@ pub struct SingleBuilderEntry<T> {
 impl<Packer, Bin, Item, Output> SingleBuilder<Packer, Bin, Item, Output>
 where
 	Packer: AtlasPacker<Item, Output, Bin::Options>,
-	Bin: AtlasBin<Item> + BinAdd<Item, Output>,
+	Bin: AtlasBin + BinAdd<Item, Output>,
 {
 	/// Creates a new atlas.
 	pub fn new(options: Bin::Options, packer: Packer) -> Self {

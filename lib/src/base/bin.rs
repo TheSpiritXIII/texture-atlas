@@ -1,5 +1,5 @@
 /// Represents a single bin in an atlas.
-pub trait Bin<Item> {
+pub trait Bin {
 	/// The options type when creating a new bin.
 	type Options;
 
@@ -11,7 +11,7 @@ pub trait Bin<Item> {
 }
 
 /// Determines how an item `Item` is added to a bin, given a parameter type `Params`.
-pub trait BinAdd<Item, Params>: Bin<Item> {
+pub trait BinAdd<Item, Params>: Bin {
 	/// Adds a new item to the bin at the given position. The given item should not overlap with
 	/// any other items previously passed into this function.
 	fn item_add(&mut self, item: &Item, params: &Params) -> Result<(), Self::Error>;

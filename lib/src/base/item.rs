@@ -103,7 +103,7 @@ impl Item2 for Size2 {
 	}
 }
 
-impl Bin<Size2> for Size2 {
+impl Bin for Size2 {
 	type Options = Size2;
 	type Error = Infallible;
 

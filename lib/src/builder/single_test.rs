@@ -42,10 +42,7 @@ struct IndexedBin<T> {
 	data: Vec<(usize, T)>,
 }
 
-impl<T> Bin<IndexedItem<T>> for IndexedBin<Pos2>
-where
-	T: Item2 + Clone,
-{
+impl Bin for IndexedBin<Pos2> {
 	type Options = Options2;
 	type Error = ();
 

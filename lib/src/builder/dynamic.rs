@@ -66,7 +66,7 @@ pub struct BuilderAddMulti<T> {
 pub struct DynamicBuilder<Packer, Bin, Item, Output>
 where
 	Packer: AtlasPacker<Item, Output, Bin::Options>,
-	Bin: AtlasBin<Item> + BinAdd<Item, Output>,
+	Bin: AtlasBin + BinAdd<Item, Output>,
 {
 	options: Bin::Options,
 	packer: Packer,
@@ -78,7 +78,7 @@ where
 impl<Packer, Bin, Item, Output> DynamicBuilder<Packer, Bin, Item, Output>
 where
 	Packer: AtlasPacker<Item, Output, Bin::Options>,
-	Bin: AtlasBin<Item> + BinAdd<Item, Output>,
+	Bin: AtlasBin + BinAdd<Item, Output>,
 {
 	pub fn new(options: Bin::Options, packer: Packer) -> Self {
 		Self {

@@ -16,7 +16,7 @@ pub trait Utilization {
 pub struct UtilizationBin2<Item, Bin>
 where
 	Item: Item2,
-	Bin: AtlasBin<Item> + Item2,
+	Bin: AtlasBin + Item2,
 {
 	bin: Bin,
 	used_area: u64,
@@ -26,7 +26,7 @@ where
 impl<Item, Bin> UtilizationBin2<Item, Bin>
 where
 	Item: Item2,
-	Bin: AtlasBin<Item> + Item2,
+	Bin: AtlasBin + Item2,
 {
 	pub fn bin(&self) -> &Bin {
 		&self.bin
@@ -37,10 +37,10 @@ where
 	}
 }
 
-impl<Item, Bin> AtlasBin<Item> for UtilizationBin2<Item, Bin>
+impl<Item, Bin> AtlasBin for UtilizationBin2<Item, Bin>
 where
 	Item: Item2,
-	Bin: AtlasBin<Item> + Item2,
+	Bin: AtlasBin + Item2,
 {
 	type Options = Bin::Options;
 	type Error = Bin::Error;
@@ -57,7 +57,7 @@ where
 impl<Item, Bin, Params> BinAdd<Item, Params> for UtilizationBin2<Item, Bin>
 where
 	Item: Item2,
-	Bin: AtlasBin<Item> + BinAdd<Item, Params> + Item2,
+	Bin: AtlasBin + BinAdd<Item, Params> + Item2,
 {
 	fn item_add(&mut self, item: &Item, params: &Params) -> Result<(), Self::Error> {
 		self.bin.item_add(item, params)?;
@@ -69,7 +69,7 @@ where
 impl<Item, Bin> Item2 for UtilizationBin2<Item, Bin>
 where
 	Item: Item2,
-	Bin: AtlasBin<Item> + Item2,
+	Bin: AtlasBin + Item2,
 {
 	fn width(&self) -> u32 {
 		self.bin.width()
@@ -83,7 +83,7 @@ where
 impl<Item, Bin> Utilization for UtilizationBin2<Item, Bin>
 where
 	Item: Item2,
-	Bin: AtlasBin<Item> + Item2,
+	Bin: AtlasBin + Item2,
 {
 	fn utilization(&self) -> f32 {
 		self.used_area as f32 / self.bin.area() as f32

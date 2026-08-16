@@ -57,7 +57,7 @@ where
 	GenericPacker: Packer<DynamicImage, Output, Options2>,
 	<GenericPacker as Packer<DynamicImage, Output, Options2>>::Error:
 		std::error::Error + Send + Sync + 'static,
-	UtilizationBin2<DynamicImage, RgbaImage>: Bin<DynamicImage> + BinAdd<DynamicImage, Output>,
+	UtilizationBin2<DynamicImage, RgbaImage>: Bin + BinAdd<DynamicImage, Output>,
 {
 	let mut atlas =
 		DynamicBuilder::<_, UtilizationBin2<DynamicImage, RgbaImage>, DynamicImage, Output>::new(

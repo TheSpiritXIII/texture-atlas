@@ -145,7 +145,6 @@ pub struct OutputArgs {
 	/// Format for the layout output file.
 	#[arg(long)]
 	pub format: Format,
-
 	// TODO: Support larger color channels than 8-bit.
 }
 
