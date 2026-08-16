@@ -4,40 +4,55 @@ This crate provides various algorithms for bin-packing axis-aligned rectangles.
 
 The most common use-case for this library is for game development. To reduce texture swapping on the GPU, multiple textures can be combined into fewer, larger textures.
 
-## Basic Usage
+## Quick Start
 
 A command-line tool is provided which can generate an atlas from a directory of images.
 
 Alternatively, the library can also be used directly. This can be helpful for writing build scripts or when needing to extend the functionality of this library.
 
-The `image` feature is enabled by default, which allows interoperability with the `image` crate:
+### Library Usage
+
+Add `texture-atlas` to your `Cargo.toml`.
+
+```toml
+[dependencies]
+texture-atlas = { git = "https://https://github.com/TheSpiritXIII/texture-atlas.git" }
+```
 
 ```rust
 use std::num::NonZeroU32;
 
 use image::RgbaImage;
-use texture_atlas::Options2;
+use image::DynamicImage;
 use texture_atlas::BinaryPacker;
 use texture_atlas::DynamicBuilder;
+use texture_atlas::Options2;
 use texture_atlas::Pos2;
 
-// Pack a list of images into multiple atlases.
-fn pack(image_list: &[&RgbaImage]) -> Vec<RgbaImage> {
-	// Output a 1024x1024 image.
-	let options =
-		Options2::with_max_size(NonZeroU32::new(1024).unwrap(), NonZeroU32::new(1024).unwrap());
+// Pack a slice of images into one or more texture atlases.
+fn pack(image_list: &[&DynamicImage]) -> Vec<RgbaImage> {
+	// Configure atlas options (e.g., max dimensions of 1024x1024).
+	let options = Options2::with_max_size(
+		NonZeroU32::new(1024).unwrap(),
+		NonZeroU32::new(1024).unwrap(),
+	);
 
-	// Take RgbaImage as input and output. Return the positions of each image.
-	let mut builder = DynamicBuilder::<_, RgbaImage, RgbaImage, Pos2>::new(
+	// Create a dynamic builder, outputting RgbaImage bins.
+	let mut builder = DynamicBuilder::<_, RgbaImage, DynamicImage, Pos2>::new(
 		options,
 		// Use binary packing.
 		BinaryPacker::new(),
 	);
 
-	// Add the images to the builder. This will give you the aforementioned positions.
-	let _position_list = builder.add_all(image_list).unwrap();
+	// Add images to the builder and retrieve their assigned positions.
+	let positions = builder.add_all(image_list).unwrap();
 
-	// Output the resulting image atlases.
+	// Print the assigned positions for each image. You'll want to store these somewhere.
+	for (image, position) in image_list.iter().zip(positions.iter()) {
+		println!("Image: {:?}, Position: {:?}", image, position);
+	}
+
+	// Generate and return the resulting atlas images.
 	builder.build()
 }
 ```
