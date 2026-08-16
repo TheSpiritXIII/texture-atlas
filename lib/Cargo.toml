@@ -11,6 +11,15 @@ serde = { workspace = true, optional = true }
 thiserror = { workspace = true }
 
 [features]
-default = ["image", "serde"]
+default = [
+	"image",
+	"packer-binary",
+	"packer-passthrough",
+	"packer-uniform",
+	"serde",
+]
 image = ["dep:image", "dep:imageproc"]
+packer-binary = []
+packer-passthrough = []
+packer-uniform = []
 serde = ["dep:serde"]

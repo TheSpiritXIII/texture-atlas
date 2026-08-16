@@ -77,9 +77,11 @@ The earlier example used [`Pos2`]. This adds items to bins as-is. A more flexibl
 The earlier example used a [`BinaryPacker`]. 
 
 The full list of packers include:
-- [`BinaryPacker`]
-- [`PassthroughPacker`]
-- [`UniformPacker`]
+- [`BinaryPacker`] (feature `packer-binary`)
+- [`PassthroughPacker`] (feature `packer-passthrough`)
+- [`UniformPacker`] (feature `packer-uniform`)
+
+All packers are enabled by default.
 
 ## Contributing
 
