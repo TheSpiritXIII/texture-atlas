@@ -35,8 +35,8 @@ use texture_atlas::Options2;
 use texture_atlas::Packer;
 use texture_atlas::Pos2;
 use texture_atlas::Rotate2;
-use texture_atlas::Scored;
-use texture_atlas::ScoredBin2;
+use texture_atlas::Utilization;
+use texture_atlas::UtilizationBin2;
 use texture_atlas_cli_types::Config;
 use texture_atlas_cli_types::Item;
 
@@ -51,16 +51,16 @@ fn create_atlas<Output>(
 	file_path_list: &[PathBuf],
 	output_dir: &Path,
 	format: Format,
-) -> anyhow::Result<(String, Vec<ScoredBin2<DynamicImage, RgbaImage>>)>
+) -> anyhow::Result<(String, Vec<UtilizationBin2<DynamicImage, RgbaImage>>)>
 where
 	Output: Serialize,
 	GenericPacker: Packer<DynamicImage, Output, Options2>,
 	<GenericPacker as Packer<DynamicImage, Output, Options2>>::Error:
 		std::error::Error + Send + Sync + 'static,
-	ScoredBin2<DynamicImage, RgbaImage>: Bin<DynamicImage> + BinAdd<DynamicImage, Output>,
+	UtilizationBin2<DynamicImage, RgbaImage>: Bin<DynamicImage> + BinAdd<DynamicImage, Output>,
 {
 	let mut atlas =
-		DynamicBuilder::<_, ScoredBin2<DynamicImage, RgbaImage>, DynamicImage, Output>::new(
+		DynamicBuilder::<_, UtilizationBin2<DynamicImage, RgbaImage>, DynamicImage, Output>::new(
 			options,
 			packer,
 		);
@@ -148,7 +148,7 @@ fn main() -> anyhow::Result<()> {
 	info!("Done!");
 	info!("Input images: {}", image_list.len());
 	info!("Output images: {}", bin_list.len());
-	info!("Score: {:.2}%", bin_list.as_slice().score() * 100.0);
+	info!("Utilization: {:.2}%", bin_list.as_slice().utilization() * 100.0);
 
 	Ok(())
 }
