@@ -134,22 +134,60 @@ struct BenchResult {
 
 impl BenchResult {
 	/// Writes the benchmark result as a markdown table row to the provided writer.
-	fn write_markdown_row(&self, writer: &mut impl Write) -> io::Result<()> {
-		writeln!(
-			writer,
-			"| {} | {} | {:.3} | {:.2}% |",
-			self.algorithm_name,
-			self.bin_count,
-			self.average_time_sec * 1000.0,
-			self.utilization * 100.0
-		)
+	fn write_markdown_row(
+		&self,
+		writer: &mut impl Write,
+		is_best_bin_count: bool,
+		is_best_time: bool,
+		is_best_utilization: bool,
+	) -> io::Result<()> {
+		write!(writer, "| {} |", self.algorithm_name)?;
+		if is_best_bin_count {
+			write!(writer, "**{}**", self.bin_count)?;
+		} else {
+			write!(writer, "{}", self.bin_count)?;
+		}
+
+		write!(writer, " | ")?;
+		if is_best_time {
+			write!(writer, "**{:.3}**", self.average_time_sec * 1000.0)?;
+		} else {
+			write!(writer, "{:.3}", self.average_time_sec * 1000.0)?;
+		}
+
+		write!(writer, " | ")?;
+		if is_best_utilization {
+			write!(writer, "**{:.2}%**", self.utilization * 100.0)?;
+		} else {
+			write!(writer, "{:.2}%", self.utilization * 100.0)?;
+		}
+
+		writeln!(writer, "|")
 	}
 
 	fn write_markdown(writer: &mut impl Write, result_list: &[Self]) -> io::Result<()> {
 		writeln!(writer, "| Algorithm | Bins Created | Time (ms) | Utilization (%) |")?;
 		writeln!(writer, "|---|---|---|---|")?;
+
+		let mut best = Self {
+			algorithm_name: "Best",
+			average_time_sec: f64::MAX,
+			bin_count: usize::MAX,
+			utilization: 0.0,
+		};
 		for result in result_list {
-			result.write_markdown_row(writer)?;
+			best.average_time_sec = best.average_time_sec.min(result.average_time_sec);
+			best.bin_count = best.bin_count.min(result.bin_count);
+			best.utilization = best.utilization.max(result.utilization);
+		}
+
+		for result in result_list {
+			result.write_markdown_row(
+				writer,
+				result.bin_count == best.bin_count,
+				result.average_time_sec == best.average_time_sec,
+				result.utilization == best.utilization,
+			)?;
 		}
 		Ok(())
 	}
