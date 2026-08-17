@@ -2,77 +2,17 @@ use std::num::NonZero;
 
 use crate::AlwaysErrorPacker;
 use crate::AlwaysExistingBinPacker;
-use crate::Bin;
-use crate::BinAdd;
-use crate::Item2;
 use crate::Options2;
 use crate::Pos2;
 use crate::SingleBuilder;
 use crate::SingleBuilderError;
 use crate::Size2;
 use crate::UniformPacker;
+use crate::test::IndexedBin;
+use crate::test::IndexedItem;
 
 fn new_options() -> Options2 {
 	Options2::with_max_size(NonZero::new(1024).unwrap(), NonZero::new(1024).unwrap())
-}
-
-// TODO: Might be useful for other tests. Maybe even code?
-struct IndexedItem<T> {
-	index: usize,
-	item: T,
-}
-
-impl<T> Item2 for IndexedItem<T>
-where
-	T: Item2,
-{
-	fn width(&self) -> u32 {
-		self.item.width()
-	}
-
-	fn height(&self) -> u32 {
-		self.item.height()
-	}
-}
-
-// TODO: Might be useful for other tests.
-struct IndexedBin<T> {
-	width: u32,
-	height: u32,
-	data: Vec<(usize, T)>,
-}
-
-impl Bin for IndexedBin<Pos2> {
-	type Options = Options2;
-	type Error = ();
-
-	fn new(options: &Self::Options) -> Self {
-		Self {
-			width: options.max_width(),
-			height: options.max_height(),
-			data: Vec::new(),
-		}
-	}
-}
-
-impl<T> BinAdd<IndexedItem<T>, Pos2> for IndexedBin<Pos2>
-where
-	T: Item2 + Clone,
-{
-	fn item_add(&mut self, item: &IndexedItem<T>, params: &Pos2) -> Result<(), Self::Error> {
-		self.data.push((item.index, *params));
-		Ok(())
-	}
-}
-
-impl<T> Item2 for IndexedBin<T> {
-	fn width(&self) -> u32 {
-		self.width
-	}
-
-	fn height(&self) -> u32 {
-		self.height
-	}
 }
 
 #[test]

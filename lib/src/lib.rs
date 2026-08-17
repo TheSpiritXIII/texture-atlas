@@ -5,6 +5,9 @@ mod builder;
 #[cfg(feature = "image")]
 mod image;
 mod packer;
+// TODO: Add a test feature.
+#[cfg(test)]
+mod test;
 
 pub use base::*;
 pub use builder::*;
