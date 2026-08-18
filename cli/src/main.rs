@@ -44,7 +44,7 @@ use crate::cli::Cli;
 use crate::cli::Format;
 use crate::generic::GenericPacker;
 
-fn create_atlas<Output>(
+fn create_atlas<Layout>(
 	options: Options2,
 	packer: GenericPacker,
 	image_list: &[DynamicImage],
@@ -53,18 +53,18 @@ fn create_atlas<Output>(
 	format: Format,
 ) -> anyhow::Result<(String, Vec<UtilizationBin2<DynamicImage, RgbaImage>>)>
 where
-	Output: Serialize,
-	GenericPacker: Packer<DynamicImage, Output, Options2>,
-	<GenericPacker as Packer<DynamicImage, Output, Options2>>::Error:
+	Layout: Serialize,
+	GenericPacker: Packer<DynamicImage, Layout, Options2>,
+	<GenericPacker as Packer<DynamicImage, Layout, Options2>>::Error:
 		std::error::Error + Send + Sync + 'static,
-	UtilizationBin2<DynamicImage, RgbaImage>: Bin + BinAdd<DynamicImage, Output>,
+	UtilizationBin2<DynamicImage, RgbaImage>: Bin + BinAdd<DynamicImage, Layout>,
 {
 	let mut atlas =
-		DynamicBuilder::<_, UtilizationBin2<DynamicImage, RgbaImage>, DynamicImage, Output>::new(
+		DynamicBuilder::<_, UtilizationBin2<DynamicImage, RgbaImage>, DynamicImage, Layout>::new(
 			options,
 			packer,
 		);
-	let data: Vec<Item<Output>> = atlas
+	let data: Vec<Item<Layout>> = atlas
 		.add_all(image_list)
 		.with_context(|| "Failed to pack images into atlas")?
 		.into_iter()
@@ -76,7 +76,7 @@ where
 			Ok(Item {
 				bin_path: output_path.to_string_lossy().into_owned(),
 				item_path: item_path.to_string_lossy().into_owned(),
-				layout: result.output,
+				layout: result.layout,
 			})
 		})
 		.collect::<anyhow::Result<Vec<_>>>()?;

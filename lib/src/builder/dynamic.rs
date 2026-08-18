@@ -28,7 +28,7 @@ pub struct BuilderAdd<T> {
 	/// The bin index of the added entry.
 	pub bin_index: usize,
 	/// The entry data.
-	pub output: T,
+	pub layout: T,
 }
 
 impl<T> BuilderAdd<T> {
@@ -36,7 +36,7 @@ impl<T> BuilderAdd<T> {
 		BuilderAddMulti {
 			bin_index: self.bin_index,
 			item_index,
-			output: self.output,
+			layout: self.layout,
 		}
 	}
 }
@@ -55,7 +55,7 @@ pub struct BuilderAddMulti<T> {
 	/// The item index from the original slice that was added.
 	pub item_index: usize,
 	/// The entry data.
-	pub output: T,
+	pub layout: T,
 }
 
 // TODO: Add static atlas variant.
@@ -63,22 +63,22 @@ pub struct BuilderAddMulti<T> {
 // TODO: Add unit tests.
 
 /// An atlas builder which allows unlimited bins.
-pub struct DynamicBuilder<Packer, Bin, Item, Output>
+pub struct DynamicBuilder<Packer, Bin, Item, Layout>
 where
-	Packer: AtlasPacker<Item, Output, Bin::Options>,
-	Bin: AtlasBin + BinAdd<Item, Output>,
+	Packer: AtlasPacker<Item, Layout, Bin::Options>,
+	Bin: AtlasBin + BinAdd<Item, Layout>,
 {
 	options: Bin::Options,
 	packer: Packer,
 	bin_list: Vec<Bin>,
 	phantom_item: PhantomData<Item>,
-	phantom_output: PhantomData<Output>,
+	phantom_layout: PhantomData<Layout>,
 }
 
-impl<Packer, Bin, Item, Output> DynamicBuilder<Packer, Bin, Item, Output>
+impl<Packer, Bin, Item, Layout> DynamicBuilder<Packer, Bin, Item, Layout>
 where
-	Packer: AtlasPacker<Item, Output, Bin::Options>,
-	Bin: AtlasBin + BinAdd<Item, Output>,
+	Packer: AtlasPacker<Item, Layout, Bin::Options>,
+	Bin: AtlasBin + BinAdd<Item, Layout>,
 {
 	pub fn new(options: Bin::Options, packer: Packer) -> Self {
 		Self {
@@ -86,56 +86,56 @@ where
 			packer,
 			bin_list: Vec::new(),
 			phantom_item: PhantomData,
-			phantom_output: PhantomData,
+			phantom_layout: PhantomData,
 		}
 	}
 
 	pub fn add(
 		&mut self,
 		item: &Item,
-	) -> BuilderResult<BuilderAdd<Output>, Bin::Error, Packer::Error> {
+	) -> BuilderResult<BuilderAdd<Layout>, Bin::Error, Packer::Error> {
 		let op = self.packer.add(&self.options, item).map_err(BuilderError::Packer)?;
-		let output = Self::add_item_to(&self.options, &mut self.bin_list, item, op)?;
-		Ok(output)
+		let layout = Self::add_item_to(&self.options, &mut self.bin_list, item, op)?;
+		Ok(layout)
 	}
 
 	pub fn add_all<T: Borrow<Item>>(
 		&mut self,
 		item_list: &[T],
-	) -> BuilderResult<Vec<BuilderAddMulti<Output>>, Bin::Error, Packer::Error> {
-		let mut output = Vec::new();
+	) -> BuilderResult<Vec<BuilderAddMulti<Layout>>, Bin::Error, Packer::Error> {
+		let mut layout_list = Vec::new();
 		for entry in self.packer.add_all(&self.options, item_list) {
 			let (item_index, op) = entry.map_err(BuilderError::Packer)?;
 			let item = item_list[item_index].borrow();
 
 			let entry = Self::add_item_to(&self.options, &mut self.bin_list, item, op)?;
-			output.push(entry.with_item_index(item_index));
+			layout_list.push(entry.with_item_index(item_index));
 		}
-		Ok(output)
+		Ok(layout_list)
 	}
 
 	// TODO: Reintroduce add_group
 	// pub fn add_group<T: Borrow<Item>>(
 	// 	&mut self,
 	// 	item_list: &[&Item],
-	// ) -> BuilderResult<Vec<BuilderAddMulti<Output>>, Bin::Error, Packer::Error> {
-	// 	let mut output = Vec::new();
+	// ) -> BuilderResult<Vec<BuilderAddMulti<Layout>>, Bin::Error, Packer::Error> {
+	// 	let mut layout_list = Vec::new();
 	// 	for entry in self.packer.add_group(&self.options, item_list) {
 	// 		let (item_index, op) = entry.map_err(BuilderError::Packer)?;
 	// 		let item = item_list[item_index];
 
 	// 		let entry = Self::add_item_to(&self.options, &mut self.bin_list, item, op)?;
-	// 		output.push(entry.with_item_index(item_index));
+	// 		layout_list.push(entry.with_item_index(item_index));
 	// 	}
-	// 	Ok(output)
+	// 	Ok(layout_list)
 	// }
 
 	fn add_item_to(
 		options: &Bin::Options,
 		bin_list: &mut Vec<Bin>,
 		item: &Item,
-		op: PackerOp<Output>,
-	) -> BuilderResult<BuilderAdd<Output>, Bin::Error, Packer::Error> {
+		op: PackerOp<Layout>,
+	) -> BuilderResult<BuilderAdd<Layout>, Bin::Error, Packer::Error> {
 		let (index, params) = match op {
 			PackerOp::NewBin(params) => {
 				let bin = Bin::new(options);
@@ -148,7 +148,7 @@ where
 		bin_list[index].item_add(item, &params).map_err(BuilderError::Bin)?;
 		Ok(BuilderAdd {
 			bin_index: index,
-			output: params,
+			layout: params,
 		})
 	}
 

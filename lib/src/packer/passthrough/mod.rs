@@ -27,14 +27,14 @@ impl Default for PassthroughPacker {
 	}
 }
 
-impl<Item, Output> Packer<Item, Output, Options2> for PassthroughPacker
+impl<Item, Layout> Packer<Item, Layout, Options2> for PassthroughPacker
 where
 	Item: Item2,
-	Output: From<Pos2>,
+	Layout: From<Pos2>,
 {
 	type Error = Infallible;
 
-	fn add(&mut self, options: &Options2, _: &Item) -> Result<PackerOp<Output>, Self::Error> {
+	fn add(&mut self, options: &Options2, _: &Item) -> Result<PackerOp<Layout>, Self::Error> {
 		Ok(PackerOp::NewBin(options.margin().into()))
 	}
 
@@ -42,10 +42,7 @@ where
 		&mut self,
 		options: &Options2,
 		group: &[T],
-	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Output>), Self::Error>> {
-		(0..group.len()).map(|index| {
-			let output = self.add(options, group[index].borrow());
-			output.map(|x| (index, x))
-		})
+	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Layout>), Self::Error>> {
+		(0..group.len()).map(|index| self.add(options, group[index].borrow()).map(|op| (index, op)))
 	}
 }

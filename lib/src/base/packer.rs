@@ -47,10 +47,10 @@ impl<T: PartialEq> PartialEq for PackerOp<T> {
 ///
 /// `Item` is the input that gets added to the bin.
 ///
-/// `Output` is the output after items are added to the bin. This should contain a list of
+/// `Layout` is the layout after items are added to the bin. This should contain a list of
 /// references of the items added with metadata, e.g. position. Most packers will suffice with
 /// [`Pos2`](crate::Pos2).
-pub trait Packer<Item, Output, Options> {
+pub trait Packer<Item, Layout, Options> {
 	/// The error type of the packer. Generally, this is the error type of the page, but packers may
 	/// emit their own errors if needed.
 	// TODO: Add default. See: https://github.com/rust-lang/rust/issues/29661
@@ -58,7 +58,7 @@ pub trait Packer<Item, Output, Options> {
 
 	/// Adds items to be placed on any available bin. `options` is always passed the same value
 	/// throughout the lifetime of the packer.
-	fn add(&mut self, options: &Options, item: &Item) -> Result<PackerOp<Output>, Self::Error>;
+	fn add(&mut self, options: &Options, item: &Item) -> Result<PackerOp<Layout>, Self::Error>;
 
 	/// Adds items to be placed on any available bin, optimizing the placement of items to reduce
 	/// the total number of bins. `options` is always passed the same value throughout the lifetime
@@ -71,7 +71,7 @@ pub trait Packer<Item, Output, Options> {
 		&mut self,
 		options: &Options,
 		group: &[T],
-	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Output>), Self::Error>>;
+	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Layout>), Self::Error>>;
 
 	// TODO: Reintroduce add_group
 	// /// Adds items to be placed on any available bin, prioritizing adding all given items to the
@@ -89,7 +89,7 @@ pub trait Packer<Item, Output, Options> {
 	// 	&mut self,
 	// 	options: &Options,
 	// 	group: &[T],
-	// ) -> impl IntoIterator<Item = Result<(usize, PackerOp<Output>), Self::Error>> {
+	// ) -> impl IntoIterator<Item = Result<(usize, PackerOp<Layout>), Self::Error>> {
 	// 	self.add_all(options, group)
 	// }
 }

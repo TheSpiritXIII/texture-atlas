@@ -37,14 +37,14 @@ impl Default for UniformPacker {
 	}
 }
 
-impl<Item, Output> Packer<Item, Output, Options2> for UniformPacker
+impl<Item, Layout> Packer<Item, Layout, Options2> for UniformPacker
 where
 	Item: Item2,
-	Output: From<Pos2>,
+	Layout: From<Pos2>,
 {
 	type Error = Infallible;
 
-	fn add(&mut self, options: &Options2, item: &Item) -> Result<PackerOp<Output>, Self::Error> {
+	fn add(&mut self, options: &Options2, item: &Item) -> Result<PackerOp<Layout>, Self::Error> {
 		let mut y = self.used.height;
 		if item.width() > options.max_logical_width()
 			|| self.used.width > options.max_logical_width() - item.width()
@@ -91,10 +91,7 @@ where
 		&mut self,
 		options: &Options2,
 		group: &[T],
-	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Output>), Self::Error>> {
-		(0..group.len()).map(|index| {
-			let output = self.add(options, group[index].borrow());
-			output.map(|x| (index, x))
-		})
+	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Layout>), Self::Error>> {
+		(0..group.len()).map(|index| self.add(options, group[index].borrow()).map(|op| (index, op)))
 	}
 }

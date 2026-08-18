@@ -30,7 +30,7 @@
 //! ## Generic Type Parameter
 //!
 //! The `T` type parameter in both [`Item<T>`] and [`Config<T>`] allows you to specify
-//! what type the `output` field should deserialize into.
+//! what type the `layout` field should deserialize into.
 //!
 //! `texture-atlas-cli` either outputs:
 //! - [`Pos2`][texture_atlas::Pos2] if `rotatable` is unset.
@@ -46,7 +46,7 @@ pub struct Item<T> {
 	pub bin_path: String,
 	/// The input item path. There is generally only 1 output per-item.
 	pub item_path: String,
-	/// The output parameters.
+	/// The layout parameters. Generally either `Pos2` or `Rotate2`.
 	pub layout: T,
 }
 

@@ -193,7 +193,7 @@ impl BenchResult {
 	}
 }
 
-fn benchmark<Packer, Output>(
+fn benchmark<Packer, Layout>(
 	algorithm: &'static str,
 	options: &Options2,
 	packer: &Packer,
@@ -201,9 +201,9 @@ fn benchmark<Packer, Output>(
 	iterations: NonZero<u32>,
 ) -> anyhow::Result<BenchResult>
 where
-	Packer: AtlasPacker<DynamicImage, Output, Options2> + Clone,
-	<Packer as AtlasPacker<DynamicImage, Output, Options2>>::Error: Debug,
-	RgbaImage: BinAdd<DynamicImage, Output>,
+	Packer: AtlasPacker<DynamicImage, Layout, Options2> + Clone,
+	<Packer as AtlasPacker<DynamicImage, Layout, Options2>>::Error: Debug,
+	RgbaImage: BinAdd<DynamicImage, Layout>,
 {
 	let mut total_duration = Duration::ZERO;
 	let mut bin_count = 0;
@@ -215,7 +215,7 @@ where
 			_,
 			UtilizationBin2<DynamicImage, RgbaImage>,
 			DynamicImage,
-			Output,
+			Layout,
 		>::new(options.clone(), packer.clone());
 
 		let start = Instant::now();
@@ -239,29 +239,29 @@ where
 	})
 }
 
-fn build_table<Output>(
+fn build_table<Layout>(
 	options: &Options2,
 	image_list: &[DynamicImage],
 	iterations: NonZero<u32>,
 ) -> anyhow::Result<Vec<BenchResult>>
 where
-	RgbaImage: BinAdd<DynamicImage, Output>,
-	BinaryPacker: AtlasPacker<DynamicImage, Output, Options2>,
-	<BinaryPacker as AtlasPacker<DynamicImage, Output, Options2>>::Error: Debug,
-	PassthroughPacker: AtlasPacker<DynamicImage, Output, Options2>,
-	<PassthroughPacker as AtlasPacker<DynamicImage, Output, Options2>>::Error: Debug,
-	UniformPacker: AtlasPacker<DynamicImage, Output, Options2>,
-	<UniformPacker as AtlasPacker<DynamicImage, Output, Options2>>::Error: Debug,
+	RgbaImage: BinAdd<DynamicImage, Layout>,
+	BinaryPacker: AtlasPacker<DynamicImage, Layout, Options2>,
+	<BinaryPacker as AtlasPacker<DynamicImage, Layout, Options2>>::Error: Debug,
+	PassthroughPacker: AtlasPacker<DynamicImage, Layout, Options2>,
+	<PassthroughPacker as AtlasPacker<DynamicImage, Layout, Options2>>::Error: Debug,
+	UniformPacker: AtlasPacker<DynamicImage, Layout, Options2>,
+	<UniformPacker as AtlasPacker<DynamicImage, Layout, Options2>>::Error: Debug,
 {
 	Ok(vec![
-		benchmark::<_, Output>("Binary", options, &BinaryPacker::new(), image_list, iterations)?,
-		benchmark::<_, Output>(
+		benchmark::<_, Layout>("Binary", options, &BinaryPacker::new(), image_list, iterations)?,
+		benchmark::<_, Layout>(
 			"Passthrough",
 			options,
 			&PassthroughPacker::new(),
 			image_list,
 			iterations,
 		)?,
-		benchmark::<_, Output>("Uniform", options, &UniformPacker::new(), image_list, iterations)?,
+		benchmark::<_, Layout>("Uniform", options, &UniformPacker::new(), image_list, iterations)?,
 	])
 }

@@ -9,16 +9,16 @@ use crate::Packer as AtlasPacker;
 use crate::PackerOp;
 
 // An atlas builder which only creates one bin. Does not allocate any heap memory.
-pub struct SingleBuilder<Packer, Bin, Item, Output>
+pub struct SingleBuilder<Packer, Bin, Item, Layout>
 where
-	Packer: AtlasPacker<Item, Output, Bin::Options>,
-	Bin: AtlasBin + BinAdd<Item, Output>,
+	Packer: AtlasPacker<Item, Layout, Bin::Options>,
+	Bin: AtlasBin + BinAdd<Item, Layout>,
 {
 	options: Bin::Options,
 	packer: Packer,
 	bin: Option<Bin>,
 	phantom_item: PhantomData<Item>,
-	phantom_output: PhantomData<Output>,
+	phantom_layout: PhantomData<Layout>,
 }
 
 #[derive(Error, Debug)]
@@ -41,13 +41,13 @@ pub struct SingleBuilderEntry<T> {
 	/// The item index from the original slice that was added.
 	pub item_index: usize,
 	/// The entry data.
-	pub output: T,
+	pub layout: T,
 }
 
-impl<Packer, Bin, Item, Output> SingleBuilder<Packer, Bin, Item, Output>
+impl<Packer, Bin, Item, Layout> SingleBuilder<Packer, Bin, Item, Layout>
 where
-	Packer: AtlasPacker<Item, Output, Bin::Options>,
-	Bin: AtlasBin + BinAdd<Item, Output>,
+	Packer: AtlasPacker<Item, Layout, Bin::Options>,
+	Bin: AtlasBin + BinAdd<Item, Layout>,
 {
 	/// Creates a new atlas.
 	pub fn new(options: Bin::Options, packer: Packer) -> Self {
@@ -56,16 +56,16 @@ where
 			packer,
 			bin: None,
 			phantom_item: PhantomData,
-			phantom_output: PhantomData,
+			phantom_layout: PhantomData,
 		}
 	}
 
 	/// Adds a new item to the atlas. Prefer `add_all`, which allows additional optimizations to
 	/// ensure items are tightly packed
-	pub fn add(&mut self, item: &Item) -> SingleBuilderResult<Output, Bin::Error, Packer::Error> {
+	pub fn add(&mut self, item: &Item) -> SingleBuilderResult<Layout, Bin::Error, Packer::Error> {
 		let op = self.packer.add(&self.options, item).map_err(SingleBuilderError::Packer)?;
-		let output = Self::add_item_to(&self.options, &mut self.bin, item, op)?;
-		Ok(output)
+		let layout = Self::add_item_to(&self.options, &mut self.bin, item, op)?;
+		Ok(layout)
 	}
 
 	/// Adds multiple items to the atlas, optimizing the placement of items by more tightly packing
@@ -73,19 +73,19 @@ where
 	pub fn add_all<T: Borrow<Item>>(
 		&mut self,
 		item_list: &[T],
-	) -> SingleBuilderResult<Vec<SingleBuilderEntry<Output>>, Bin::Error, Packer::Error> {
-		let mut output = Vec::with_capacity(item_list.len());
+	) -> SingleBuilderResult<Vec<SingleBuilderEntry<Layout>>, Bin::Error, Packer::Error> {
+		let mut layout_list = Vec::with_capacity(item_list.len());
 		for entry in self.packer.add_all(&self.options, item_list) {
 			let (item_index, op) = entry.map_err(SingleBuilderError::Packer)?;
 			let item = item_list[item_index].borrow();
 
 			let entry = Self::add_item_to(&self.options, &mut self.bin, item, op)?;
-			output.push(SingleBuilderEntry {
+			layout_list.push(SingleBuilderEntry {
 				item_index,
-				output: entry,
+				layout: entry,
 			});
 		}
-		Ok(output)
+		Ok(layout_list)
 	}
 
 	// TODO: add `add_all_array` for nostd
@@ -100,8 +100,8 @@ where
 		options: &Bin::Options,
 		bin: &mut Option<Bin>,
 		item: &Item,
-		op: PackerOp<Output>,
-	) -> SingleBuilderResult<Output, Bin::Error, Packer::Error> {
+		op: PackerOp<Layout>,
+	) -> SingleBuilderResult<Layout, Bin::Error, Packer::Error> {
 		let (bin, params) = match bin {
 			Some(bin) => {
 				match op {
