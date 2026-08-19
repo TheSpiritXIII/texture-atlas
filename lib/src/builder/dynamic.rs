@@ -114,22 +114,6 @@ where
 		Ok(layout_list)
 	}
 
-	// TODO: Reintroduce add_group
-	// pub fn add_group<T: Borrow<Item>>(
-	// 	&mut self,
-	// 	item_list: &[&Item],
-	// ) -> BuilderResult<Vec<BuilderAddMulti<Layout>>, Bin::Error, Packer::Error> {
-	// 	let mut layout_list = Vec::new();
-	// 	for entry in self.packer.add_group(&self.options, item_list) {
-	// 		let (item_index, op) = entry.map_err(BuilderError::Packer)?;
-	// 		let item = item_list[item_index];
-
-	// 		let entry = Self::add_item_to(&self.options, &mut self.bin_list, item, op)?;
-	// 		layout_list.push(entry.with_item_index(item_index));
-	// 	}
-	// 	Ok(layout_list)
-	// }
-
 	fn add_item_to(
 		options: &Bin::Options,
 		bin_list: &mut Vec<Bin>,

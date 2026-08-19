@@ -73,25 +73,6 @@ where
 		};
 		items.into_iter()
 	}
-
-	// TODO: Reintroduce add_group
-	// fn add_group<T: std::borrow::Borrow<Item>>(
-	// 	&mut self,
-	// 	options: &Options2,
-	// 	group: &[T],
-	// ) -> impl IntoIterator<Item = Result<(usize, PackerOp<Pos2>), Self::Error>> {
-	// 	// TODO: Avoid extra allocations.
-	// 	let items: Vec<_> = match self {
-	// 		Self::Binary(packer) => {
-	// 			Packer::<Item, Pos2, Options2>::add_group(packer, options, group)
-	// 				.into_iter()
-	// 				.collect()
-	// 		}
-	// 		Self::Passthrough(packer) => packer.add_group(options, group).into_iter().collect(),
-	// 		Self::Uniform(packer) => packer.add_group(options, group).into_iter().collect(),
-	// 	};
-	// 	items.into_iter()
-	// }
 }
 
 impl<Item> Packer<Item, Rotate2, Options2> for GenericPacker
@@ -125,23 +106,4 @@ where
 		};
 		items.into_iter()
 	}
-
-	// TODO: Reintroduce add_group
-	// fn add_group<T: std::borrow::Borrow<Item>>(
-	// 	&mut self,
-	// 	options: &Options2,
-	// 	group: &[T],
-	// ) -> impl IntoIterator<Item = Result<(usize, PackerOp<Rotate2>), Self::Error>> {
-	// 	// TODO: Avoid extra allocations.
-	// 	let items: Vec<_> = match self {
-	// 		Self::Binary(packer) => {
-	// 			Packer::<Item, Rotate2, Options2>::add_group(packer, options, group)
-	// 				.into_iter()
-	// 				.collect()
-	// 		}
-	// 		Self::Passthrough(packer) => packer.add_group(options, group).into_iter().collect(),
-	// 		Self::Uniform(packer) => packer.add_group(options, group).into_iter().collect(),
-	// 	};
-	// 	items.into_iter()
-	// }
 }
