@@ -22,6 +22,7 @@ pub struct UniformPacker {
 }
 
 impl UniformPacker {
+	#[must_use]
 	pub fn new() -> Self {
 		Self {
 			used: Size2::new(u32::MAX, u32::MAX),

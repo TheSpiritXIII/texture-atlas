@@ -62,14 +62,12 @@ pub fn assert_add_overflow_then_small<T: Debug + PartialEq>(
 	assert_eq!(
 		packer.add(options, &size),
 		Ok(new_bin()),
-		"{}: initial large item must have new bin",
-		scenario
+		"{scenario}: initial large item must have new bin",
 	);
 	assert_eq!(
 		packer.add(options, &Size2::new(1, 1)),
 		Ok(new_bin()),
-		"{}: small item must be overflowed to new bin",
-		scenario
+		"{scenario}: small item must be overflowed to new bin",
 	);
 }
 
@@ -83,18 +81,16 @@ pub fn assert_add_small_then_overflow<T: Debug + PartialEq>(
 	assert_eq!(
 		packer.add(options, &size),
 		Ok(new_bin()),
-		"{}: initial small item must have new bin",
-		scenario
+		"{scenario}: initial small item must have new bin",
 	);
 	assert_eq!(
 		packer.add(options, &Size2::new(1, 1)),
 		Ok(new_bin()),
-		"{}: large item must have overflowed to new bin",
-		scenario
+		"{scenario}: large item must have overflowed to new bin",
 	);
 }
 
-/// Tests add_all with large item first, then small, expecting overflow.
+/// Tests `add_all` with large item first, then small, expecting overflow.
 pub fn assert_add_all_overflow_then_small<T: Debug + PartialEq>(
 	options: &Options2,
 	mut packer: impl AtlasPacker<Size2, Pos2, Options2, Error = T>,
@@ -104,18 +100,16 @@ pub fn assert_add_all_overflow_then_small<T: Debug + PartialEq>(
 	assert_eq!(
 		packer.add_all(options, &[size]).into_iter().collect::<Vec<_>>(),
 		vec![Ok((0, new_bin()))],
-		"{}: initial large item must have new bin",
-		scenario
+		"{scenario}: initial large item must have new bin",
 	);
 	assert_eq!(
 		packer.add_all(options, &[Size2::new(1, 1)]).into_iter().collect::<Vec<_>>(),
 		vec![Ok((0, new_bin()))],
-		"{}: small item must be overflowed to new bin",
-		scenario
+		"{scenario}: small item must be overflowed to new bin",
 	);
 }
 
-/// Tests add_all with small item first, then large, expecting overflow.
+/// Tests `add_all` with small item first, then large, expecting overflow.
 pub fn assert_add_all_small_then_overflow<T: Debug + PartialEq>(
 	options: &Options2,
 	mut packer: impl AtlasPacker<Size2, Pos2, Options2, Error = T>,
@@ -125,13 +119,11 @@ pub fn assert_add_all_small_then_overflow<T: Debug + PartialEq>(
 	assert_eq!(
 		packer.add_all(options, &[Size2::new(1, 1)]).into_iter().collect::<Vec<_>>(),
 		vec![Ok((0, new_bin()))],
-		"{}: initial small item must have new bin",
-		scenario
+		"{scenario}: initial small item must have new bin",
 	);
 	assert_eq!(
 		packer.add_all(options, &[size]).into_iter().collect::<Vec<_>>(),
 		vec![Ok((0, new_bin()))],
-		"{}: large item must have overflowed to new bin",
-		scenario
+		"{scenario}: large item must have overflowed to new bin",
 	);
 }

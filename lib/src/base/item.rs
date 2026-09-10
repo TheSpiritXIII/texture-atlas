@@ -30,6 +30,7 @@ pub enum Fit2 {
 
 impl Fit2 {
 	/// Returns true if the item can be placed in the space.
+	#[must_use]
 	pub fn fits(&self) -> bool {
 		!matches!(*self, Fit2::None)
 	}
@@ -81,6 +82,7 @@ pub struct Size2 {
 }
 
 impl Size2 {
+	#[must_use]
 	pub fn new(width: u32, height: u32) -> Self {
 		Self {
 			width,
@@ -88,6 +90,7 @@ impl Size2 {
 		}
 	}
 
+	#[must_use]
 	pub fn with_spacing(self, spacing: u32) -> Self {
 		Self::new(self.width + spacing, self.height + spacing)
 	}

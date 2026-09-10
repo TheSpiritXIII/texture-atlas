@@ -45,11 +45,11 @@ where
 		rect: &ImageBuffer<P, Vec<P::Subpixel>>,
 		params: &Rotate2,
 	) -> Result<(), Self::Error> {
-		if !params.rotate {
-			self.copy_from(rect, params.pos.x, params.pos.y)
-		} else {
+		if params.rotate {
 			let image_rotated = rotate90(rect);
 			self.copy_from(&image_rotated, params.pos.x, params.pos.y)
+		} else {
+			self.copy_from(rect, params.pos.x, params.pos.y)
 		}
 	}
 }
@@ -72,11 +72,11 @@ where
 	DynamicImage: image::GenericImageView<Pixel = P>,
 {
 	fn item_add(&mut self, rect: &DynamicImage, params: &Rotate2) -> Result<(), Self::Error> {
-		if !params.rotate {
-			self.copy_from(rect, params.pos.x, params.pos.y)
-		} else {
+		if params.rotate {
 			let image_rotated = rect.rotate90();
 			self.copy_from(&image_rotated, params.pos.x, params.pos.y)
+		} else {
+			self.copy_from(rect, params.pos.x, params.pos.y)
 		}
 	}
 }

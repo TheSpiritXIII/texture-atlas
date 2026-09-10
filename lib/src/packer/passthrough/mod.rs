@@ -16,6 +16,7 @@ use crate::Pos2;
 pub struct PassthroughPacker;
 
 impl PassthroughPacker {
+	#[must_use]
 	pub fn new() -> Self {
 		Self {}
 	}

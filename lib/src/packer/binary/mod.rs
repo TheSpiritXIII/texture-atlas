@@ -29,6 +29,7 @@ pub struct BinaryPacker {
 }
 
 impl BinaryPacker {
+	#[must_use]
 	pub fn new() -> Self {
 		Self {
 			bin_list: Vec::new(),

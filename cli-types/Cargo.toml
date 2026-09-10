@@ -5,8 +5,11 @@ edition.workspace = true
 license.workspace = true
 
 [dependencies]
-texture-atlas = { path = "../lib" }
 serde = { workspace = true }
+texture-atlas = { path = "../lib" }
 
 [dev-dependencies]
 serde_json = { workspace = true }
+
+[lints]
+workspace = true

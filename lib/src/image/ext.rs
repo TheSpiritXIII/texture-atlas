@@ -26,7 +26,7 @@ pub trait ImageExt {
 	fn margin_bottom(&self) -> u32;
 
 	/// Returns the empty image boundary. If no boundary is found, returns a boundary where `right`
-	/// and `bottom` are 0, `left`` is the image width and `top` is the image height.
+	/// and `bottom` are 0, `left` is the image width and `top` is the image height.
 	fn margins(&self) -> Margins;
 
 	/// Returns a tuple of the cropped image and the empty borders. If no empty borders are found,

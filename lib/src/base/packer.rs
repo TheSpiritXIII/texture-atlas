@@ -6,10 +6,10 @@ use std::fmt::Formatter;
 pub enum PackerOp<T> {
 	/// Indicates to add T to a new bin. Bin indices start at 0 and increments by 1 each time a new
 	/// bin is created. After this operation, the same bin can be selected using
-	/// [ExistingBin](PackerOp::ExistingBin).
+	/// [`ExistingBin`](PackerOp::ExistingBin).
 	NewBin(T),
 	/// Indicates to add T to an existing bin. Bin indices start at 0 and must be created with a
-	/// [NewBin](PackerOp::NewBin) operation first.
+	/// [`NewBin`](PackerOp::NewBin) operation first.
 	ExistingBin((usize, T)),
 }
 
@@ -72,4 +72,28 @@ pub trait Packer<Item, Layout, Options> {
 		options: &Options,
 		group: &[T],
 	) -> impl IntoIterator<Item = Result<(usize, PackerOp<Layout>), Self::Error>>;
+}
+
+pub trait PackerExt<Item, Layout, Options>: Packer<Item, Layout, Options> {
+	fn add_all_vec<T: Borrow<Item>>(
+		&mut self,
+		options: &Options,
+		group: &[T],
+	) -> Result<Vec<(usize, PackerOp<Layout>)>, Self::Error>;
+}
+
+impl<Item, Layout, Options, P: Packer<Item, Layout, Options>> PackerExt<Item, Layout, Options>
+	for P
+{
+	fn add_all_vec<T: Borrow<Item>>(
+		&mut self,
+		options: &Options,
+		group: &[T],
+	) -> Result<Vec<(usize, PackerOp<Layout>)>, Self::Error> {
+		let mut result = Vec::new();
+		for (index, item) in group.iter().enumerate() {
+			result.push((index, self.add(options, item.borrow())?));
+		}
+		Ok(result)
+	}
 }

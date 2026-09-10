@@ -42,8 +42,7 @@ fn assert_fill_bin(options: &Options2, packer: &mut UniformPacker, bin_index: us
 	assert_eq!(
 		packer.add(options, &Size2::new(MAX_WIDTH / 2, MAX_HEIGHT / 2)),
 		Ok(new_bin()),
-		"Bin {} initial item",
-		bin_index
+		"Bin {bin_index} initial item",
 	);
 	assert_eq!(
 		packer.add(options, &Size2::new(MAX_WIDTH / 2, MAX_HEIGHT / 2)),
@@ -54,8 +53,7 @@ fn assert_fill_bin(options: &Options2, packer: &mut UniformPacker, bin_index: us
 				y: 0
 			}
 		))),
-		"Bin {} first row second item",
-		bin_index
+		"Bin {bin_index} first row second item"
 	);
 	assert_eq!(
 		packer.add(options, &Size2::new(MAX_WIDTH / 2, MAX_HEIGHT / 2)),
@@ -66,8 +64,7 @@ fn assert_fill_bin(options: &Options2, packer: &mut UniformPacker, bin_index: us
 				y: MAX_HEIGHT / 2,
 			}
 		))),
-		"Bin {} second row first item",
-		bin_index
+		"Bin {bin_index} second row first item",
 	);
 	assert_eq!(
 		packer.add(options, &Size2::new(MAX_WIDTH / 2, MAX_HEIGHT / 2)),
@@ -78,7 +75,6 @@ fn assert_fill_bin(options: &Options2, packer: &mut UniformPacker, bin_index: us
 				y: MAX_HEIGHT / 2,
 			}
 		))),
-		"Bin {} second row second item",
-		bin_index
+		"Bin {bin_index} second row second item"
 	);
 }

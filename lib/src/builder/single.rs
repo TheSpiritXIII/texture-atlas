@@ -102,23 +102,20 @@ where
 		item: &Item,
 		op: PackerOp<Layout>,
 	) -> SingleBuilderResult<Layout, Bin::Error, Packer::Error> {
-		let (bin, params) = match bin {
-			Some(bin) => {
-				match op {
-					PackerOp::NewBin(_) => {
-						return Err(SingleBuilderError::DoesNotFit);
-					}
-					PackerOp::ExistingBin((_, params)) => (bin, params),
+		let (bin, params) = if let Some(bin) = bin {
+			match op {
+				PackerOp::NewBin(_) => {
+					return Err(SingleBuilderError::DoesNotFit);
 				}
+				PackerOp::ExistingBin((_, params)) => (bin, params),
 			}
-			None => {
-				// TODO: Might not need to handle this case if we create bin in constructor somehow.
-				let PackerOp::NewBin(params) = op else {
-					return Err(SingleBuilderError::MissingBin);
-				};
-				let bin = bin.insert(Bin::new(options));
-				(bin, params)
-			}
+		} else {
+			// TODO: Might not need to handle this case if we create bin in constructor somehow.
+			let PackerOp::NewBin(params) = op else {
+				return Err(SingleBuilderError::MissingBin);
+			};
+			let bin = bin.insert(Bin::new(options));
+			(bin, params)
 		};
 		bin.item_add(item, &params).map_err(SingleBuilderError::Bin)?;
 		Ok(params)

@@ -26,7 +26,7 @@ fn main() -> io::Result<()> {
 
 	fs::create_dir_all(&cli.output_dir)?;
 	for (i, image) in cli.generate.generate(&mut rng).enumerate() {
-		let output_path = cli.output_dir.join(format!("image_{}.png", i));
+		let output_path = cli.output_dir.join(format!("image_{i}.png"));
 		image.save(&output_path).unwrap();
 	}
 	Ok(())

@@ -32,9 +32,9 @@ fn slice() {
 	bin1.item_add(&Size2::new(10, 5), &()).unwrap();
 	bin2.item_add(&Size2::new(10, 10), &()).unwrap();
 
-	let bins = [
+	let bin_list = [
 		bin1,
 		bin2,
 	];
-	assert_eq!(bins.as_slice().utilization(), 0.75);
+	assert_eq!(bin_list.as_slice().utilization(), 0.75);
 }

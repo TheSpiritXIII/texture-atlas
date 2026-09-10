@@ -21,6 +21,7 @@ pub struct Pos2 {
 }
 
 impl Pos2 {
+	#[must_use]
 	pub fn new(x: u32, y: u32) -> Self {
 		Self {
 			x,

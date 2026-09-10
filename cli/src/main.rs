@@ -118,10 +118,10 @@ fn main() -> anyhow::Result<()> {
 	};
 
 	fs::create_dir_all(&cli.output.output_dir).with_context(|| {
-		format!("Failed to create output directory: {:?}", cli.output.output_dir)
+		format!("Failed to create output directory: {}", cli.output.output_dir.display())
 	})?;
 	for (i, bin) in bin_list.iter().enumerate() {
-		let output_path = cli.output.output_dir.join(format!("atlas_{}.png", i));
+		let output_path = cli.output.output_dir.join(format!("atlas_{i}.png"));
 		let image = bin.bin();
 		let image_cropped = if let Some((image, _)) = image.crop_margin(cli.atlas.margin) {
 			image
@@ -131,16 +131,17 @@ fn main() -> anyhow::Result<()> {
 		image_cropped
 			.to_image()
 			.save(&output_path)
-			.with_context(|| format!("Failed to save atlas image: {:?}", output_path))?;
+			.with_context(|| format!("Failed to save atlas image: {}", output_path.display()))?;
 	}
 
 	if let Some(output_file) = cli.output.output_file {
 		if let Some(parent) = output_file.parent() {
-			fs::create_dir_all(parent)
-				.with_context(|| format!("Failed to create parent directory: {:?}", parent))?;
+			fs::create_dir_all(parent).with_context(|| {
+				format!("Failed to create parent directory: {}", parent.display())
+			})?;
 		}
 		fs::write(&output_file, &value)
-			.with_context(|| format!("Failed to write config file: {:?}", output_file))?;
+			.with_context(|| format!("Failed to write config file: {}", output_file.display()))?;
 	} else {
 		println!("{value}");
 	}

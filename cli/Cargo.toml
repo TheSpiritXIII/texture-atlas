@@ -15,3 +15,6 @@ serde_json = { workspace = true }
 texture-atlas = { path = "../lib" }
 texture-atlas-cli-types = { path = "../cli-types" }
 toml = { workspace = true }
+
+[lints]
+workspace = true

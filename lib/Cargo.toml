@@ -12,14 +12,17 @@ thiserror = { workspace = true }
 
 [features]
 default = [
-	"image",
-	"packer-binary",
-	"packer-passthrough",
-	"packer-uniform",
-	"serde",
+  "image",
+  "packer-binary",
+  "packer-passthrough",
+  "packer-uniform",
+  "serde",
 ]
 image = ["dep:image", "dep:imageproc"]
 packer-binary = []
 packer-passthrough = []
 packer-uniform = []
 serde = ["dep:serde"]
+
+[lints]
+workspace = true

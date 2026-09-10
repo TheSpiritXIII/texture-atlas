@@ -1,6 +1,8 @@
 #[cfg(test)]
 mod test;
 
+use std::fmt::Write;
+
 use chacha20::ChaCha20Rng;
 use image::Rgb;
 use image::RgbImage;
@@ -78,7 +80,10 @@ fn str_to_seed(s: &str) -> [u8; 32] {
 }
 
 fn seed_to_str(seed: &[u8; 32]) -> String {
-	seed.iter().map(|x| format!("{:02x}", x)).collect::<Vec<String>>().join("")
+	seed.iter().fold(String::new(), |mut output, x| {
+		let _ = write!(output, "{x:02x}");
+		output
+	})
 }
 
 /// Arguments for generating batches of images.
@@ -101,6 +106,7 @@ pub struct GenerateArgs {
 
 impl GenerateArgs {
 	/// Initializes a `ChaCha20Rng` and returns the seed string (either provided or generated).
+	#[must_use]
 	pub fn rng(&self) -> (ChaCha20Rng, String) {
 		if let Some(seed) = &self.seed {
 			(rng_with_seed(seed), seed.clone())
