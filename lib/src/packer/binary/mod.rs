@@ -36,7 +36,7 @@ impl BinaryPacker {
 		}
 	}
 
-	fn add_bin(&mut self, options: &Options2, item: &Size2) {
+	fn add_bin(&mut self, options: &Options2, item: Size2) {
 		self.bin_list.push(BinaryBin::new(options, item));
 	}
 }
@@ -56,13 +56,13 @@ where
 	fn add(&mut self, options: &Options2, item: &Item) -> Result<PackerOp<Pos2>, Self::Error> {
 		let size = options.item_size(item);
 		for (index, bin) in &mut self.bin_list.iter_mut().enumerate() {
-			if let Some(position) = bin.add_to_smallest_node(&size) {
+			if let Some(position) = bin.add_to_smallest_node(size) {
 				// TODO: Add test for multiple bins.
 				return Ok(PackerOp::ExistingBin((index, options.pos(position.x, position.y))));
 			}
 		}
 
-		self.add_bin(options, &size);
+		self.add_bin(options, size);
 		Ok(PackerOp::NewBin(options.margin()))
 	}
 
@@ -92,7 +92,7 @@ struct BinaryBin {
 }
 
 impl BinaryBin {
-	pub fn new(options: &Options2, item: &Size2) -> Self {
+	pub fn new(options: &Options2, item: Size2) -> Self {
 		let node = Node::new(options.max_logical_size());
 
 		let node_list = match node.fit(item) {
@@ -119,7 +119,7 @@ impl BinaryBin {
 		}
 	}
 
-	pub fn add_to_smallest_node(&mut self, item: &Size2) -> Option<Pos2> {
+	pub fn add_to_smallest_node(&mut self, item: Size2) -> Option<Pos2> {
 		for (index, node) in self.node_list.iter().enumerate() {
 			let fit = node.fit(item);
 			if !fit.fits() {
@@ -132,7 +132,7 @@ impl BinaryBin {
 		None
 	}
 
-	fn replace(&mut self, index: usize, item: &Size2, fit: Fit2) -> Pos2 {
+	fn replace(&mut self, index: usize, item: Size2, fit: Fit2) -> Pos2 {
 		let node = &self.node_list[index];
 		let position = Pos2::new(node.position.x, node.position.y);
 

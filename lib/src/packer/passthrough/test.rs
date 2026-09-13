@@ -16,7 +16,7 @@ fn new_options() -> Options2 {
 fn add_overflow() {
 	let options = new_options();
 	let packer = PassthroughPacker::new();
-	assert_add_overflow(&options, packer);
+	assert_add_overflow(&options, &packer);
 }
 
 #[test]

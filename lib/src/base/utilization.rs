@@ -9,7 +9,7 @@ use crate::Item2Ext;
 pub trait Utilization {
 	/// Returns a value between 0 and 1 for the fraction of space occupied, with 1 being completely
 	/// full.
-	fn utilization(&self) -> f32;
+	fn utilization(&self) -> f64;
 }
 
 /// A delegating bin which tracks space utilization of the wrapped bin.
@@ -85,8 +85,9 @@ where
 	Item: Item2,
 	Bin: AtlasBin + Item2,
 {
-	fn utilization(&self) -> f32 {
-		self.used_area as f32 / self.bin.area() as f32
+	#[allow(clippy::cast_precision_loss)]
+	fn utilization(&self) -> f64 {
+		self.used_area as f64 / self.bin.area() as f64
 	}
 }
 
@@ -94,11 +95,12 @@ impl<T> Utilization for &[T]
 where
 	T: Utilization,
 {
-	fn utilization(&self) -> f32 {
+	#[allow(clippy::cast_precision_loss)]
+	fn utilization(&self) -> f64 {
 		let mut total_utilization = 0.0;
 		for item in *self {
 			total_utilization += item.utilization();
 		}
-		total_utilization / self.len() as f32
+		total_utilization / self.len() as f64
 	}
 }

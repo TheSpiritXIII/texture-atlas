@@ -11,14 +11,14 @@ use crate::new_bin;
 
 /// Asserts underflow behavior for various algorithm-agnostic size scenarios. This primarily helps
 /// algorithms which tightly and deterministically pack items.
-pub fn assert_add_underflow<Packer, Error>(options: &Options2, packer: Packer)
+pub fn assert_add_underflow<Packer, Error>(options: &Options2, packer: &Packer)
 where
 	Packer: AtlasPacker<Size2, Pos2, Options2, Error = Error> + Clone,
 	Error: Debug + PartialEq,
 {
 	assert_add_underflow_small(options, packer.clone());
 	assert_add_underflow_max_width(options, packer.clone());
-	assert_add_underflow_max_height(options, packer);
+	assert_add_underflow_max_height(options, packer.clone());
 }
 
 pub fn assert_add_underflow_small<Packer, Error>(options: &Options2, mut packer: Packer)

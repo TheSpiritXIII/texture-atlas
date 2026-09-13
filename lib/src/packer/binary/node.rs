@@ -19,7 +19,7 @@ impl Node {
 		}
 	}
 
-	pub fn split(&self, add: &Size2) -> (Self, Self) {
+	pub fn split(&self, add: Size2) -> (Self, Self) {
 		(
 			self.split_horizontal(add),
 			Self {
@@ -32,7 +32,7 @@ impl Node {
 		)
 	}
 
-	pub fn split_horizontal(&self, add: &Size2) -> Self {
+	pub fn split_horizontal(&self, add: Size2) -> Self {
 		Self {
 			position: Pos2 {
 				x: self.position.x + add.width,
@@ -42,7 +42,7 @@ impl Node {
 		}
 	}
 
-	pub fn split_vertical(&self, add: &Size2) -> Self {
+	pub fn split_vertical(&self, add: Size2) -> Self {
 		Self {
 			position: Pos2 {
 				x: self.position.x,
@@ -72,7 +72,7 @@ fn split() {
 		},
 		size: Size2::new(10, 10),
 	};
-	let (a, b) = node.split(&Size2::new(2, 3));
+	let (a, b) = node.split(Size2::new(2, 3));
 	assert_eq!(
 		a,
 		Node {

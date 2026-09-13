@@ -10,35 +10,25 @@ pub const MAX_WIDTH: u32 = 1024;
 pub const MAX_HEIGHT: u32 = 1024;
 
 /// Asserts overflow behavior for various algorithm-agnostic size scenarios.
-pub fn assert_add_overflow<Packer, Error>(options: &Options2, packer: Packer)
+pub fn assert_add_overflow<Packer, Error>(options: &Options2, packer: &Packer)
 where
 	Packer: AtlasPacker<Size2, Pos2, Options2, Error = Error> + Clone,
 	Error: Debug + PartialEq,
 {
+	assert_add_overflow_with(options, packer, Size2::new(MAX_WIDTH, MAX_HEIGHT), "max size");
 	assert_add_overflow_with(
 		options,
-		packer.clone(),
-		Size2::new(MAX_WIDTH, MAX_HEIGHT),
-		"max size",
-	);
-	assert_add_overflow_with(
-		options,
-		packer.clone(),
+		packer,
 		Size2::new(MAX_WIDTH + 1, MAX_HEIGHT + 1),
 		"overflow size",
 	);
-	assert_add_overflow_with(
-		options,
-		packer.clone(),
-		Size2::new(u32::MAX, u32::MAX),
-		"numeric limit",
-	);
+	assert_add_overflow_with(options, packer, Size2::new(u32::MAX, u32::MAX), "numeric limit");
 }
 
 /// Asserts overflow behavior for a specific size and scenario.
 pub fn assert_add_overflow_with<Packer, Error>(
 	options: &Options2,
-	packer: Packer,
+	packer: &Packer,
 	size: Size2,
 	scenario: &str,
 ) where

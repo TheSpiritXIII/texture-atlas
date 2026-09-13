@@ -22,6 +22,8 @@ use texture_atlas::UniformPacker;
 use texture_atlas::Utilization;
 use texture_atlas::UtilizationBin2;
 
+const FLOAT_PRECISION: f64 = 0.001;
+
 /// CLI arguments for running packing algorithm comparison benchmarks.
 #[derive(Args, Clone, Debug)]
 pub struct CompareArgs {
@@ -185,8 +187,8 @@ impl BenchResult {
 			result.write_markdown_row(
 				writer,
 				result.bin_count == best.bin_count,
-				result.average_time_sec == best.average_time_sec,
-				result.utilization == best.utilization,
+				(result.average_time_sec - best.average_time_sec).abs() < FLOAT_PRECISION,
+				(result.utilization - best.utilization).abs() < FLOAT_PRECISION,
 			)?;
 		}
 		Ok(())
@@ -228,7 +230,7 @@ where
 		total_duration += elapsed;
 		// TODO: This does not take into account these being potentially indeterministic.
 		bin_count = bin_list.len();
-		utilization = f64::from(bin_list.as_slice().utilization());
+		utilization = bin_list.as_slice().utilization();
 	}
 
 	Ok(BenchResult {

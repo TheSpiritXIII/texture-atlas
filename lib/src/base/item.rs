@@ -38,7 +38,7 @@ impl Fit2 {
 
 // Common methods for all [`Item2`] types.
 pub trait Item2Ext: Item2 {
-	fn fit(&self, other: &Size2) -> Fit2 {
+	fn fit(&self, other: Size2) -> Fit2 {
 		match self.width().cmp(&other.width) {
 			std::cmp::Ordering::Equal => {
 				match self.height().cmp(&other.height) {
@@ -60,7 +60,7 @@ pub trait Item2Ext: Item2 {
 
 	/// Returns the total number of pixels this rectangle takes up.
 	fn area(&self) -> u64 {
-		self.width() as u64 * self.height() as u64
+		u64::from(self.width()) * u64::from(self.height())
 	}
 
 	/// Returns true if this rectangle has an area of 0.

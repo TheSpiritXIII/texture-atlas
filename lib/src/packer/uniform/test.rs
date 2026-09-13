@@ -20,14 +20,14 @@ fn new_options() -> Options2 {
 fn add_overflow() {
 	let options = new_options();
 	let packer = UniformPacker::new();
-	assert_add_overflow(&options, packer);
+	assert_add_overflow(&options, &packer);
 }
 
 #[test]
 fn add_underflow() {
 	let options = new_options();
 	let packer = UniformPacker::new();
-	assert_add_underflow(&options, packer.clone());
+	assert_add_underflow(&options, &packer);
 }
 
 #[test]

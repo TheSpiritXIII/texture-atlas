@@ -4,24 +4,26 @@ use crate::Size2;
 use crate::Utilization;
 use crate::UtilizationBin2;
 
+const FLOAT_PRECISION: f64 = 0.01;
+
 #[test]
 fn bin_empty() {
 	let bin = UtilizationBin2::<Size2, Size2>::new(&Size2::new(10, 10));
-	assert_eq!(bin.utilization(), 0.0);
+	assert!(bin.utilization().abs() < FLOAT_PRECISION);
 }
 
 #[test]
 fn bin_part() {
 	let mut bin = UtilizationBin2::<Size2, Size2>::new(&Size2::new(10, 10));
 	bin.item_add(&Size2::new(5, 5), &()).unwrap();
-	assert_eq!(bin.utilization(), 0.25);
+	assert!((bin.utilization() - 0.25).abs() < FLOAT_PRECISION);
 }
 
 #[test]
 fn bin_full() {
 	let mut bin = UtilizationBin2::<Size2, Size2>::new(&Size2::new(10, 10));
 	bin.item_add(&Size2::new(10, 10), &()).unwrap();
-	assert_eq!(bin.utilization(), 1.0);
+	assert!((bin.utilization() - 1.0).abs() < FLOAT_PRECISION);
 }
 
 #[test]
@@ -36,5 +38,5 @@ fn slice() {
 		bin1,
 		bin2,
 	];
-	assert_eq!(bin_list.as_slice().utilization(), 0.75);
+	assert!((bin_list.as_slice().utilization() - 0.75).abs() < FLOAT_PRECISION);
 }
