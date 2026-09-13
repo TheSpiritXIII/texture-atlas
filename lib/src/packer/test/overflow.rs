@@ -1,3 +1,4 @@
+#![allow(clippy::missing_panics_doc)]
 use std::fmt::Debug;
 
 use crate::Options2;
